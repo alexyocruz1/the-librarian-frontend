@@ -88,11 +88,13 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
       if (mode === 'edit' && user) {
         setValue('name', user.name);
         setValue('email', user.email);
-        setValue('role', user.role);
+        setValue('role', user.role === 'superadmin' ? 'admin' : user.role);
         setValue('status', user.status);
         setValue('studentId', user.studentId || '');
-        setValue('libraries', user.libraries || []);
-        setValue('profile', user.profile || {});
+        setValue('libraries', user.libraries?.map(lib => lib._id) || []);
+        setValue('profile', {
+          phone: user.profile?.phone || '',
+        });
       } else {
         reset();
       }

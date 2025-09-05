@@ -66,15 +66,15 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && book) {
-        setValue('isbn13', book.isbn13);
+        setValue('isbn13', book.isbn13 || '');
         setValue('isbn10', book.isbn10 || '');
         setValue('title', book.title);
         setValue('subtitle', book.subtitle || '');
         setValue('authors', book.authors.join(', '));
-        setValue('categories', book.categories.join(', '));
-        setValue('language', book.language);
-        setValue('publisher', book.publisher);
-        setValue('publishedYear', book.publishedYear);
+        setValue('categories', book.categories?.join(', ') || '');
+        setValue('language', book.language || '');
+        setValue('publisher', book.publisher || '');
+        setValue('publishedYear', book.publishedYear || 0);
         setValue('description', book.description || '');
         setValue('coverUrl', book.coverUrl || '');
       } else {

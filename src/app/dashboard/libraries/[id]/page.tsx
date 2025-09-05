@@ -12,7 +12,8 @@ import {
   BookOpenIcon,
   UserPlusIcon,
   TrashIcon,
-  XMarkIcon
+  XMarkIcon,
+  BuildingLibraryIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -88,7 +89,7 @@ export default function LibraryDetailPage() {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Library not found</h2>
-        <p className="text-gray-600 mb-4">The library you're looking for doesn't exist.</p>
+        <p className="text-gray-600 mb-4">The library you&apos;re looking for doesn&apos;t exist.</p>
         <Button onClick={() => router.back()}>
           Go Back
         </Button>
@@ -132,7 +133,19 @@ export default function LibraryDetailPage() {
                   <MapPinIcon className="w-6 h-6 text-gray-400 mt-1" />
                   <div>
                     <h3 className="font-medium text-gray-900 mb-1">Location</h3>
-                    <p className="text-gray-600">{library.location}</p>
+                    <p className="text-gray-600">
+                      {library.location ? (
+                        <>
+                          {library.location.address && <div>{library.location.address}</div>}
+                          {library.location.city && library.location.state && (
+                            <div>{library.location.city}, {library.location.state}</div>
+                          )}
+                          {library.location.country && <div>{library.location.country}</div>}
+                        </>
+                      ) : (
+                        'No location specified'
+                      )}
+                    </p>
                   </div>
                 </div>
 
@@ -141,7 +154,10 @@ export default function LibraryDetailPage() {
                     <PhoneIcon className="w-6 h-6 text-gray-400 mt-1" />
                     <div>
                       <h3 className="font-medium text-gray-900 mb-1">Contact Information</h3>
-                      <p className="text-gray-600">{library.contact}</p>
+                      <p className="text-gray-600">
+                        {library.contact?.email && <div>Email: {library.contact.email}</div>}
+                        {library.contact?.phone && <div>Phone: {library.contact.phone}</div>}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -238,7 +254,7 @@ export default function LibraryDetailPage() {
             <div className="text-center py-8">
               <div className="text-gray-400 text-4xl mb-2">👥</div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No administrators</h3>
-              <p className="text-gray-600 mb-4">This library doesn't have any assigned administrators yet.</p>
+              <p className="text-gray-600 mb-4">This library doesn&apos;t have any assigned administrators yet.</p>
               {canManage && (
                 <Button
                   leftIcon={<UserPlusIcon className="w-5 h-5" />}

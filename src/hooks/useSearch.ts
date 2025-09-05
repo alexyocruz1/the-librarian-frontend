@@ -9,6 +9,7 @@ export interface SearchFilters {
   category?: string;
   author?: string;
   isbn?: string;
+  publisher?: string;
   availability?: boolean;
   publishedYear?: number;
   language?: string;
@@ -68,9 +69,14 @@ export const useSearch = (options: UseSearchOptions = {}) => {
       setError(null);
 
       try {
-        const params = new URLSearchParams({
-          q: searchQuery.trim(),
-          ...searchFilters,
+        const params = new URLSearchParams();
+        params.append('q', searchQuery.trim());
+        
+        // Add non-empty filter values
+        Object.entries(searchFilters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, String(value));
+          }
         });
 
         // Get suggestions

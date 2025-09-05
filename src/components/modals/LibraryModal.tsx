@@ -57,8 +57,10 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
       if (mode === 'edit' && library) {
         setValue('name', library.name);
         setValue('code', library.code);
-        setValue('location', library.location);
-        setValue('contact', library.contact || '');
+        setValue('location', library.location ? 
+          `${library.location.address || ''} ${library.location.city || ''} ${library.location.state || ''} ${library.location.country || ''}`.trim() : '');
+        setValue('contact', library.contact ? 
+          `${library.contact.email || ''} ${library.contact.phone || ''}`.trim() : '');
       } else {
         reset();
       }

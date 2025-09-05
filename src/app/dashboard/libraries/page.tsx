@@ -85,7 +85,11 @@ export default function LibrariesPage() {
   const filteredLibraries = libraries.filter(library => {
     const matchesSearch = library.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          library.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         library.location.toLowerCase().includes(searchTerm.toLowerCase());
+                         (library.location && 
+                          (library.location.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           library.location.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           library.location.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           library.location.country?.toLowerCase().includes(searchTerm.toLowerCase())));
     return matchesSearch;
   });
 
@@ -184,7 +188,19 @@ export default function LibrariesPage() {
                     <MapPinIcon className="w-5 h-5 text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-sm font-medium text-gray-900">Location</p>
-                      <p className="text-sm text-gray-600">{library.location}</p>
+                      <p className="text-sm text-gray-600">
+                        {library.location ? (
+                          <>
+                            {library.location.address && <div>{library.location.address}</div>}
+                            {library.location.city && library.location.state && (
+                              <div>{library.location.city}, {library.location.state}</div>
+                            )}
+                            {library.location.country && <div>{library.location.country}</div>}
+                          </>
+                        ) : (
+                          'No location specified'
+                        )}
+                      </p>
                     </div>
                   </div>
 
@@ -194,7 +210,10 @@ export default function LibrariesPage() {
                       <PhoneIcon className="w-5 h-5 text-gray-400 mt-0.5" />
                       <div>
                         <p className="text-sm font-medium text-gray-900">Contact</p>
-                        <p className="text-sm text-gray-600">{library.contact}</p>
+                        <p className="text-sm text-gray-600">
+                          {library.contact?.email && <div>Email: {library.contact.email}</div>}
+                          {library.contact?.phone && <div>Phone: {library.contact.phone}</div>}
+                        </p>
                       </div>
                     </div>
                   )}

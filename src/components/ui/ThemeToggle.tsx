@@ -16,7 +16,7 @@ interface ThemeToggleProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export default function ThemeToggle({ 
+function ThemeToggle({ 
   className, 
   showLabel = false,
   size = 'md'
@@ -87,6 +87,10 @@ export default function ThemeToggle({
     </div>
   );
 }
+
+// Export both named and default
+export { ThemeToggle };
+export default ThemeToggle;
 
 // Alternative dropdown version
 export function ThemeSelector({ className }: { className?: string }) {

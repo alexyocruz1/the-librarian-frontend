@@ -9,6 +9,7 @@ export interface Notification {
   title: string;
   message: string;
   timestamp: string;
+  read?: boolean;
   metadata?: Record<string, any>;
 }
 

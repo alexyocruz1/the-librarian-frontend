@@ -239,7 +239,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
             className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4"
           >
             <p className="text-sm text-gray-500 text-center">
-              No results found for "{value}"
+              No results found for &quot;{value}&quot;
             </p>
           </motion.div>
         )}

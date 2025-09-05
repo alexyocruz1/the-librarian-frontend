@@ -69,7 +69,7 @@ export default function PendingStudentsPage() {
       <div className="text-center py-12">
         <div className="text-gray-400 text-6xl mb-4">🚫</div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-        <p className="text-gray-600">You don't have permission to access this page.</p>
+        <p className="text-gray-600">You don&apos;t have permission to access this page.</p>
       </div>
     );
   }
@@ -194,14 +194,8 @@ export default function PendingStudentsPage() {
                         {user.profile && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
                             <h4 className="text-sm font-medium text-gray-900 mb-1">Additional Information:</h4>
-                            {user.profile.department && (
-                              <p className="text-sm text-gray-600">Department: {user.profile.department}</p>
-                            )}
                             {user.profile.phone && (
                               <p className="text-sm text-gray-600">Phone: {user.profile.phone}</p>
-                            )}
-                            {user.profile.address && (
-                              <p className="text-sm text-gray-600">Address: {user.profile.address}</p>
                             )}
                           </div>
                         )}

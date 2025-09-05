@@ -138,7 +138,7 @@ export default function BooksPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Books</h1>
-          <p className="text-gray-600 mt-1">Manage your library's book collection</p>
+          <p className="text-gray-600 mt-1">Manage your library&apos;s book collection</p>
         </div>
         {user?.role === 'admin' || user?.role === 'superadmin' ? (
           <Button

@@ -81,7 +81,7 @@ export default function CopyModal({
         setValue('status', copy.status);
         setValue('condition', copy.condition);
         setValue('shelfLocation', copy.shelfLocation || '');
-        setValue('acquiredAt', new Date(copy.acquiredAt).toISOString().split('T')[0]);
+        setValue('acquiredAt', copy.acquiredAt ? new Date(copy.acquiredAt).toISOString().split('T')[0] : '');
       } else {
         reset();
       }

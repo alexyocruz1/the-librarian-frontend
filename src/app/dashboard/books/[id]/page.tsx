@@ -113,7 +113,7 @@ export default function BookDetailPage() {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Book not found</h2>
-        <p className="text-gray-600 mb-4">The book you're looking for doesn't exist.</p>
+        <p className="text-gray-600 mb-4">The book you&apos;re looking for doesn&apos;t exist.</p>
         <Button onClick={() => router.back()}>
           Go Back
         </Button>
@@ -209,7 +209,7 @@ export default function BookDetailPage() {
                       Categories
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      {title.categories.map((category) => (
+                      {title.categories?.map((category) => (
                         <Badge key={category} variant="secondary">
                           {category}
                         </Badge>
@@ -385,7 +385,7 @@ export default function BookDetailPage() {
                         {copy.shelfLocation || 'Not specified'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(copy.acquiredAt).toLocaleDateString()}
+                        {copy.acquiredAt ? new Date(copy.acquiredAt).toLocaleDateString() : 'Not specified'}
                       </td>
                       {canManage && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -444,7 +444,7 @@ export default function BookDetailPage() {
           copy={editingCopy}
           mode={editingCopy ? 'edit' : 'create'}
           titleId={title._id}
-          libraryId={title.libraryId || ''}
+          libraryId={inventory?.libraryId || ''}
         />
       )}
     </div>

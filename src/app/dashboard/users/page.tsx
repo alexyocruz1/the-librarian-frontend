@@ -358,7 +358,7 @@ export default function UsersPage() {
                             >
                               Edit
                             </Button>
-                            {isSuperAdmin && user._id !== currentUser?._id && (
+                            {isSuperAdmin && user._id !== currentUser?.id && (
                               <Button
                                 size="sm"
                                 variant="ghost"
