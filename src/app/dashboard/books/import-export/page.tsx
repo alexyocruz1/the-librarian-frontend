@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 export default function ImportExportPage() {
@@ -61,7 +62,7 @@ export default function ImportExportPage() {
       if (fileInput) fileInput.value = '';
     } catch (error: any) {
       console.error('Error importing CSV:', error);
-      toast.error(error.response?.data?.message || 'Failed to import CSV file');
+      toast.error(getErrorMessage(error));
     } finally {
       setImporting(false);
     }
@@ -84,10 +85,10 @@ export default function ImportExportPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success('Catalog exported successfully');
+      toast.success(getSuccessMessage('csv_exported'));
     } catch (error: any) {
       console.error('Error exporting CSV:', error);
-      toast.error('Failed to export catalog');
+      toast.error(getErrorMessage(error));
     } finally {
       setExporting(false);
     }
@@ -110,10 +111,10 @@ export default function ImportExportPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      toast.success('Template downloaded successfully');
+      toast.success(getSuccessMessage('template_downloaded'));
     } catch (error: any) {
       console.error('Error downloading template:', error);
-      toast.error('Failed to download template');
+      toast.error(getErrorMessage(error));
     } finally {
       setDownloadTemplate(false);
     }

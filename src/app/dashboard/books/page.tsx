@@ -14,6 +14,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useSearch, SearchFilters } from '@/hooks/useSearch';
 import { Title, Inventory, Copy } from '@/types';
+import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 export default function BooksPage() {
@@ -51,7 +52,7 @@ export default function BooksPage() {
       setTitles(response.data.data || []);
     } catch (error) {
       console.error('Error fetching titles:', error);
-      toast.error('Failed to fetch books');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -61,6 +62,7 @@ export default function BooksPage() {
       setInventories(response.data.data || []);
     } catch (error) {
       console.error('Error fetching inventories:', error);
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

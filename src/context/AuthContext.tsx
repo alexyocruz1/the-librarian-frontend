@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { AuthState, AuthUser, LoginCredentials, RegisterData } from '@/types';
 import apiClient from '@/lib/api';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import { toast } from 'react-hot-toast';
 
 interface AuthContextType extends AuthState {
@@ -75,16 +76,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           isLoading: false,
         });
         
-        toast.success('Login successful!');
+        toast.success(getSuccessMessage('login'));
         return true;
       } else {
         setAuthState(prev => ({ ...prev, isLoading: false }));
-        toast.error(response.error || 'Login failed');
+        toast.error(getErrorMessage({ response: { data: { error: response.error } } }));
         return false;
       }
     } catch (error: any) {
       setAuthState(prev => ({ ...prev, isLoading: false }));
-      toast.error(error.response?.data?.error || 'Login failed');
+      toast.error(getErrorMessage(error));
       return false;
     }
   };
@@ -103,19 +104,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           isLoading: false,
         });
         
-        const message = data.role === 'guest' 
-          ? 'Account created successfully!' 
-          : 'Account created successfully. Please wait for admin approval.';
-        toast.success(message);
+        toast.success(getSuccessMessage('register'));
         return true;
       } else {
         setAuthState(prev => ({ ...prev, isLoading: false }));
-        toast.error(response.error || 'Registration failed');
+        toast.error(getErrorMessage({ response: { data: { error: response.error } } }));
         return false;
       }
     } catch (error: any) {
       setAuthState(prev => ({ ...prev, isLoading: false }));
-      toast.error(error.response?.data?.error || 'Registration failed');
+      toast.error(getErrorMessage(error));
       return false;
     }
   };
@@ -132,7 +130,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         isAuthenticated: false,
         isLoading: false,
       });
-      toast.success('Logged out successfully');
+      toast.success(getSuccessMessage('logout'));
     }
   };
 

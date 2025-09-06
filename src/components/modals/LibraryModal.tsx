@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { Library } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 const librarySchema = z.object({
@@ -85,17 +86,17 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
 
       if (mode === 'create') {
         await api.post('/libraries', libraryData);
-        toast.success('Library created successfully');
+        toast.success(getSuccessMessage('library_created'));
       } else {
         await api.put(`/libraries/${library?._id}`, libraryData);
-        toast.success('Library updated successfully');
+        toast.success(getSuccessMessage('library_updated'));
       }
 
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error saving library:', error);
-      toast.error(error.response?.data?.message || 'Failed to save library');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

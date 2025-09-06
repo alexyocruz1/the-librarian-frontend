@@ -23,6 +23,7 @@ import LibraryModal from '@/components/modals/LibraryModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { Library } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 export default function LibrariesPage() {
@@ -44,7 +45,7 @@ export default function LibrariesPage() {
       setLibraries(response.data.data || []);
     } catch (error) {
       console.error('Error fetching libraries:', error);
-      toast.error('Failed to fetch libraries');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -55,11 +56,11 @@ export default function LibrariesPage() {
 
     try {
       await api.delete(`/libraries/${libraryId}`);
-      toast.success('Library deleted successfully');
+      toast.success(getSuccessMessage('library_deleted'));
       fetchLibraries();
     } catch (error: any) {
       console.error('Error deleting library:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete library');
+      toast.error(getErrorMessage(error));
     }
   };
 

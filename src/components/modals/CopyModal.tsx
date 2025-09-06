@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { Copy, CopyStatus, CopyCondition } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 const copySchema = z.object({
@@ -101,17 +102,17 @@ export default function CopyModal({
 
       if (mode === 'create') {
         await api.post('/copies', copyData);
-        toast.success('Copy added successfully');
+        toast.success(getSuccessMessage('copy_created'));
       } else {
         await api.put(`/copies/${copy?._id}`, copyData);
-        toast.success('Copy updated successfully');
+        toast.success(getSuccessMessage('copy_updated'));
       }
 
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error saving copy:', error);
-      toast.error(error.response?.data?.message || 'Failed to save copy');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

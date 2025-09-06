@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { Title } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 const bookSchema = z.object({
@@ -98,17 +99,17 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
 
       if (mode === 'create') {
         await api.post('/titles', bookData);
-        toast.success('Book created successfully');
+        toast.success(getSuccessMessage('book_created'));
       } else {
         await api.put(`/titles/${book?._id}`, bookData);
-        toast.success('Book updated successfully');
+        toast.success(getSuccessMessage('book_updated'));
       }
 
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error saving book:', error);
-      toast.error(error.response?.data?.message || 'Failed to save book');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }

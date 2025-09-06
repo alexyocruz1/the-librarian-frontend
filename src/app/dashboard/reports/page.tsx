@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
+import { getErrorMessage, getSuccessMessage, getInfoMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 interface ReportStats {
@@ -113,7 +114,7 @@ export default function ReportsPage() {
       setStats(reportStats);
     } catch (error) {
       console.error('Error fetching report data:', error);
-      toast.error('Failed to fetch report data');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -122,10 +123,10 @@ export default function ReportsPage() {
   const handleExportReport = async (type: string) => {
     try {
       // TODO: Implement actual report export
-      toast.success(`${type} report exported successfully`);
+      toast.success(getSuccessMessage('report_exported'));
     } catch (error) {
       console.error('Error exporting report:', error);
-      toast.error('Failed to export report');
+      toast.error(getErrorMessage(error));
     }
   };
 

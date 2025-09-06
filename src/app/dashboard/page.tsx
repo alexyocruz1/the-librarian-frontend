@@ -15,7 +15,9 @@ import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 interface DashboardStats {
   totalBooks: number;
@@ -132,6 +134,7 @@ export default function DashboardPage() {
         });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        toast.error(getErrorMessage(error));
         // Set default values on error
         setStats({
           totalBooks: 0,
@@ -142,7 +145,7 @@ export default function DashboardPage() {
           recentActivity: [{
             id: 'error',
             type: 'system',
-            message: 'Unable to load dashboard data',
+            message: getInfoMessage('no_data'),
             timestamp: new Date().toISOString(),
           }],
         });

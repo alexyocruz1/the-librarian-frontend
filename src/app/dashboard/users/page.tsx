@@ -20,6 +20,7 @@ import UserModal from '@/components/modals/UserModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { User, UserRole, UserStatus } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 export default function UsersPage() {
@@ -43,7 +44,7 @@ export default function UsersPage() {
       setUsers(response.data.data || []);
     } catch (error) {
       console.error('Error fetching users:', error);
-      toast.error('Failed to fetch users');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -52,11 +53,11 @@ export default function UsersPage() {
   const handleApproveUser = async (userId: string) => {
     try {
       await api.put(`/users/${userId}/approve`);
-      toast.success('User approved successfully');
+      toast.success(getSuccessMessage('user_approved'));
       fetchUsers();
     } catch (error: any) {
       console.error('Error approving user:', error);
-      toast.error(error.response?.data?.message || 'Failed to approve user');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -65,11 +66,11 @@ export default function UsersPage() {
 
     try {
       await api.put(`/users/${userId}/reject`);
-      toast.success('User rejected successfully');
+      toast.success(getSuccessMessage('user_rejected'));
       fetchUsers();
     } catch (error: any) {
       console.error('Error rejecting user:', error);
-      toast.error(error.response?.data?.message || 'Failed to reject user');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -78,11 +79,11 @@ export default function UsersPage() {
 
     try {
       await api.delete(`/users/${userId}`);
-      toast.success('User deleted successfully');
+      toast.success(getSuccessMessage('user_deleted'));
       fetchUsers();
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete user');
+      toast.error(getErrorMessage(error));
     }
   };
 

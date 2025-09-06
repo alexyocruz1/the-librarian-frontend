@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { User, UserRole, UserStatus } from '@/types';
+import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 
 const userSchema = z.object({
@@ -107,6 +108,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
       setLibraries(response.data.data || []);
     } catch (error) {
       console.error('Error fetching libraries:', error);
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -125,17 +127,17 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
 
       if (mode === 'create') {
         await api.post('/users', userData);
-        toast.success('User created successfully');
+        toast.success(getSuccessMessage('user_created'));
       } else {
         await api.put(`/users/${user?._id}`, userData);
-        toast.success('User updated successfully');
+        toast.success(getSuccessMessage('user_updated'));
       }
 
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error saving user:', error);
-      toast.error(error.response?.data?.message || 'Failed to save user');
+      toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
