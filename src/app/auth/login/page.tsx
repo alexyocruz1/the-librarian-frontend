@@ -202,20 +202,6 @@ export default function LoginPage() {
           </motion.div>
         </motion.div>
 
-        {/* Demo credentials */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200"
-        >
-          <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
-          <div className="text-xs text-blue-700 space-y-1">
-            <p><strong>Super Admin:</strong> admin@library.com / admin123</p>
-            <p><strong>Student:</strong> student@library.com / student123</p>
-            <p><strong>Guest:</strong> guest@library.com / guest123</p>
-          </div>
-        </motion.div>
       </motion.div>
     </div>
   );

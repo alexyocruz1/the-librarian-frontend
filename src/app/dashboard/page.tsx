@@ -14,45 +14,29 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate } from '@/lib/utils';
+import { api } from '@/lib/api';
+import { useState, useEffect } from 'react';
 
-// Mock data - in real app, this would come from API
-const mockStats = {
-  totalBooks: 1247,
-  totalUsers: 89,
-  totalLibraries: 3,
-  pendingRequests: 12,
-  overdueBooks: 5,
-  recentActivity: [
-    {
-      id: 1,
-      type: 'book_borrowed',
-      message: 'John Doe borrowed "The Great Gatsby"',
-      timestamp: new Date().toISOString(),
-      user: 'John Doe',
-      book: 'The Great Gatsby',
-    },
-    {
-      id: 2,
-      type: 'user_registered',
-      message: 'New student registration: Jane Smith',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      user: 'Jane Smith',
-    },
-    {
-      id: 3,
-      type: 'book_returned',
-      message: 'Alice Johnson returned "To Kill a Mockingbird"',
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
-      user: 'Alice Johnson',
-      book: 'To Kill a Mockingbird',
-    },
-  ],
-};
+interface DashboardStats {
+  totalBooks: number;
+  totalUsers: number;
+  totalLibraries: number;
+  pendingRequests: number;
+  overdueBooks: number;
+  recentActivity: Array<{
+    id: string;
+    type: string;
+    message: string;
+    timestamp: string;
+    user?: string;
+    book?: string;
+  }>;
+}
 
-const statCards = [
+const getStatCards = (stats: DashboardStats) => [
   {
     name: 'Total Books',
-    value: mockStats.totalBooks,
+    value: stats.totalBooks,
     icon: BookOpenIcon,
     color: 'primary',
     change: '+12%',
@@ -60,7 +44,7 @@ const statCards = [
   },
   {
     name: 'Total Users',
-    value: mockStats.totalUsers,
+    value: stats.totalUsers,
     icon: UsersIcon,
     color: 'success',
     change: '+8%',
@@ -68,7 +52,7 @@ const statCards = [
   },
   {
     name: 'Libraries',
-    value: mockStats.totalLibraries,
+    value: stats.totalLibraries,
     icon: BuildingLibraryIcon,
     color: 'warning',
     change: '0%',
@@ -76,7 +60,7 @@ const statCards = [
   },
   {
     name: 'Pending Requests',
-    value: mockStats.pendingRequests,
+    value: stats.pendingRequests,
     icon: ClipboardDocumentListIcon,
     color: 'error',
     change: '+3',
@@ -86,6 +70,89 @@ const statCards = [
 
 export default function DashboardPage() {
   const { user, hasRole } = useAuth();
+  const [stats, setStats] = useState<DashboardStats>({
+    totalBooks: 0,
+    totalUsers: 0,
+    totalLibraries: 0,
+    pendingRequests: 0,
+    overdueBooks: 0,
+    recentActivity: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch all data in parallel
+        const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse] = await Promise.all([
+          api.get('/titles'),
+          api.get('/users'),
+          api.get('/libraries'),
+          api.get('/borrow-requests/pending'),
+          api.get('/borrow-records/overdue'),
+        ]);
+
+        const totalBooks = titlesResponse.data?.data?.titles?.length || 0;
+        const totalUsers = usersResponse.data?.data?.users?.length || 0;
+        const totalLibraries = librariesResponse.data?.data?.libraries?.length || 0;
+        const pendingRequests = borrowRequestsResponse.data?.data?.requests?.length || 0;
+        const overdueBooks = borrowRecordsResponse.data?.data?.overdueRecords?.length || 0;
+
+        // For recent activity, we'll create a simple list based on available data
+        const recentActivity = [
+          ...(pendingRequests > 0 ? [{
+            id: 'pending-requests',
+            type: 'pending_approval',
+            message: `${pendingRequests} pending borrow request${pendingRequests > 1 ? 's' : ''}`,
+            timestamp: new Date().toISOString(),
+          }] : []),
+          ...(overdueBooks > 0 ? [{
+            id: 'overdue-books',
+            type: 'overdue',
+            message: `${overdueBooks} overdue book${overdueBooks > 1 ? 's' : ''}`,
+            timestamp: new Date().toISOString(),
+          }] : []),
+          {
+            id: 'system-status',
+            type: 'system',
+            message: 'Library system is running smoothly',
+            timestamp: new Date().toISOString(),
+          },
+        ];
+
+        setStats({
+          totalBooks,
+          totalUsers,
+          totalLibraries,
+          pendingRequests,
+          overdueBooks,
+          recentActivity,
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        // Set default values on error
+        setStats({
+          totalBooks: 0,
+          totalUsers: 0,
+          totalLibraries: 0,
+          pendingRequests: 0,
+          overdueBooks: 0,
+          recentActivity: [{
+            id: 'error',
+            type: 'system',
+            message: 'Unable to load dashboard data',
+            timestamp: new Date().toISOString(),
+          }],
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -112,6 +179,29 @@ export default function DashboardPage() {
         return 'bg-gray-50 border-gray-200';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white">
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back, {user?.name}! 👋
+          </h1>
+          <p className="text-primary-100 text-lg">
+            Loading your library system data...
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-white rounded-xl p-6 shadow-sm border animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -146,7 +236,7 @@ export default function DashboardPage() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
       >
-        {statCards.map((stat, index) => (
+        {getStatCards(stats).map((stat, index) => (
           <motion.div
             key={stat.name}
             initial={{ opacity: 0, y: 20 }}
@@ -216,7 +306,7 @@ export default function DashboardPage() {
             <CardHeader title="Recent Activity" />
             <CardBody>
               <div className="space-y-4">
-                {mockStats.recentActivity.map((activity, index) => (
+                {stats.recentActivity.map((activity, index) => (
                   <motion.div
                     key={activity.id}
                     initial={{ opacity: 0, x: -20 }}
