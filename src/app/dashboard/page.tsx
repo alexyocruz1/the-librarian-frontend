@@ -87,8 +87,13 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         
-        // Fetch all data in parallel
-        const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse] = await Promise.all([
+        // Add a small delay to ensure token is properly set
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        console.log('📊 Fetching dashboard data...');
+        
+        // Fetch all data in parallel with individual error handling
+        const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse] = await Promise.allSettled([
           api.get('/titles'),
           api.get('/users'),
           api.get('/libraries'),
@@ -96,11 +101,19 @@ export default function DashboardPage() {
           api.get('/borrow-records/overdue'),
         ]);
 
-        const totalBooks = titlesResponse.data?.data?.titles?.length || 0;
-        const totalUsers = usersResponse.data?.data?.users?.length || 0;
-        const totalLibraries = librariesResponse.data?.data?.libraries?.length || 0;
-        const pendingRequests = borrowRequestsResponse.data?.data?.requests?.length || 0;
-        const overdueBooks = borrowRecordsResponse.data?.data?.overdueRecords?.length || 0;
+        // Handle individual responses
+        const totalBooks = titlesResponse.status === 'fulfilled' ? (titlesResponse.value.data?.data?.titles?.length || 0) : 0;
+        const totalUsers = usersResponse.status === 'fulfilled' ? (usersResponse.value.data?.data?.users?.length || 0) : 0;
+        const totalLibraries = librariesResponse.status === 'fulfilled' ? (librariesResponse.value.data?.data?.libraries?.length || 0) : 0;
+        const pendingRequests = borrowRequestsResponse.status === 'fulfilled' ? (borrowRequestsResponse.value.data?.data?.requests?.length || 0) : 0;
+        const overdueBooks = borrowRecordsResponse.status === 'fulfilled' ? (borrowRecordsResponse.value.data?.data?.overdueRecords?.length || 0) : 0;
+
+        // Log any failed requests
+        [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse].forEach((response, index) => {
+          if (response.status === 'rejected') {
+            console.error(`📊 API call ${index} failed:`, response.reason);
+          }
+        });
 
         // For recent activity, we'll create a simple list based on available data
         const recentActivity = [
@@ -134,7 +147,7 @@ export default function DashboardPage() {
         });
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        toast.error(getErrorMessage(error));
+        // Don't show toast for individual API failures - they're handled above
         // Set default values on error
         setStats({
           totalBooks: 0,

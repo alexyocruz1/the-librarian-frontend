@@ -64,11 +64,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     try {
+      console.log('🔐 Login attempt started');
       setAuthState(prev => ({ ...prev, isLoading: true }));
       
       const response = await apiClient.login(credentials);
+      console.log('🔐 Login response:', response);
       
       if (response.success && response.data) {
+        // Store token in localStorage
+        localStorage.setItem('accessToken', response.data.accessToken);
+        console.log('🔐 Token stored in localStorage');
+        
         setAuthState({
           user: response.data.user,
           accessToken: response.data.accessToken,
@@ -76,16 +82,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
           isLoading: false,
         });
         
-        toast.success(getSuccessMessage('login'));
+        console.log('🔐 Auth state updated, user authenticated');
+        toast.success(getSuccessMessage('login'), { duration: 3000 });
         return true;
       } else {
+        console.log('🔐 Login failed:', response.error);
         setAuthState(prev => ({ ...prev, isLoading: false }));
-        toast.error(getErrorMessage({ response: { data: { error: response.error } } }));
+        toast.error(getErrorMessage({ response: { data: { error: response.error } } }), { duration: 4000 });
         return false;
       }
     } catch (error: any) {
+      console.error('🔐 Login error:', error);
       setAuthState(prev => ({ ...prev, isLoading: false }));
-      toast.error(getErrorMessage(error));
+      toast.error(getErrorMessage(error), { duration: 4000 });
       return false;
     }
   };
@@ -97,6 +106,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await apiClient.register(data);
       
       if (response.success && response.data) {
+        // Store token in localStorage
+        localStorage.setItem('accessToken', response.data.accessToken);
+        
         setAuthState({
           user: response.data.user,
           accessToken: response.data.accessToken,
@@ -124,6 +136,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      // Clear token from localStorage
+      localStorage.removeItem('accessToken');
+      
       setAuthState({
         user: null,
         accessToken: null,

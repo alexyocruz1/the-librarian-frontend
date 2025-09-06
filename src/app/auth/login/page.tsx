@@ -42,20 +42,32 @@ export default function LoginPage() {
   }, [isAuthenticated, router]);
 
   const onSubmit = async (data: LoginFormData) => {
+    console.log('📝 Login form submitted with data:', data);
     setIsLoading(true);
     try {
       const success = await login(data);
-      if (success) {
-        router.push('/dashboard');
+      console.log('📝 Login result:', success);
+      // Don't redirect here - let the isAuthenticated check handle it
+      if (!success) {
+        // Add a small delay to show error message
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
       }
     } catch (error) {
-      console.error('Login error:', error);
-    } finally {
-      setIsLoading(false);
+      console.error('📝 Login error:', error);
+      // Add a small delay to show error message
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
     }
   };
 
   if (isAuthenticated) {
+    // Add a small delay to show success message before redirect
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 1000);
     return null; // Prevent flash of login form
   }
 

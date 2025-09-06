@@ -24,6 +24,9 @@ class ApiClient {
         const token = this.getAccessToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
+          console.log('🔑 Adding auth token to request:', config.url);
+        } else {
+          console.log('🔑 No auth token available for request:', config.url);
         }
         return config;
       },
@@ -38,7 +41,11 @@ class ApiClient {
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Don't try to refresh token for login/register requests
+        if (error.response?.status === 401 && 
+            !originalRequest._retry && 
+            !originalRequest.url?.includes('/auth/login') &&
+            !originalRequest.url?.includes('/auth/register')) {
           originalRequest._retry = true;
 
           try {
@@ -62,7 +69,9 @@ class ApiClient {
 
   private getAccessToken(): string | null {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
+    console.log('🔑 Getting access token:', token ? 'Token exists' : 'No token');
+    return token;
   }
 
   private setAccessToken(token: string): void {
@@ -131,17 +140,13 @@ class ApiClient {
   // Auth methods
   async login(credentials: { email: string; password: string }) {
     const response = await this.post('/auth/login', credentials);
-    if (response.success && response.data?.accessToken) {
-      this.setAccessToken(response.data.accessToken);
-    }
+    // Don't set token here - let AuthContext handle it to avoid race conditions
     return response;
   }
 
   async register(data: { name: string; email: string; password: string; role?: string }) {
     const response = await this.post('/auth/register', data);
-    if (response.success && response.data?.accessToken) {
-      this.setAccessToken(response.data.accessToken);
-    }
+    // Don't set token here - let AuthContext handle it to avoid race conditions
     return response;
   }
 
