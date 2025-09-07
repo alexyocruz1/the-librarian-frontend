@@ -162,6 +162,7 @@ export interface AuthUser {
   role: UserRole;
   status: UserStatus;
   libraries?: string[];
+  lastLoginAt?: string;
 }
 
 export interface AuthState {
