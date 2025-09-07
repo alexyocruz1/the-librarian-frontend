@@ -13,6 +13,16 @@ export interface User {
   profile?: {
     phone?: string;
   };
+  preferences?: {
+    language?: string;
+    timezone?: string;
+    notifications?: {
+      email?: boolean;
+      push?: boolean;
+      borrowReminders?: boolean;
+      systemUpdates?: boolean;
+    };
+  };
   lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
