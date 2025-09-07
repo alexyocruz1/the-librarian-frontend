@@ -13,6 +13,7 @@ export interface User {
   profile?: {
     phone?: string;
   };
+  lastLoginAt?: string;
   createdAt: string;
   updatedAt: string;
 }

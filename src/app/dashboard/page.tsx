@@ -239,7 +239,7 @@ export default function DashboardPage() {
               {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'}
             </Badge>
             <span className="text-primary-100 text-sm">
-              Last login: {formatDate(new Date())}
+              {user?.lastLoginAt ? `Last login: ${formatDate(user.lastLoginAt)}` : 'First login'}
             </span>
           </div>
         </div>
