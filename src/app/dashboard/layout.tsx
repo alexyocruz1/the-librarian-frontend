@@ -126,7 +126,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Mobile sidebar */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -143,19 +143,19 @@ export default function DashboardLayout({
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-xl lg:hidden"
             >
-              <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+              <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center">
                   <BookOpenIcon className="w-8 h-8 text-primary-600" />
-                  <span className="ml-2 text-xl font-bold text-gray-900">The Librarian</span>
+                  <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-100">The Librarian</span>
                 </div>
                               <button
                 onClick={() => setSidebarOpen(false)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 aria-label="Close sidebar"
               >
-                <XMarkIcon className="w-5 h-5" />
+                <XMarkIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
               </div>
               <nav className="mt-6 px-3">
@@ -166,8 +166,8 @@ export default function DashboardLayout({
                       className={cn(
                         'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
                         isActive(item.href)
-                          ? 'bg-primary-100 text-primary-700'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                       )}
                     >
                       <item.icon className="w-5 h-5 mr-3" />
@@ -187,8 +187,8 @@ export default function DashboardLayout({
                               className={cn(
                                 'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                                 isActive(child.href)
-                                  ? 'bg-primary-50 text-primary-600'
-                                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                                  ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
+                                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
                               )}
                             >
                               <child.icon className="w-4 h-4 mr-3" />
@@ -207,10 +207,10 @@ export default function DashboardLayout({
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
-          <div className="flex items-center h-16 px-6 border-b border-gray-200">
+        <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+          <div className="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-700">
             <BookOpenIcon className="w-8 h-8 text-primary-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">The Librarian</span>
+            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-100">The Librarian</span>
           </div>
           <nav className="flex-1 mt-6 px-3 space-y-1">
             {filteredNavigation.map((item) => (
@@ -220,8 +220,8 @@ export default function DashboardLayout({
                   className={cn(
                     'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
                     isActive(item.href)
-                      ? 'bg-primary-100 text-primary-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                   )}
                 >
                   <item.icon className="w-5 h-5 mr-3" />
@@ -241,8 +241,8 @@ export default function DashboardLayout({
                           className={cn(
                             'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
                             isActive(child.href)
-                              ? 'bg-primary-50 text-primary-600'
-                              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                              ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
+                              : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
                           )}
                         >
                           <child.icon className="w-4 h-4 mr-3" />
@@ -260,15 +260,15 @@ export default function DashboardLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <div className="sticky top-0 z-30 bg-white border-b border-gray-200">
+        <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <div className="flex items-center">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors lg:hidden"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors lg:hidden"
                 aria-label="Open sidebar"
               >
-                <Bars3Icon className="w-5 h-5" />
+                <Bars3Icon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
 
@@ -282,15 +282,15 @@ export default function DashboardLayout({
               {/* User menu */}
               <div className="flex items-center space-x-3">
                 <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
                 </div>
                 <div className="relative">
                   <button 
-                    className="flex items-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     aria-label="User profile menu"
                   >
-                    <UserCircleIcon className="w-8 h-8 text-gray-400" />
+                    <UserCircleIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                   </button>
                 </div>
                 <Button
