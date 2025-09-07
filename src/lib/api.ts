@@ -263,6 +263,16 @@ class ApiClient {
   async removeAdminFromLibrary(libraryId: string, userId: string) {
     return this.delete(`/libraries/${libraryId}/admins/${userId}`);
   }
+
+  // Dashboard endpoints
+  async getDashboardStats() {
+    return this.get('/dashboard/stats');
+  }
+
+  async getRecentActivity(limit?: number) {
+    const params = limit ? { limit } : {};
+    return this.get('/dashboard/activity', { params });
+  }
 }
 
 // Create and export a singleton instance

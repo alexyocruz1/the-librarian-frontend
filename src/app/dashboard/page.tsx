@@ -13,7 +13,7 @@ import {
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useAuth } from '@/hooks/useAuth';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatDateTime } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import { useState, useEffect } from 'react';
@@ -86,52 +86,46 @@ export default function DashboardPage() {
         // Add a small delay to ensure token is properly set
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Fetch all data in parallel with individual error handling
-        const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse] = await Promise.allSettled([
-          api.get('/titles'),
-          api.get('/users'),
-          api.get('/libraries'),
-          api.get('/borrow-requests/pending'),
-          api.get('/borrow-records/overdue'),
+        // Fetch dashboard stats and recent activity from the new API endpoints
+        const [statsResponse, activityResponse] = await Promise.allSettled([
+          api.getDashboardStats(),
+          api.getRecentActivity(10),
         ]);
 
-        // Handle individual responses
-        const totalBooks = titlesResponse.status === 'fulfilled' ? (titlesResponse.value.data?.data?.titles?.length || 0) : 0;
-        const totalUsers = usersResponse.status === 'fulfilled' ? (usersResponse.value.data?.data?.users?.length || 0) : 0;
-        const totalLibraries = librariesResponse.status === 'fulfilled' ? (librariesResponse.value.data?.data?.libraries?.length || 0) : 0;
-        const pendingRequests = borrowRequestsResponse.status === 'fulfilled' ? (borrowRequestsResponse.value.data?.data?.requests?.length || 0) : 0;
-        const overdueBooks = borrowRecordsResponse.status === 'fulfilled' ? (borrowRecordsResponse.value.data?.data?.overdueRecords?.length || 0) : 0;
-
-        // Log any failed requests (only in development)
-        if (process.env.NODE_ENV === 'development') {
-          [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse].forEach((response, index) => {
-            if (response.status === 'rejected') {
-              console.error(`📊 API call ${index} failed:`, response.reason);
-            }
-          });
+        // Handle stats response
+        let totalBooks = 0, totalUsers = 0, totalLibraries = 0, pendingRequests = 0, overdueBooks = 0;
+        if (statsResponse.status === 'fulfilled') {
+          const statsData = statsResponse.value.data?.data;
+          totalBooks = statsData?.totalBooks || 0;
+          totalUsers = statsData?.totalUsers || 0;
+          totalLibraries = statsData?.totalLibraries || 0;
+          pendingRequests = statsData?.pendingRequests || 0;
+          overdueBooks = statsData?.overdueBooks || 0;
         }
 
-        // For recent activity, we'll create a simple list based on available data
-        const recentActivity = [
-          ...(pendingRequests > 0 ? [{
-            id: 'pending-requests',
-            type: 'pending_approval',
-            message: `${pendingRequests} pending borrow request${pendingRequests > 1 ? 's' : ''}`,
-            timestamp: new Date().toISOString(),
-          }] : []),
-          ...(overdueBooks > 0 ? [{
-            id: 'overdue-books',
-            type: 'overdue',
-            message: `${overdueBooks} overdue book${overdueBooks > 1 ? 's' : ''}`,
-            timestamp: new Date().toISOString(),
-          }] : []),
-          {
+        // Handle activity response
+        let recentActivity: any[] = [];
+        if (activityResponse.status === 'fulfilled') {
+          recentActivity = activityResponse.value.data?.data?.activities || [];
+        } else {
+          // Fallback activity if API fails
+          recentActivity = [{
             id: 'system-status',
             type: 'system',
             message: 'Library system is running smoothly',
             timestamp: new Date().toISOString(),
-          },
-        ];
+          }];
+        }
+
+        // Log any failed requests (only in development)
+        if (process.env.NODE_ENV === 'development') {
+          if (statsResponse.status === 'rejected') {
+            console.error('📊 Dashboard stats API failed:', statsResponse.reason);
+          }
+          if (activityResponse.status === 'rejected') {
+            console.error('📊 Recent activity API failed:', activityResponse.reason);
+          }
+        }
 
         setStats({
           totalBooks,
@@ -172,8 +166,17 @@ export default function DashboardPage() {
         return <BookOpenIcon className="w-4 h-4 text-primary-600" />;
       case 'book_returned':
         return <BookOpenIcon className="w-4 h-4 text-success-600" />;
+      case 'book_added':
+        return <BookOpenIcon className="w-4 h-4 text-primary-600" />;
       case 'user_registered':
+      case 'user_registration':
         return <UsersIcon className="w-4 h-4 text-warning-600" />;
+      case 'pending_approval':
+        return <ClipboardDocumentListIcon className="w-4 h-4 text-warning-600" />;
+      case 'overdue':
+        return <ClockIcon className="w-4 h-4 text-error-600" />;
+      case 'system':
+        return <ChartBarIcon className="w-4 h-4 text-primary-600" />;
       default:
         return <ClockIcon className="w-4 h-4 text-gray-600" />;
     }
@@ -182,13 +185,22 @@ export default function DashboardPage() {
   const getActivityColor = (type: string) => {
     switch (type) {
       case 'book_borrowed':
-        return 'bg-primary-50 border-primary-200';
+        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-700';
       case 'book_returned':
-        return 'bg-success-50 border-success-200';
+        return 'bg-success-50 dark:bg-success-900/20 border-success-200 dark:border-success-700';
+      case 'book_added':
+        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-700';
       case 'user_registered':
-        return 'bg-warning-50 border-warning-200';
+      case 'user_registration':
+        return 'bg-warning-50 dark:bg-warning-900/20 border-warning-200 dark:border-warning-700';
+      case 'pending_approval':
+        return 'bg-warning-50 dark:bg-warning-900/20 border-warning-200 dark:border-warning-700';
+      case 'overdue':
+        return 'bg-error-50 dark:bg-error-900/20 border-error-200 dark:border-error-700';
+      case 'system':
+        return 'bg-primary-50 dark:bg-primary-900/20 border-primary-200 dark:border-primary-700';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
     }
   };
 
@@ -329,9 +341,9 @@ export default function DashboardPage() {
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{activity.message}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatDate(activity.timestamp)}
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{activity.message}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {formatDateTime(activity.timestamp)}
                       </p>
                     </div>
                   </motion.div>

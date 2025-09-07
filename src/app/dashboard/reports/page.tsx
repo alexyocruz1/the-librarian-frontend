@@ -330,8 +330,8 @@ export default function ReportsPage() {
                     {activity.type === 'approval' && <UsersIcon className="w-4 h-4 text-success-600" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900">{activity.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{activity.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {new Date(activity.timestamp).toLocaleString()}
                     </p>
                   </div>
