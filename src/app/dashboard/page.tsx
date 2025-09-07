@@ -41,32 +41,28 @@ const getStatCards = (stats: DashboardStats) => [
     value: stats.totalBooks,
     icon: BookOpenIcon,
     color: 'primary',
-    change: '+12%',
-    changeType: 'positive' as const,
+    description: 'In catalog',
   },
   {
     name: 'Total Users',
     value: stats.totalUsers,
     icon: UsersIcon,
     color: 'success',
-    change: '+8%',
-    changeType: 'positive' as const,
+    description: 'Registered',
   },
   {
     name: 'Libraries',
     value: stats.totalLibraries,
     icon: BuildingLibraryIcon,
     color: 'warning',
-    change: '0%',
-    changeType: 'neutral' as const,
+    description: 'Branches',
   },
   {
     name: 'Pending Requests',
     value: stats.pendingRequests,
     icon: ClipboardDocumentListIcon,
     color: 'error',
-    change: '+3',
-    changeType: 'negative' as const,
+    description: 'Awaiting approval',
   },
 ];
 
@@ -250,7 +246,7 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6"
       >
         {getStatCards(stats).map((stat, index) => (
           <motion.div
@@ -259,49 +255,48 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
           >
-            <Card variant="elevated" className="hover:shadow-medium transition-shadow duration-200">
-              <CardBody>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                    <div className="flex items-center mt-2">
-                      <span
-                        className={`text-sm font-medium ${
-                          stat.changeType === 'positive'
-                            ? 'text-success-600'
-                            : stat.changeType === 'negative'
-                            ? 'text-error-600'
-                            : 'text-gray-600'
+            <Card variant="elevated" className="hover:shadow-medium transition-all duration-200 hover:scale-105">
+              <CardBody className="p-4 lg:p-6">
+                <div className="flex flex-col">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400 leading-tight">{stat.name}</p>
+                    </div>
+                    <div
+                      className={`p-2 lg:p-3 rounded-full flex-shrink-0 ml-3 ${
+                        stat.color === 'primary'
+                          ? 'bg-primary-100 dark:bg-primary-900/30'
+                          : stat.color === 'success'
+                          ? 'bg-success-100 dark:bg-success-900/30'
+                          : stat.color === 'warning'
+                          ? 'bg-warning-100 dark:bg-warning-900/30'
+                          : 'bg-error-100 dark:bg-error-900/30'
+                      }`}
+                    >
+                      <stat.icon
+                        className={`w-5 h-5 lg:w-6 lg:h-6 ${
+                          stat.color === 'primary'
+                            ? 'text-primary-600 dark:text-primary-400'
+                            : stat.color === 'success'
+                            ? 'text-success-600 dark:text-success-400'
+                            : stat.color === 'warning'
+                            ? 'text-warning-600 dark:text-warning-400'
+                            : 'text-error-600 dark:text-error-400'
                         }`}
-                      >
-                        {stat.change}
-                      </span>
-                      <span className="text-sm text-gray-500 ml-1">from last month</span>
+                      />
                     </div>
                   </div>
-                  <div
-                    className={`p-3 rounded-xl ${
-                      stat.color === 'primary'
-                        ? 'bg-primary-100'
-                        : stat.color === 'success'
-                        ? 'bg-success-100'
-                        : stat.color === 'warning'
-                        ? 'bg-warning-100'
-                        : 'bg-error-100'
-                    }`}
-                  >
-                    <stat.icon
-                      className={`w-6 h-6 ${
-                        stat.color === 'primary'
-                          ? 'text-primary-600'
-                          : stat.color === 'success'
-                          ? 'text-success-600'
-                          : stat.color === 'warning'
-                          ? 'text-warning-600'
-                          : 'text-error-600'
-                      }`}
-                    />
+                  <div className="space-y-1">
+                    <p className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                      {loading ? (
+                        <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      ) : (
+                        stat.value.toLocaleString()
+                      )}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                      {stat.description}
+                    </p>
                   </div>
                 </div>
               </CardBody>
