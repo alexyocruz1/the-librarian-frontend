@@ -38,8 +38,27 @@ export const useSocket = () => {
       return;
     }
 
+    // Check if WebSocket is enabled (default to true for development)
+    const websocketEnabled = process.env.NEXT_PUBLIC_WEBSOCKET_ENABLED !== 'false';
+    if (!websocketEnabled) {
+      console.log('WebSocket connection disabled via environment variable');
+      return;
+    }
+
+    // Check if we're in production and on a free tier (disable WebSocket for stability)
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isFreeTier = process.env.NEXT_PUBLIC_FREE_TIER === 'true';
+    if (isProduction && isFreeTier) {
+      console.log('WebSocket disabled for free tier production deployment');
+      return;
+    }
+
     // Initialize socket connection
-    const newSocket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000', {
+    // Remove /api/v1 from the URL for WebSocket connection
+    const baseUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1')
+      .replace('/api/v1', '');
+    
+    const newSocket = io(baseUrl, {
       auth: {
         token: accessToken,
       },
@@ -61,8 +80,9 @@ export const useSocket = () => {
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
+      console.warn('WebSocket connection error (this is normal if WebSocket server is not available):', error.message);
       setIsConnected(false);
+      // Don't show error toast for WebSocket connection issues
     });
 
     // Notification events
