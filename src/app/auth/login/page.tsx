@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(1, 'Password is required'),
+  rememberMe: z.boolean().optional(),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -29,10 +30,20 @@ export default function LoginPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
+
+  // Load remembered email on component mount
+  React.useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      setValue('email', rememberedEmail);
+      // Don't auto-check remember me - let user decide each time
+    }
+  }, [setValue]);
 
   // Redirect if already authenticated
   React.useEffect(() => {
@@ -44,6 +55,15 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     console.log('📝 Login form submitted with data:', data);
     setIsLoading(true);
+    
+    // Handle remember me functionality
+    if (data.rememberMe) {
+      localStorage.setItem('rememberedEmail', data.email);
+    } else {
+      // If user unchecks remember me, clear the remembered email
+      localStorage.removeItem('rememberedEmail');
+    }
+    
     try {
       const success = await login(data);
       console.log('📝 Login result:', success);
@@ -123,12 +143,19 @@ export default function LoginPage() {
                     label="Email address"
                     placeholder="Enter your email"
                     error={errors.email?.message}
+                    autoComplete="email"
+                    name="email"
                     leftIcon={
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                       </svg>
                     }
                   />
+                  {localStorage.getItem('rememberedEmail') && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      ✓ Email remembered from previous login
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -138,6 +165,8 @@ export default function LoginPage() {
                     label="Password"
                     placeholder="Enter your password"
                     error={errors.password?.message}
+                    autoComplete="current-password"
+                    name="password"
                     leftIcon={
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -163,8 +192,8 @@ export default function LoginPage() {
                   <div className="flex items-center">
                     <input
                       id="remember-me"
-                      name="remember-me"
                       type="checkbox"
+                      {...register('rememberMe')}
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -187,9 +216,10 @@ export default function LoginPage() {
                   fullWidth
                   size="lg"
                   loading={isLoading}
+                  disabled={isLoading}
                   className="gradient-primary shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Sign in
+                  {isLoading ? 'Signing in... (This may take a moment)' : 'Sign in'}
                 </Button>
               </form>
             </CardBody>

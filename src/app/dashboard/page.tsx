@@ -90,8 +90,6 @@ export default function DashboardPage() {
         // Add a small delay to ensure token is properly set
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        console.log('📊 Fetching dashboard data...');
-        
         // Fetch all data in parallel with individual error handling
         const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse] = await Promise.allSettled([
           api.get('/titles'),
@@ -108,12 +106,14 @@ export default function DashboardPage() {
         const pendingRequests = borrowRequestsResponse.status === 'fulfilled' ? (borrowRequestsResponse.value.data?.data?.requests?.length || 0) : 0;
         const overdueBooks = borrowRecordsResponse.status === 'fulfilled' ? (borrowRecordsResponse.value.data?.data?.overdueRecords?.length || 0) : 0;
 
-        // Log any failed requests
-        [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse].forEach((response, index) => {
-          if (response.status === 'rejected') {
-            console.error(`📊 API call ${index} failed:`, response.reason);
-          }
-        });
+        // Log any failed requests (only in development)
+        if (process.env.NODE_ENV === 'development') {
+          [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse].forEach((response, index) => {
+            if (response.status === 'rejected') {
+              console.error(`📊 API call ${index} failed:`, response.reason);
+            }
+          });
+        }
 
         // For recent activity, we'll create a simple list based on available data
         const recentActivity = [

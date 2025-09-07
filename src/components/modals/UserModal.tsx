@@ -188,6 +188,8 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                           {...register('name')}
                           error={errors.name?.message}
                           placeholder="Enter full name"
+                          autoComplete="name"
+                          name="name"
                         />
                         
                         <Input
@@ -196,6 +198,8 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                           {...register('email')}
                           error={errors.email?.message}
                           placeholder="Enter email address"
+                          autoComplete="email"
+                          name="email"
                         />
                         
                         <Input
@@ -204,6 +208,8 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                           {...register('password')}
                           error={errors.password?.message}
                           placeholder="Enter password"
+                          autoComplete={mode === 'create' ? 'new-password' : 'new-password'}
+                          name="password"
                         />
                       </div>
 

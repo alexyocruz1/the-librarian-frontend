@@ -8,7 +8,7 @@ class ApiClient {
   constructor() {
     this.client = axios.create({
       baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
-      timeout: 10000,
+      timeout: 30000, // Increased to 30 seconds for Render free tier cold starts
       headers: {
         'Content-Type': 'application/json',
       },
@@ -24,9 +24,6 @@ class ApiClient {
         const token = this.getAccessToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
-          console.log('🔑 Adding auth token to request:', config.url);
-        } else {
-          console.log('🔑 No auth token available for request:', config.url);
         }
         return config;
       },
@@ -69,9 +66,7 @@ class ApiClient {
 
   private getAccessToken(): string | null {
     if (typeof window === 'undefined') return null;
-    const token = localStorage.getItem('accessToken');
-    console.log('🔑 Getting access token:', token ? 'Token exists' : 'No token');
-    return token;
+    return localStorage.getItem('accessToken');
   }
 
   private setAccessToken(token: string): void {
@@ -83,6 +78,40 @@ class ApiClient {
     if (typeof window === 'undefined') return;
     localStorage.removeItem('accessToken');
     Cookies.remove('refreshToken');
+  }
+
+  private async retryRequest(config: AxiosRequestConfig): Promise<AxiosResponse> {
+    // Determine retry strategy based on request type
+    const isCriticalEndpoint = config.url?.includes('/auth/') || 
+                              config.url?.includes('/login') || 
+                              config.url?.includes('/register');
+    
+    const maxRetries = isCriticalEndpoint ? 3 : 2; // More retries for critical endpoints
+    
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        return await this.client(config);
+      } catch (error: any) {
+        const isLastAttempt = i === maxRetries - 1;
+        const isTimeoutOrNetworkError = 
+          error.code === 'ECONNABORTED' || 
+          error.code === 'ERR_NETWORK' || 
+          error.message?.includes('timeout') ||
+          error.message?.includes('Network Error');
+
+        if (isTimeoutOrNetworkError && !isLastAttempt) {
+          // Wait before retrying (exponential backoff)
+          const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s...
+          const endpoint = config.url || 'unknown';
+          console.log(`🔄 Retrying ${config.method?.toUpperCase()} ${endpoint} in ${delay}ms (attempt ${i + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        
+        throw error;
+      }
+    }
+    throw new Error('Max retries exceeded');
   }
 
   private async refreshToken(): Promise<void> {
@@ -106,7 +135,8 @@ class ApiClient {
   // Generic request method
   async request<T = any>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
     try {
-      const response: AxiosResponse<ApiResponse<T>> = await this.client(config);
+      // Use retry logic for all requests to handle Render cold starts
+      const response: AxiosResponse<ApiResponse<T>> = await this.retryRequest(config);
       return response.data;
     } catch (error: any) {
       if (error.response?.data) {
@@ -138,7 +168,7 @@ class ApiClient {
   }
 
   // Auth methods
-  async login(credentials: { email: string; password: string }) {
+  async login(credentials: { email: string; password: string; rememberMe?: boolean }) {
     const response = await this.post('/auth/login', credentials);
     // Don't set token here - let AuthContext handle it to avoid race conditions
     return response;

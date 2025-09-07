@@ -4,7 +4,10 @@ export const getErrorMessage = (error: any): string => {
   // Network/CORS errors
   if (!error.response) {
     if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
-      return 'Unable to connect to the server. Please check your internet connection and try again.';
+      return 'Unable to connect to the server. The server might be starting up. Please wait a moment and try again.';
+    }
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      return 'Request timed out. The server is taking longer than usual to respond. Please try again.';
     }
     if (error.message?.includes('CORS')) {
       return 'Connection blocked. Please try refreshing the page or contact support.';
