@@ -111,6 +111,8 @@
   "reports.libraryPerf.summary": "{totalBorrows} total borrows • {activeLoans} active loans",
   "reports.overduePercent": "{percent}% overdue",
   "reports.activity.timestamp": "{date}",
+  "dashboard.loading": "Loading your dashboard…",
+  "history.loading": "Fetching your history…",
   "auth.login.title": "The Librarian",
   "auth.login.subtitle": "Sign in to your account",
   "auth.login.email.label": "Email address",

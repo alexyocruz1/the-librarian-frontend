@@ -210,7 +210,7 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return <AppLoader title="The Librarian" subtitle="Loading your dashboard…" size="md" />;
+    return <AppLoader subtitle={t('dashboard.loading')} size="md" />;
   }
 
   return (

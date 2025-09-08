@@ -295,7 +295,7 @@ export default function MyHistoryPage() {
 
       {/* Content */}
       {loading ? (
-        <AppLoader subtitle="Fetching your history…" size="md" />
+        <AppLoader subtitle={t('history.loading')} size="md" />
       ) : error ? (
         <ErrorState />
       ) : records.length === 0 ? (

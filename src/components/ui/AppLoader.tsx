@@ -3,6 +3,7 @@
 import React from 'react';
 import { BookOpenIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
+import { useI18n } from '@/context/I18nContext';
 
 interface AppLoaderProps {
   title?: string;
@@ -13,12 +14,15 @@ interface AppLoaderProps {
 }
 
 export default function AppLoader({
-  title = 'The Librarian',
-  subtitle = 'Loading your experience…',
+  title,
+  subtitle,
   className,
   iconClassName,
   size = 'md',
 }: AppLoaderProps) {
+  const { t } = useI18n();
+  const resolvedTitle = title ?? t('app.title');
+  const resolvedSubtitle = subtitle ?? t('app.loading');
   const sizeClasses = {
     sm: {
       iconWrap: 'w-16 h-16',
@@ -62,7 +66,7 @@ export default function AppLoader({
         transition={{ duration: 0.4, delay: 0.1 }}
         className={`${sizeClasses.title} font-bold text-gray-900 dark:text-gray-100`}
       >
-        {title}
+        {resolvedTitle}
       </motion.h3>
 
       <motion.p
@@ -71,7 +75,7 @@ export default function AppLoader({
         transition={{ duration: 0.4, delay: 0.15 }}
         className={`${sizeClasses.subtitle} text-gray-600 dark:text-gray-400 mt-2`}
       >
-        {subtitle}
+        {resolvedSubtitle}
       </motion.p>
 
       <div className="mt-6">
