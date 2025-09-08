@@ -388,7 +388,7 @@ export default function ReportsPage() {
           />
           <CardBody>
             <div className="space-y-4">
-              {stats.popularBooks.map((book, index) => (
+              {(stats.popularBooks ?? []).map((book, index) => (
                 <motion.div
                   key={book.title}
                   initial={{ opacity: 0, x: -20 }}
@@ -422,7 +422,7 @@ export default function ReportsPage() {
           />
           <CardBody>
             <div className="space-y-4">
-              {stats.recentActivity.map((activity, index) => (
+              {(stats.recentActivity ?? []).map((activity, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, x: 20 }}
@@ -452,6 +452,8 @@ export default function ReportsPage() {
 
       {/* Additional Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {stats.systemHealth && (
+        <>
         <Card>
           <CardHeader title={t('reports.libraryStats.title')} />
           <CardBody>
@@ -511,7 +513,7 @@ export default function ReportsPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.systemHealth.overdueRate')}</span>
                 <Badge variant={stats.systemHealth.overdueRate > 20 ? 'error' : 'success'}>
-                  {formatPercentage(stats.systemHealth.overdueRate / 100)}
+                  {formatPercentage((stats.systemHealth.overdueRate ?? 0) / 100)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
@@ -529,6 +531,8 @@ export default function ReportsPage() {
             </div>
           </CardBody>
         </Card>
+        </>
+        )}
       </div>
 
       {/* Additional Analytics Sections */}

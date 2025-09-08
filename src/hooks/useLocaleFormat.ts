@@ -31,7 +31,11 @@ export function useLocaleFormat() {
     try { return new Intl.NumberFormat(locale, { style: 'currency', currency, ...options }).format(amount); } catch { return String(amount); }
   };
 
-  return { locale, formatDate, formatDateTime, formatNumber, formatCurrency };
+  const formatPercentage = (value: number, options?: Intl.NumberFormatOptions) => {
+    try { return new Intl.NumberFormat(locale, { style: 'percent', maximumFractionDigits: 1, ...options }).format(value); } catch { return String(value); }
+  };
+
+  return { locale, formatDate, formatDateTime, formatNumber, formatCurrency, formatPercentage };
 }
 
 

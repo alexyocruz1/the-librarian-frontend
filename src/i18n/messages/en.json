@@ -275,7 +275,24 @@
   "users.confirm.reject": "Are you sure you want to reject this user?",
   "users.confirm.delete": "Are you sure you want to delete this user? This action cannot be undone.",
   "common.library": "library",
-  "common.libraries": "libraries"
+  "common.libraries": "libraries",
+  "pendingStudents.title": "Pending Students",
+  "pendingStudents.subtitle": "Review and approve student registration requests",
+  "pendingStudents.stats.pending": "Pending Requests",
+  "pendingStudents.stats.students": "Students",
+  "pendingStudents.stats.withStudentId": "With Student ID",
+  "pendingStudents.card.title": "Pending Approval",
+  "pendingStudents.card.subtitle": "{count} users waiting for approval",
+  "pendingStudents.empty.title": "All caught up!",
+  "pendingStudents.empty.description": "No pending user approvals at this time.",
+  "pendingStudents.labels.studentId": "Student ID: {id}",
+  "pendingStudents.labels.requestedOn": "Requested on {date}",
+  "pendingStudents.labels.additionalInfo": "Additional Information:",
+  "pendingStudents.labels.phone": "Phone: {phone}",
+  "pendingStudents.toast.fetchError": "Failed to fetch pending users",
+  "pendingStudents.toast.approved": "User approved successfully",
+  "pendingStudents.toast.rejected": "User rejected successfully",
+  "pendingStudents.confirm.reject": "Are you sure you want to reject this user? They will not be able to access the system."
 }
 
 

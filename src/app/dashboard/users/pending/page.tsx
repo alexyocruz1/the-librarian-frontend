@@ -19,8 +19,10 @@ import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getErrorMessage } from '@/lib/errorMessages';
+import { useI18n } from '@/context/I18nContext';
 
 export default function PendingStudentsPage() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [pendingUsers, setPendingUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function PendingStudentsPage() {
       setPendingUsers(response.data.data || []);
     } catch (error) {
       console.error('Error fetching pending users:', error);
-      toast.error('Failed to fetch pending users');
+      toast.error(t('pendingStudents.toast.fetchError'));
     } finally {
       setLoading(false);
     }
@@ -44,7 +46,7 @@ export default function PendingStudentsPage() {
   const handleApproveUser = async (userId: string) => {
     try {
       await api.approveStudent(userId);
-      toast.success('User approved successfully');
+      toast.success(t('pendingStudents.toast.approved'));
       fetchPendingUsers();
     } catch (error: any) {
       console.error('Error approving user:', error);
@@ -53,11 +55,11 @@ export default function PendingStudentsPage() {
   };
 
   const handleRejectUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to reject this user? They will not be able to access the system.')) return;
+    if (!confirm(t('pendingStudents.confirm.reject'))) return;
 
     try {
       await api.rejectStudent(userId);
-      toast.success('User rejected successfully');
+      toast.success(t('pendingStudents.toast.rejected'));
       fetchPendingUsers();
     } catch (error: any) {
       console.error('Error rejecting user:', error);
@@ -71,8 +73,8 @@ export default function PendingStudentsPage() {
     return (
       <div className="text-center py-12">
         <div className="text-gray-400 text-6xl mb-4">🚫</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-        <p className="text-gray-600">You don&apos;t have permission to access this page.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('common.accessDenied.title')}</h2>
+        <p className="text-gray-600">{t('common.accessDenied.description')}</p>
       </div>
     );
   }
@@ -125,8 +127,8 @@ export default function PendingStudentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Pending Students</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Review and approve student registration requests</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('pendingStudents.title')}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{t('pendingStudents.subtitle')}</p>
       </div>
 
       {/* Stats */}
@@ -138,7 +140,7 @@ export default function PendingStudentsPage() {
                 <ClockIcon className="h-8 w-8 text-warning-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Requests</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('pendingStudents.stats.pending')}</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{pendingUsers.length}</p>
               </div>
             </div>
@@ -152,7 +154,7 @@ export default function PendingStudentsPage() {
                 <UserIcon className="h-8 w-8 text-primary-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Students</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('pendingStudents.stats.students')}</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {pendingUsers.filter(u => u.role === 'student').length}
                 </p>
@@ -168,7 +170,7 @@ export default function PendingStudentsPage() {
                 <AcademicCapIcon className="h-8 w-8 text-success-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">With Student ID</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('pendingStudents.stats.withStudentId')}</p>
                 <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {pendingUsers.filter(u => u.studentId).length}
                 </p>
@@ -181,15 +183,15 @@ export default function PendingStudentsPage() {
       {/* Pending Users List */}
       <Card>
         <CardHeader 
-          title="Pending Approval" 
-          subtitle={`${pendingUsers.length} users waiting for approval`}
+          title={t('pendingStudents.card.title')} 
+          subtitle={t('pendingStudents.card.subtitle', { count: pendingUsers.length })}
         />
         <CardBody>
           {pendingUsers.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">✅</div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">All caught up!</h3>
-              <p className="text-gray-600 dark:text-gray-400">No pending user approvals at this time.</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('pendingStudents.empty.title')}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{t('pendingStudents.empty.description')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -221,20 +223,20 @@ export default function PendingStudentsPage() {
                         {user.studentId && (
                           <div className="flex items-center gap-2 mb-2">
                             <AcademicCapIcon className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">Student ID: {user.studentId}</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{t('pendingStudents.labels.studentId', { id: user.studentId })}</span>
                           </div>
                         )}
 
                         <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <ClockIcon className="w-4 h-4" />
-                          <span>Requested on {new Date(user.createdAt).toLocaleDateString()}</span>
+                          <span>{t('pendingStudents.labels.requestedOn', { date: new Date(user.createdAt).toLocaleDateString() })}</span>
                         </div>
 
                         {user.profile && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Additional Information:</h4>
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{t('pendingStudents.labels.additionalInfo')}</h4>
                             {user.profile.phone && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400">Phone: {user.profile.phone}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">{t('pendingStudents.labels.phone', { phone: user.profile.phone })}</p>
                             )}
                           </div>
                         )}
@@ -249,7 +251,7 @@ export default function PendingStudentsPage() {
                         leftIcon={<XCircleIcon className="w-4 h-4" />}
                         className="text-error-600 border-error-300 hover:bg-error-50"
                       >
-                        Reject
+                        {t('users.actions.reject')}
                       </Button>
                       <Button
                         size="sm"
@@ -257,7 +259,7 @@ export default function PendingStudentsPage() {
                         leftIcon={<CheckCircleIcon className="w-4 h-4" />}
                         className="bg-success-600 hover:bg-success-700"
                       >
-                        Approve
+                        {t('users.actions.approve')}
                       </Button>
                     </div>
                   </div>

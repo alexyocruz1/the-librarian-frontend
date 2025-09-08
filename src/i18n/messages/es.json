@@ -275,7 +275,24 @@
   "users.confirm.reject": "¿Seguro que quieres rechazar a este usuario?",
   "users.confirm.delete": "¿Seguro que quieres eliminar a este usuario? Esta acción no se puede deshacer.",
   "common.library": "biblioteca",
-  "common.libraries": "bibliotecas"
+  "common.libraries": "bibliotecas",
+  "pendingStudents.title": "Estudiantes Pendientes",
+  "pendingStudents.subtitle": "Revisa y aprueba solicitudes de registro de estudiantes",
+  "pendingStudents.stats.pending": "Solicitudes Pendientes",
+  "pendingStudents.stats.students": "Estudiantes",
+  "pendingStudents.stats.withStudentId": "Con ID de Estudiante",
+  "pendingStudents.card.title": "Pendientes de Aprobación",
+  "pendingStudents.card.subtitle": "{count} usuarios esperando aprobación",
+  "pendingStudents.empty.title": "¡Todo al día!",
+  "pendingStudents.empty.description": "No hay aprobaciones pendientes en este momento.",
+  "pendingStudents.labels.studentId": "ID de Estudiante: {id}",
+  "pendingStudents.labels.requestedOn": "Solicitado el {date}",
+  "pendingStudents.labels.additionalInfo": "Información Adicional:",
+  "pendingStudents.labels.phone": "Teléfono: {phone}",
+  "pendingStudents.toast.fetchError": "No se pudieron obtener los usuarios pendientes",
+  "pendingStudents.toast.approved": "Usuario aprobado correctamente",
+  "pendingStudents.toast.rejected": "Usuario rechazado correctamente",
+  "pendingStudents.confirm.reject": "¿Seguro que quieres rechazar a este usuario? No podrá acceder al sistema."
 }
 
 
