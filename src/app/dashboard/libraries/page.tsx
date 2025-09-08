@@ -27,9 +27,11 @@ import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 export default function LibrariesPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [libraries, setLibraries] = useState<Library[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -133,15 +135,15 @@ export default function LibrariesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Libraries</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage library locations and administrators</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('libraries.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('libraries.subtitle')}</p>
         </div>
         {canManage && (
           <Button
             leftIcon={<PlusIcon className="w-5 h-5" />}
             onClick={handleAddLibrary}
           >
-            Add Library
+            {t('libraries.add')}
           </Button>
         )}
       </div>
@@ -152,7 +154,7 @@ export default function LibrariesPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Search libraries by name, code, or location..."
+                placeholder={t('libraries.search.placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 leftIcon={<MagnifyingGlassIcon className="w-5 h-5" />}
@@ -163,7 +165,7 @@ export default function LibrariesPage() {
               onClick={() => setShowFilters(!showFilters)}
               leftIcon={<FunnelIcon className="w-5 h-5" />}
             >
-              Filters
+              {t('libraries.filters')}
             </Button>
           </div>
         </CardBody>
@@ -181,7 +183,7 @@ export default function LibrariesPage() {
             <Card className="h-full hover:shadow-lg transition-shadow">
               <CardHeader
                 title={library.name}
-                subtitle={`Code: ${library.code}`}
+                subtitle={t('libraries.code', { code: library.code })}
                 action={
                   canManage && (
                     <div className="flex items-center gap-2">
@@ -191,7 +193,7 @@ export default function LibrariesPage() {
                         onClick={() => handleEditLibrary(library)}
                         leftIcon={<PencilIcon className="w-4 h-4" />}
                       >
-                        Edit
+                        {t('common.edit', { default: 'Edit' })}
                       </Button>
                       <Button
                         size="sm"
@@ -200,7 +202,7 @@ export default function LibrariesPage() {
                         leftIcon={<TrashIcon className="w-4 h-4" />}
                         className="text-error-600 hover:text-error-700"
                       >
-                        Delete
+                        {t('common.delete', { default: 'Delete' })}
                       </Button>
                     </div>
                   )
@@ -212,7 +214,7 @@ export default function LibrariesPage() {
                   <div className="flex items-start gap-3">
                     <MapPinIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Location</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraries.location')}</p>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {library.location ? (
                           <>
@@ -223,7 +225,7 @@ export default function LibrariesPage() {
                             {library.location.country && <div>{library.location.country}</div>}
                           </>
                         ) : (
-                          'No location specified'
+                          t('libraries.location.none')
                         )}
                       </p>
                     </div>
@@ -234,10 +236,10 @@ export default function LibrariesPage() {
                     <div className="flex items-start gap-3">
                       <PhoneIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Contact</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraries.contact')}</p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {library.contact?.email && <div>Email: {library.contact.email}</div>}
-                          {library.contact?.phone && <div>Phone: {library.contact.phone}</div>}
+                          {library.contact?.email && <div>{t('libraries.contact.email', { email: library.contact.email })}</div>}
+                          {library.contact?.phone && <div>{t('libraries.contact.phone', { phone: library.contact.phone })}</div>}
                         </p>
                       </div>
                     </div>
@@ -250,14 +252,14 @@ export default function LibrariesPage() {
                         <UsersIcon className="w-4 h-4 text-primary-600" />
                         <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Admins</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('libraries.stats.admins')}</p>
                     </div>
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <BookOpenIcon className="w-4 h-4 text-success-600" />
                         <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Books</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('libraries.stats.books')}</p>
                     </div>
                   </div>
 
@@ -271,7 +273,7 @@ export default function LibrariesPage() {
                         leftIcon={<UserPlusIcon className="w-4 h-4" />}
                         onClick={() => {/* TODO: Open assign admin modal */}}
                       >
-                        Manage Admins
+                        {t('libraries.manageAdmins')}
                       </Button>
                     </div>
                   )}
@@ -286,9 +288,9 @@ export default function LibrariesPage() {
         <Card>
           <CardBody className="text-center py-12">
             <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🏛️</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No libraries found</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('libraries.empty.title')}</h3>
             <p className="text-gray-600 dark:text-gray-400">
-              {searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first library'}
+              {searchTerm ? t('libraries.empty.hint.search') : t('libraries.empty.hint.start')}
             </p>
           </CardBody>
         </Card>

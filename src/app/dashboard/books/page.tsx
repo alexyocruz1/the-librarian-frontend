@@ -18,8 +18,10 @@ import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 export default function BooksPage() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [titles, setTitles] = useState<Title[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -125,7 +127,7 @@ export default function BooksPage() {
   const handleAdvancedSearch = (filters: SearchFilters) => {
     // Implement advanced search logic
     console.log('Advanced search filters:', filters);
-    toast.success('Advanced search completed');
+    toast.success(t('books.toast.advancedDone'));
   };
 
   if (loading) {
@@ -174,15 +176,15 @@ export default function BooksPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Books</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your library&apos;s book collection</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('books.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('books.subtitle')}</p>
         </div>
         {user?.role === 'admin' || user?.role === 'superadmin' ? (
           <Button
             leftIcon={<PlusIcon className="w-5 h-5" />}
             onClick={handleAddBook}
           >
-            Add Book
+            {t('books.add')}
           </Button>
         ) : null}
       </div>
@@ -198,7 +200,7 @@ export default function BooksPage() {
                 onSelect={handleSearchSelect}
                 suggestions={suggestions}
                 loading={searchLoading}
-                placeholder="Search books by title, author, or ISBN..."
+                placeholder={t('books.search.placeholder')}
                 showSuggestions={true}
                 maxSuggestions={8}
               />
@@ -208,7 +210,7 @@ export default function BooksPage() {
               onClick={() => setShowAdvancedSearch(true)}
               leftIcon={<FunnelIcon className="w-5 h-5" />}
             >
-              Advanced
+              {t('common.advanced')}
             </Button>
           </div>
         </CardBody>
@@ -243,7 +245,7 @@ export default function BooksPage() {
                         {title.title}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        by {title.authors.join(', ')}
+                        {t('books.by')} {title.authors.join(', ')}
                       </p>
                       {title.categories && title.categories.length > 0 && (
                         <div className="flex flex-wrap gap-1 mb-3">
@@ -258,9 +260,9 @@ export default function BooksPage() {
                     
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <span>Total Copies: {totalCopies}</span>
+                        <span>{t('books.totalCopies')}: {totalCopies}</span>
                         <span className="text-green-600 font-medium">
-                          Available: {availableCopies}
+                          {t('books.availableCopies')}: {availableCopies}
                         </span>
                       </div>
                       
@@ -271,7 +273,7 @@ export default function BooksPage() {
                           className="flex-1"
                           onClick={() => handleEditBook(title)}
                         >
-                          View Details
+                          {t('books.viewDetails')}
                         </Button>
                         {(user?.role === 'admin' || user?.role === 'superadmin') && (
                           <Button
@@ -279,7 +281,7 @@ export default function BooksPage() {
                             size="sm"
                             onClick={() => handleEditBook(title)}
                           >
-                            Edit
+                            {t('common.edit')}
                           </Button>
                         )}
                       </div>
@@ -297,9 +299,9 @@ export default function BooksPage() {
           <div className="text-gray-400 mb-4">
             <MagnifyingGlassIcon className="w-16 h-16 mx-auto" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No books found</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('books.noResults.title')}</h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {searchTerm ? `No books match "${searchTerm}"` : 'No books available'}
+            {searchTerm ? t('books.noResults.descriptionWithTerm', { term: searchTerm }) : t('books.noResults.descriptionEmpty')}
           </p>
         </div>
       )}
