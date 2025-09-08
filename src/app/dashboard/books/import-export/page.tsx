@@ -184,7 +184,7 @@ export default function ImportExportPage() {
                   onChange={handleFileSelect}
                   className="file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
                 />
-                {importFile && (
+                {importFile ? (
                   <div className="mt-2 flex items-center gap-2">
                     <Badge variant="success" size="sm">
                       {importFile.name}
@@ -192,6 +192,10 @@ export default function ImportExportPage() {
                     <span className="text-sm text-gray-500 dark:text-gray-400">
                       ({(importFile.size / 1024).toFixed(1)} KB)
                     </span>
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {t('books.import.noFile')}
                   </div>
                 )}
               </div>

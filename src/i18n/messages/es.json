@@ -176,6 +176,7 @@
   "books.import.template.description": "Descarga nuestra plantilla CSV para asegurar el formato correcto.",
   "books.import.template.download": "Descargar Plantilla",
   "books.import.selectFile": "Selecciona archivo CSV",
+  "books.import.noFile": "Ningún archivo seleccionado",
   "books.import.process.title": "Proceso de Importación",
   "books.import.process.description": "Todos los registros serán validados antes de importar. Si algún registro falla, se cancelará toda la importación. Revisa cuidadosamente el formato de la plantilla.",
   "books.import.action": "Importar Libros",

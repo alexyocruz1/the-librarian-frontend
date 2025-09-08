@@ -176,6 +176,7 @@
   "books.import.template.description": "Download our CSV template to ensure your file has the correct format.",
   "books.import.template.download": "Download Template",
   "books.import.selectFile": "Select CSV File",
+  "books.import.noFile": "No file chosen",
   "books.import.process.title": "Import Process",
   "books.import.process.description": "All records will be validated before import. If any record fails validation, the entire import will be cancelled. Check the template format carefully.",
   "books.import.action": "Import Books",
