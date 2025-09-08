@@ -12,16 +12,17 @@ import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { Library } from '@/types';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
+import { useI18n } from '@/context/I18nContext';
 import toast from 'react-hot-toast';
 
-const librarySchema = z.object({
-  name: z.string().min(1, 'Library name is required'),
-  code: z.string().min(1, 'Library code is required').max(10, 'Code must be 10 characters or less'),
-  location: z.string().min(1, 'Location is required'),
+const createLibrarySchema = (t: (key: string) => string) => z.object({
+  name: z.string().min(1, t('libraryModal.validation.nameRequired')),
+  code: z.string().min(1, t('libraryModal.validation.codeRequired')).max(10, t('libraryModal.validation.codeMaxLength')),
+  location: z.string().min(1, t('libraryModal.validation.locationRequired')),
   contact: z.string().optional(),
 });
 
-type LibraryFormData = z.infer<typeof librarySchema>;
+type LibraryFormData = z.infer<ReturnType<typeof createLibrarySchema>>;
 
 interface LibraryModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ interface LibraryModalProps {
 
 export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode }: LibraryModalProps) {
   const [loading, setLoading] = useState(false);
+  const { t } = useI18n();
 
   const {
     register,
@@ -42,7 +44,7 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
     setValue,
     watch
   } = useForm<LibraryFormData>({
-    resolver: zodResolver(librarySchema),
+    resolver: zodResolver(createLibrarySchema(t)),
     defaultValues: {
       name: '',
       code: '',
@@ -123,8 +125,8 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
-                  title={mode === 'create' ? 'Add New Library' : 'Edit Library'}
-                  subtitle={mode === 'create' ? 'Create a new library location' : 'Update library information'}
+                  title={mode === 'create' ? t('libraryModal.title.create') : t('libraryModal.title.edit')}
+                  subtitle={mode === 'create' ? t('libraryModal.subtitle.create') : t('libraryModal.subtitle.edit')}
                   action={
                     <Button
                       variant="ghost"
@@ -139,45 +141,80 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Input
-                        label="Library Name *"
+                        label={t('libraryModal.fields.name')}
                         {...register('name')}
                         error={errors.name?.message}
-                        placeholder="Enter library name"
+                        placeholder={t('libraryModal.placeholders.name')}
                       />
                       
                       <Input
-                        label="Library Code *"
+                        label={t('libraryModal.fields.code')}
                         {...register('code')}
                         error={errors.code?.message}
-                        placeholder="e.g., MAIN, BRANCH1"
-                        help="Short code to identify this library (max 10 characters)"
+                        placeholder={t('libraryModal.placeholders.code')}
+                        help={t('libraryModal.help.code')}
                       />
                     </div>
 
                     <Input
-                      label="Location *"
+                      label={t('libraryModal.fields.location')}
                       {...register('location')}
                       error={errors.location?.message}
-                      placeholder="Enter library address or location"
+                      placeholder={t('libraryModal.placeholders.location')}
                     />
 
                     <Input
-                      label="Contact Information"
+                      label={t('libraryModal.fields.contact')}
                       {...register('contact')}
                       error={errors.contact?.message}
-                      placeholder="Phone number, email, or other contact details"
+                      placeholder={t('libraryModal.placeholders.contact')}
                     />
 
                     {/* Code Preview */}
                     {codeValue && (
                       <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Library Code Preview</h4>
-                        <div className="text-lg font-mono text-primary-600">
-                          {codeValue.toUpperCase()}
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">{t('libraryModal.preview.title')}</h4>
+                        
+                        {/* Barcode Preview */}
+                        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 mb-3">
+                          <div className="text-center">
+                            {/* Simulated Barcode */}
+                            <div className="inline-block bg-black dark:bg-white p-2 rounded">
+                              <div className="flex items-center justify-center space-x-1 mb-1">
+                                {Array.from({ length: 20 }, (_, i) => (
+                                  <div
+                                    key={i}
+                                    className="bg-white dark:bg-black"
+                                    style={{
+                                      width: Math.random() > 0.5 ? '2px' : '1px',
+                                      height: '20px'
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                              <div className="text-xs font-mono text-white dark:text-black">
+                                {codeValue.toUpperCase()}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          This code will be used for book barcodes and identification
-                        </p>
+
+                        {/* Example Usage */}
+                        <div className="space-y-2">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            <strong>{t('libraryModal.preview.example')}:</strong>
+                          </div>
+                          <div className="text-xs font-mono bg-gray-100 dark:bg-gray-600 p-2 rounded">
+                            {codeValue.toUpperCase()}-2025-0001
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {t('libraryModal.preview.format', { 
+                              code: codeValue.toUpperCase(), 
+                              year: '2025', 
+                              sequence: '0001' 
+                            })}
+                          </p>
+                        </div>
                       </div>
                     )}
 
@@ -189,13 +226,13 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                         onClick={onClose}
                         disabled={loading}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
                       <Button
                         type="submit"
                         loading={loading}
                       >
-                        {mode === 'create' ? 'Create Library' : 'Update Library'}
+                        {mode === 'create' ? t('libraryModal.actions.create') : t('libraryModal.actions.update')}
                       </Button>
                     </div>
                   </form>
