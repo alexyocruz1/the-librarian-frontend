@@ -13,6 +13,7 @@ import {
   BuildingLibraryIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
+import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
@@ -75,6 +76,9 @@ interface ReportStats {
     lastUpdated: string;
   };
 }
+
+const RecentActivity = dynamic(() => import('./recent-activity').then(m => m.default), { ssr: false, loading: () => null });
+const PopularBooks = dynamic(() => import('./popular-books').then(m => m.default), { ssr: false, loading: () => null });
 
 export default function ReportsPage() {
   const { user } = useAuth();
@@ -380,74 +384,11 @@ export default function ReportsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Popular Books */}
-        <Card>
-          <CardHeader 
-            title={t('reports.popular.title')} 
-            subtitle={t('reports.popular.subtitle')}
-          />
-          <CardBody>
-            <div className="space-y-4">
-              {(stats.popularBooks ?? []).map((book, index) => (
-                <motion.div
-                  key={book.title}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-medium text-primary-700">#{index + 1}</span>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{book.title}</h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{formatNumber(book.borrowCount)} borrows</p>
-                    </div>
-                  </div>
-                  <Badge variant="success" size="sm">
-                    {book.borrowCount}
-                  </Badge>
-                </motion.div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
+        {/* Popular Books (lazy) */}
+        <PopularBooks stats={stats} />
 
-        {/* Recent Activity */}
-        <Card>
-          <CardHeader 
-            title={t('reports.recent.title')} 
-            subtitle={t('reports.recent.subtitle')}
-          />
-          <CardBody>
-            <div className="space-y-4">
-              {(stats.recentActivity ?? []).map((activity, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
-                >
-                  <div className="flex-shrink-0 mt-1">
-                    {activity.type === 'borrow' && <BookOpenIcon className="w-4 h-4 text-primary-600" />}
-                    {activity.type === 'return' && <BookOpenIcon className="w-4 h-4 text-success-600" />}
-                    {activity.type === 'request' && <ClockIcon className="w-4 h-4 text-warning-600" />}
-                    {activity.type === 'overdue' && <ExclamationTriangleIcon className="w-4 h-4 text-error-600" />}
-                    {activity.type === 'approval' && <UsersIcon className="w-4 h-4 text-success-600" />}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-gray-100">{activity.message}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {t('reports.activity.timestamp', { date: new Date(activity.timestamp).toLocaleString() })}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
+        {/* Recent Activity (lazy) */}
+        <RecentActivity stats={stats} />
       </div>
 
       {/* Additional Statistics */}
