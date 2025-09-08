@@ -93,10 +93,10 @@ export default function SettingsPage() {
   }, [user, profileForm]);
 
   const tabs = [
-    { id: 'profile', name: 'Profile', icon: UserIcon },
-    { id: 'security', name: 'Security', icon: ShieldCheckIcon },
-    { id: 'preferences', name: 'Preferences', icon: Cog6ToothIcon },
-    { id: 'notifications', name: 'Notifications', icon: BellIcon },
+    { id: 'profile', name: t('settings.tabs.profile'), icon: UserIcon },
+    { id: 'security', name: t('settings.tabs.security'), icon: ShieldCheckIcon },
+    { id: 'preferences', name: t('settings.tabs.preferences'), icon: Cog6ToothIcon },
+    { id: 'notifications', name: t('settings.tabs.notifications'), icon: BellIcon },
   ];
 
   const handleProfileUpdate = async (data: ProfileFormData) => {
@@ -104,9 +104,9 @@ export default function SettingsPage() {
     try {
       await api.updateProfile(data);
       await refreshUser();
-      toast.success('Profile updated successfully!');
+      toast.success(t('settings.profile.toast.updated'));
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to update profile');
+      toast.error(error.response?.data?.error || t('settings.profile.toast.updateError'));
     } finally {
       setIsLoading(false);
     }
@@ -120,9 +120,9 @@ export default function SettingsPage() {
         newPassword: data.newPassword,
       });
       passwordForm.reset();
-      toast.success('Password changed successfully!');
+      toast.success(t('settings.security.toast.changed'));
     } catch (error: any) {
-      toast.error(error.response?.data?.error || 'Failed to change password');
+      toast.error(error.response?.data?.error || t('settings.security.toast.changeError'));
     } finally {
       setIsLoading(false);
     }
@@ -220,10 +220,10 @@ export default function SettingsPage() {
             </div>
             <div className="flex items-center space-x-3">
               <Badge variant={getRoleBadgeVariant(user?.role || '')}>
-                {user?.role}
+                {user?.role ? t(`users.roles.${user.role}`) : ''}
               </Badge>
               <Badge variant={getStatusBadgeVariant(user?.status || '')}>
-                {user?.status}
+                {user?.status ? t(`users.status.${user.status}`) : ''}
               </Badge>
             </div>
           </div>
@@ -273,18 +273,18 @@ export default function SettingsPage() {
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <Card>
-                <CardHeader title="Profile Information" />
+                <CardHeader title={t('settings.profile.title')} />
                 <CardBody>
                   <form onSubmit={profileForm.handleSubmit(handleProfileUpdate)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <Input
-                        label="Full Name"
+                        label={t('settings.profile.fullName')}
                         {...profileForm.register('name')}
                         error={profileForm.formState.errors.name?.message}
                         required
                       />
                       <Input
-                        label="Email Address"
+                        label={t('settings.profile.email')}
                         type="email"
                         {...profileForm.register('email')}
                         error={profileForm.formState.errors.email?.message}
@@ -292,7 +292,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <Input
-                      label="Phone Number"
+                      label={t('settings.profile.phone')}
                       type="tel"
                       {...profileForm.register('phone')}
                       error={profileForm.formState.errors.phone?.message}
@@ -304,7 +304,7 @@ export default function SettingsPage() {
                         loading={isLoading}
                         disabled={!profileForm.formState.isDirty}
                       >
-                        Update Profile
+                        {t('settings.profile.updateButton')}
                       </Button>
                     </div>
                   </form>
@@ -315,13 +315,13 @@ export default function SettingsPage() {
             {/* Security Tab */}
             {activeTab === 'security' && (
               <Card>
-                <CardHeader title="Security Settings" />
+                <CardHeader title={t('settings.security.title')} />
                 <CardBody>
                   <form onSubmit={passwordForm.handleSubmit(handlePasswordChange)} className="space-y-6">
                     <div className="space-y-4">
                       <div className="relative">
                         <Input
-                          label="Current Password"
+                          label={t('settings.security.currentPassword')}
                           type={showCurrentPassword ? 'text' : 'password'}
                           {...passwordForm.register('currentPassword')}
                           error={passwordForm.formState.errors.currentPassword?.message}
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="relative">
                         <Input
-                          label="New Password"
+                          label={t('settings.security.newPassword')}
                           type={showNewPassword ? 'text' : 'password'}
                           {...passwordForm.register('newPassword')}
                           error={passwordForm.formState.errors.newPassword?.message}
@@ -361,7 +361,7 @@ export default function SettingsPage() {
                       </div>
                       <div className="relative">
                         <Input
-                          label="Confirm New Password"
+                          label={t('settings.security.confirmPassword')}
                           type={showConfirmPassword ? 'text' : 'password'}
                           {...passwordForm.register('confirmPassword')}
                           error={passwordForm.formState.errors.confirmPassword?.message}
@@ -387,7 +387,7 @@ export default function SettingsPage() {
                         loading={isLoading}
                         disabled={!passwordForm.formState.isDirty}
                       >
-                        Change Password
+                        {t('settings.security.changeButton')}
                       </Button>
                     </div>
                   </form>
@@ -399,18 +399,18 @@ export default function SettingsPage() {
             {activeTab === 'preferences' && (
               <div className="space-y-6">
                 <Card>
-                  <CardHeader title="Appearance" />
+                  <CardHeader title={t('settings.preferences.appearance.title')} />
                   <CardBody>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                          Theme
+                          {t('settings.preferences.appearance.theme')}
                         </label>
                         <div className="grid grid-cols-3 gap-3">
                           {[
-                            { value: 'light', label: 'Light', icon: '☀️' },
-                            { value: 'dark', label: 'Dark', icon: '🌙' },
-                            { value: 'system', label: 'System', icon: '💻' },
+                            { value: 'light', label: t('settings.preferences.appearance.light'), icon: '☀️' },
+                            { value: 'dark', label: t('settings.preferences.appearance.dark'), icon: '🌙' },
+                            { value: 'system', label: t('settings.preferences.appearance.system'), icon: '💻' },
                           ].map((option) => (
                             <button
                               key={option.value}
@@ -435,38 +435,38 @@ export default function SettingsPage() {
                 </Card>
 
                 <Card>
-                  <CardHeader title="Language & Region" />
+                  <CardHeader title={t('settings.preferences.region.title')} />
                   <CardBody>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Language
+                          {t('settings.preferences.region.language')}
                         </label>
                         <select 
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                          aria-label="Select language"
+                          aria-label={t('settings.preferences.region.aria.language')}
                           value={preferences.language}
                           onChange={(e) => { updatePreference('language', e.target.value); setLocale(e.target.value as any); }}
                         >
-                          <option value="en">English</option>
-                          <option value="es">Español</option>
+                          <option value="en">{t('auth.language.en')}</option>
+                          <option value="es">{t('auth.language.es')}</option>
                         </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Time Zone
+                          {t('settings.preferences.region.timezone')}
                         </label>
                         <select 
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                          aria-label="Select time zone"
+                          aria-label={t('settings.preferences.region.aria.timezone')}
                           value={preferences.timezone}
                           onChange={(e) => updatePreference('timezone', e.target.value)}
                         >
                           <option value="UTC">UTC</option>
-                          <option value="America/New_York">Eastern Time</option>
-                          <option value="America/Chicago">Central Time</option>
-                          <option value="America/Denver">Mountain Time</option>
-                          <option value="America/Los_Angeles">Pacific Time</option>
+                          <option value="America/New_York">{t('settings.preferences.region.tz.eastern')}</option>
+                          <option value="America/Chicago">{t('settings.preferences.region.tz.central')}</option>
+                          <option value="America/Denver">{t('settings.preferences.region.tz.mountain')}</option>
+                          <option value="America/Los_Angeles">{t('settings.preferences.region.tz.pacific')}</option>
                         </select>
                       </div>
                     </div>
@@ -476,7 +476,7 @@ export default function SettingsPage() {
                         onClick={savePreferences}
                         loading={preferencesLoading}
                       >
-                        Save Preferences
+                        {t('settings.preferences.save')}
                       </Button>
                     </div>
                   </CardBody>
@@ -487,16 +487,16 @@ export default function SettingsPage() {
             {/* Notifications Tab */}
             {activeTab === 'notifications' && (
               <Card>
-                <CardHeader title="Notification Preferences" />
+                <CardHeader title={t('settings.notifications.title')} />
                 <CardBody>
                   <div className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          Email Notifications
+                          {t('settings.notifications.email.title')}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Receive notifications via email
+                          {t('settings.notifications.email.desc')}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -505,7 +505,7 @@ export default function SettingsPage() {
                           className="sr-only peer" 
                           checked={preferences.notifications.email}
                           onChange={(e) => updateNotificationPreference('email', e.target.checked)}
-                          aria-label="Enable email notifications"
+                          aria-label={t('settings.notifications.email.aria')}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                       </label>
@@ -513,10 +513,10 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          Push Notifications
+                          {t('settings.notifications.push.title')}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Receive push notifications in your browser
+                          {t('settings.notifications.push.desc')}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -525,7 +525,7 @@ export default function SettingsPage() {
                           className="sr-only peer" 
                           checked={preferences.notifications.push}
                           onChange={(e) => updateNotificationPreference('push', e.target.checked)}
-                          aria-label="Enable push notifications"
+                          aria-label={t('settings.notifications.push.aria')}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                       </label>
@@ -533,10 +533,10 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          Borrow Reminders
+                          {t('settings.notifications.borrow.title')}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Get reminded about due dates and overdue books
+                          {t('settings.notifications.borrow.desc')}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -545,7 +545,7 @@ export default function SettingsPage() {
                           className="sr-only peer" 
                           checked={preferences.notifications.borrowReminders}
                           onChange={(e) => updateNotificationPreference('borrowReminders', e.target.checked)}
-                          aria-label="Enable borrow reminders"
+                          aria-label={t('settings.notifications.borrow.aria')}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                       </label>
@@ -553,10 +553,10 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                          System Updates
+                          {t('settings.notifications.system.title')}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Notifications about system maintenance and updates
+                          {t('settings.notifications.system.desc')}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -565,7 +565,7 @@ export default function SettingsPage() {
                           className="sr-only peer" 
                           checked={preferences.notifications.systemUpdates}
                           onChange={(e) => updateNotificationPreference('systemUpdates', e.target.checked)}
-                          aria-label="Enable system updates notifications"
+                          aria-label={t('settings.notifications.system.aria')}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600"></div>
                       </label>
@@ -576,7 +576,7 @@ export default function SettingsPage() {
                         onClick={savePreferences}
                         loading={preferencesLoading}
                       >
-                        Save Preferences
+                        {t('settings.preferences.save')}
                       </Button>
                     </div>
                   </div>
