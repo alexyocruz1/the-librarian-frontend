@@ -203,21 +203,22 @@ export default function ReportsPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6 items-stretch">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          className="h-full"
         >
-          <Card>
-            <CardBody className="p-6">
+          <Card className="h-full">
+            <CardBody className="p-6 h-full">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <BookOpenIcon className="h-8 w-8 text-primary-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Books</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalBooks.toLocaleString()}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.totalBooks.toLocaleString()}</p>
                 </div>
               </div>
             </CardBody>
@@ -228,16 +229,17 @@ export default function ReportsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
+          className="h-full"
         >
-          <Card>
-            <CardBody className="p-6">
+          <Card className="h-full">
+            <CardBody className="p-6 h-full">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <UsersIcon className="h-8 w-8 text-success-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalUsers.toLocaleString()}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.totalUsers.toLocaleString()}</p>
                 </div>
               </div>
             </CardBody>
@@ -248,16 +250,17 @@ export default function ReportsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="h-full"
         >
-          <Card>
-            <CardBody className="p-6">
+          <Card className="h-full">
+            <CardBody className="p-6 h-full">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <ClockIcon className="h-8 w-8 text-warning-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Loans</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.activeLoans}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.activeLoans}</p>
                 </div>
               </div>
             </CardBody>
@@ -268,16 +271,17 @@ export default function ReportsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          className="h-full"
         >
-          <Card>
-            <CardBody className="p-6">
+          <Card className="h-full">
+            <CardBody className="p-6 h-full">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <ExclamationTriangleIcon className="h-8 w-8 text-error-600" />
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue Books</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.overdueBooks}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.overdueBooks}</p>
                 </div>
               </div>
             </CardBody>

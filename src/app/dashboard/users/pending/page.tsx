@@ -84,8 +84,8 @@ export default function PendingStudentsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Pending Students</h1>
-        <p className="text-gray-600 mt-1">Review and approve student registration requests</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Pending Students</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Review and approve student registration requests</p>
       </div>
 
       {/* Stats */}
@@ -97,8 +97,8 @@ export default function PendingStudentsPage() {
                 <ClockIcon className="h-8 w-8 text-warning-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Pending Requests</p>
-                <p className="text-2xl font-semibold text-gray-900">{pendingUsers.length}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Requests</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{pendingUsers.length}</p>
               </div>
             </div>
           </CardBody>
@@ -111,8 +111,8 @@ export default function PendingStudentsPage() {
                 <UserIcon className="h-8 w-8 text-primary-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Students</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Students</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {pendingUsers.filter(u => u.role === 'student').length}
                 </p>
               </div>
@@ -127,8 +127,8 @@ export default function PendingStudentsPage() {
                 <AcademicCapIcon className="h-8 w-8 text-success-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">With Student ID</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">With Student ID</p>
+                <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {pendingUsers.filter(u => u.studentId).length}
                 </p>
               </div>
@@ -147,8 +147,8 @@ export default function PendingStudentsPage() {
           {pendingUsers.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">✅</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">All caught up!</h3>
-              <p className="text-gray-600">No pending user approvals at this time.</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">All caught up!</h3>
+              <p className="text-gray-600 dark:text-gray-400">No pending user approvals at this time.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -171,29 +171,29 @@ export default function PendingStudentsPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-medium text-gray-900">{user.name}</h3>
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{user.name}</h3>
                           <Badge variant="warning">Pending</Badge>
                           <Badge variant="secondary">{user.role}</Badge>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{user.email}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{user.email}</p>
                         
                         {user.studentId && (
                           <div className="flex items-center gap-2 mb-2">
                             <AcademicCapIcon className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm text-gray-600">Student ID: {user.studentId}</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Student ID: {user.studentId}</span>
                           </div>
                         )}
 
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                           <ClockIcon className="w-4 h-4" />
                           <span>Requested on {new Date(user.createdAt).toLocaleDateString()}</span>
                         </div>
 
                         {user.profile && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <h4 className="text-sm font-medium text-gray-900 mb-1">Additional Information:</h4>
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">Additional Information:</h4>
                             {user.profile.phone && (
-                              <p className="text-sm text-gray-600">Phone: {user.profile.phone}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">Phone: {user.profile.phone}</p>
                             )}
                           </div>
                         )}
