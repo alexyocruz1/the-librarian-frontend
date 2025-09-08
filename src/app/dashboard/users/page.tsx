@@ -24,8 +24,10 @@ import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 export default function UsersPage() {
+  const { t } = useI18n();
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function UsersPage() {
   };
 
   const handleRejectUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to reject this user?')) return;
+    if (!confirm(t('users.confirm.reject'))) return;
 
     try {
       await api.put(`/users/${userId}/reject`);
@@ -77,7 +79,7 @@ export default function UsersPage() {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    if (!confirm(t('users.confirm.delete'))) return;
 
     try {
       await api.delete(`/users/${userId}`);
@@ -171,15 +173,15 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Users</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage library users and permissions</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('users.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('users.subtitle')}</p>
         </div>
         {canManage && (
           <Button
             leftIcon={<PlusIcon className="w-5 h-5" />}
             onClick={handleAddUser}
           >
-            Add User
+            {t('users.add')}
           </Button>
         )}
       </div>
@@ -190,7 +192,7 @@ export default function UsersPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Search users by name, email, or student ID..."
+                placeholder={t('users.search.placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 leftIcon={<MagnifyingGlassIcon className="w-5 h-5" />}
@@ -201,7 +203,7 @@ export default function UsersPage() {
               onClick={() => setShowFilters(!showFilters)}
               leftIcon={<FunnelIcon className="w-5 h-5" />}
             >
-              Filters
+              {t('users.filters')}
             </Button>
           </div>
 
@@ -215,36 +217,36 @@ export default function UsersPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
+                    {t('users.filter.role')}
                   </label>
                   <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    aria-label="Filter by role"
+                    aria-label={t('users.filter.aria.role')}
                   >
-                    <option value="">All Roles</option>
-                    <option value="superadmin">Super Admin</option>
-                    <option value="admin">Admin</option>
-                    <option value="student">Student</option>
-                    <option value="guest">Guest</option>
+                    <option value="">{t('users.filter.role.all')}</option>
+                    <option value="superadmin">{t('users.roles.superadmin')}</option>
+                    <option value="admin">{t('users.roles.admin')}</option>
+                    <option value="student">{t('users.roles.student')}</option>
+                    <option value="guest">{t('users.roles.guest')}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
+                    {t('users.filter.status')}
                   </label>
                   <select
                     value={selectedStatus}
                     onChange={(e) => setSelectedStatus(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                    aria-label="Filter by status"
+                    aria-label={t('users.filter.aria.status')}
                   >
-                    <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="suspended">Suspended</option>
+                    <option value="">{t('users.filter.status.all')}</option>
+                    <option value="active">{t('users.status.active')}</option>
+                    <option value="pending">{t('users.status.pending')}</option>
+                    <option value="rejected">{t('users.status.rejected')}</option>
+                    <option value="suspended">{t('users.status.suspended')}</option>
                   </select>
                 </div>
               </div>
@@ -256,18 +258,18 @@ export default function UsersPage() {
       {/* Users Table */}
       <Card>
         <CardHeader 
-          title="All Users" 
-          subtitle={`${filteredUsers.length} users found`}
+          title={t('users.card.title')} 
+          subtitle={t('users.card.subtitle', { count: filteredUsers.length })}
         />
         <CardBody>
           {filteredUsers.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 text-4xl mb-2">👥</div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No users found</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('users.empty.title')}</h3>
               <p className="text-gray-600 dark:text-gray-400">
                 {searchTerm || selectedRole || selectedStatus 
-                  ? 'Try adjusting your search criteria' 
-                  : 'No users have been registered yet'}
+                  ? t('users.empty.searchHint') 
+                  : t('users.empty.noUsers')}
               </p>
             </div>
           ) : (
@@ -276,26 +278,26 @@ export default function UsersPage() {
                 <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      User
+                      {t('users.table.user')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Role
+                      {t('users.table.role')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Status
+                      {t('users.table.status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Student ID
+                      {t('users.table.studentId')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Libraries
+                      {t('users.table.libraries')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                      Joined
+                      {t('users.table.joined')}
                     </th>
                     {canManage && (
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Actions
+                        {t('users.table.actions')}
                       </th>
                     )}
                   </tr>
@@ -339,7 +341,7 @@ export default function UsersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         {user.libraries && user.libraries.length > 0 
-                          ? `${user.libraries.length} library${user.libraries.length > 1 ? 'ies' : ''}`
+                          ? `${user.libraries.length} ${user.libraries.length > 1 ? t('common.libraries') : t('common.library')}`
                           : '-'
                         }
                       </td>
@@ -358,7 +360,7 @@ export default function UsersPage() {
                                   leftIcon={<CheckCircleIcon className="w-4 h-4" />}
                                   className="text-success-600 hover:text-success-700"
                                 >
-                                  Approve
+                                  {t('users.actions.approve')}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -367,7 +369,7 @@ export default function UsersPage() {
                                   leftIcon={<XCircleIcon className="w-4 h-4" />}
                                   className="text-error-600 hover:text-error-700"
                                 >
-                                  Reject
+                                  {t('users.actions.reject')}
                                 </Button>
                               </>
                             )}
@@ -377,7 +379,7 @@ export default function UsersPage() {
                               onClick={() => handleEditUser(user)}
                               leftIcon={<PencilIcon className="w-4 h-4" />}
                             >
-                              Edit
+                              {t('common.edit')}
                             </Button>
                             {isSuperAdmin && user._id !== currentUser?.id && (
                               <Button
@@ -387,7 +389,7 @@ export default function UsersPage() {
                                 leftIcon={<TrashIcon className="w-4 h-4" />}
                                 className="text-error-600 hover:text-error-700"
                               >
-                                Delete
+                                {t('common.delete')}
                               </Button>
                             )}
                           </div>
