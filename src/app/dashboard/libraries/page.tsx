@@ -109,8 +109,8 @@ export default function LibrariesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Libraries</h1>
-          <p className="text-gray-600 mt-1">Manage library locations and administrators</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Libraries</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage library locations and administrators</p>
         </div>
         {canManage && (
           <Button
@@ -186,10 +186,10 @@ export default function LibrariesPage() {
                 <div className="space-y-4">
                   {/* Location */}
                   <div className="flex items-start gap-3">
-                    <MapPinIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <MapPinIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Location</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Location</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {library.location ? (
                           <>
                             {library.location.address && <div>{library.location.address}</div>}
@@ -208,10 +208,10 @@ export default function LibrariesPage() {
                   {/* Contact */}
                   {library.contact && (
                     <div className="flex items-start gap-3">
-                      <PhoneIcon className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <PhoneIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Contact</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">Contact</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           {library.contact?.email && <div>Email: {library.contact.email}</div>}
                           {library.contact?.phone && <div>Phone: {library.contact.phone}</div>}
                         </p>
@@ -220,26 +220,26 @@ export default function LibrariesPage() {
                   )}
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <UsersIcon className="w-4 h-4 text-primary-600" />
-                        <span className="text-lg font-semibold text-gray-900">0</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500">Admins</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Admins</p>
                     </div>
                     <div className="text-center">
                       <div className="flex items-center justify-center gap-1 mb-1">
                         <BookOpenIcon className="w-4 h-4 text-success-600" />
-                        <span className="text-lg font-semibold text-gray-900">0</span>
+                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500">Books</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Books</p>
                     </div>
                   </div>
 
                   {/* Actions */}
                   {canManage && (
-                    <div className="pt-4 border-t border-gray-100">
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                       <Button
                         fullWidth
                         variant="outline"
@@ -261,9 +261,9 @@ export default function LibrariesPage() {
       {filteredLibraries.length === 0 && (
         <Card>
           <CardBody className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">🏛️</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No libraries found</h3>
-            <p className="text-gray-600">
+            <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🏛️</div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No libraries found</h3>
+            <p className="text-gray-600 dark:text-gray-400">
               {searchTerm ? 'Try adjusting your search terms' : 'Start by adding your first library'}
             </p>
           </CardBody>
