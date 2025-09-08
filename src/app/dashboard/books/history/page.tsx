@@ -1,6 +1,6 @@
 'use client';
-
-import React, { useState, useEffect, useCallback } from 'react';
+ 
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookOpenIcon,
@@ -107,46 +107,51 @@ export default function MyHistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'borrowed' | 'returned' | 'overdue' | 'lost'>('all');
 
-  const fetchHistory = useCallback(async () => {
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Check if user ID exists
+      // If user is not ready yet, don't error; just finish loading with empty
       if (!user?.id) {
-        console.error('No user ID available');
-        setError('User not authenticated');
+        setRecords([]);
+        setLoading(false);
         return;
       }
-      
-      console.log('Fetching history for user:', user.id);
+
       const response = await api.get('/borrow-records/user/' + user.id);
-      
-      console.log('API Response:', response.data);
       
       if (response.data.success) {
         const records = response.data.data?.history || [];
-        console.log('Records found:', records.length);
         setRecords(records);
+        setError(null);
+        // If we get an empty array, that's not an error - it's just no history
       } else {
-        console.error('API returned success: false', response.data);
-        setError('Failed to fetch borrow history');
+        const possible = (response as any)?.data?.data?.history;
+        if (Array.isArray(possible)) {
+          setRecords(possible);
+          setError(null);
+        } else {
+          setError('Failed to fetch borrow history');
+        }
       }
     } catch (error) {
       console.error('Error fetching history:', error);
-      console.error('Error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
-      });
-      
       const errorMessage = getErrorMessage(error);
       
       // Check if it's a 404 or similar "no data" error vs a real error
       if (error.response?.status === 404 || errorMessage.includes('not found')) {
-        console.log('Treating as no data found, showing empty state');
-        setRecords([]); // Set empty array instead of error
+        // Treat as empty state, not an error
+        setRecords([]);
+        setError(null);
       } else {
         setError(errorMessage);
         toast.error(errorMessage);
@@ -154,13 +159,7 @@ export default function MyHistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchHistory();
-    }
-  }, [user?.id, fetchHistory]);
+  };
 
   const filteredRecords = records.filter(record => {
     if (filter === 'all') return true;

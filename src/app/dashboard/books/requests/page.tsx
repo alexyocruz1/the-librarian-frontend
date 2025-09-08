@@ -1,6 +1,6 @@
 'use client';
-
-import React, { useState, useEffect, useCallback } from 'react';
+ 
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookmarkIcon,
@@ -98,46 +98,51 @@ export default function MyRequestsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'cancelled'>('all');
 
-  const fetchRequests = useCallback(async () => {
+  const hasFetched = useRef(false);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Check if user ID exists
+      // If user is not ready yet, don't error; just finish loading
       if (!user?.id) {
-        console.error('No user ID available');
-        setError('User not authenticated');
+        setRequests([]);
+        setLoading(false);
         return;
       }
-      
-      console.log('Fetching requests for user:', user.id);
+
       const response = await api.get('/borrow-requests/user/' + user.id);
-      
-      console.log('API Response:', response.data);
       
       if (response.data.success) {
         const requests = response.data.data?.requests || [];
-        console.log('Requests found:', requests.length);
         setRequests(requests);
+        setError(null);
+        // If we get an empty array, that's not an error - it's just no requests
       } else {
-        console.error('API returned success: false', response.data);
-        setError('Failed to fetch requests');
+        const possible = (response as any)?.data?.data?.requests;
+        if (Array.isArray(possible)) {
+          setRequests(possible);
+          setError(null);
+        } else {
+          setError('Failed to fetch requests');
+        }
       }
     } catch (error) {
       console.error('Error fetching requests:', error);
-      console.error('Error details:', {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
-      });
-      
       const errorMessage = getErrorMessage(error);
       
       // Check if it's a 404 or similar "no data" error vs a real error
       if (error.response?.status === 404 || errorMessage.includes('not found')) {
-        console.log('Treating as no data found, showing empty state');
-        setRequests([]); // Set empty array instead of error
+        // Treat as empty state, not an error
+        setRequests([]);
+        setError(null);
       } else {
         setError(errorMessage);
         toast.error(errorMessage);
@@ -145,13 +150,7 @@ export default function MyRequestsPage() {
     } finally {
       setLoading(false);
     }
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (user?.id) {
-      fetchRequests();
-    }
-  }, [user?.id, fetchRequests]);
+  };
 
   const handleCancelRequest = async (requestId: string) => {
     try {
