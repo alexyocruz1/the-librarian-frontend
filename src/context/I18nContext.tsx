@@ -21,10 +21,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   const setLocale = (loc: SupportedLocale) => {
     setLocaleState(loc);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('librarian-locale', loc);
+      }
+    } catch {}
   };
 
   useEffect(() => {
-    // Determine initial locale from preferences or browser
+    // Determine initial locale from localStorage, preferences, or browser
+    try {
+      const saved = typeof window !== 'undefined' ? (localStorage.getItem('librarian-locale') as SupportedLocale | null) : null;
+      if (saved && supportedLocales.includes(saved)) {
+        setLocaleState(saved);
+        return;
+      }
+    } catch {}
+
     const preferred = (preferences.language as SupportedLocale) || defaultLocale;
     const browser = typeof navigator !== 'undefined' ? (navigator.language?.slice(0, 2) as SupportedLocale) : defaultLocale;
     const initial = supportedLocales.includes(preferred) ? preferred : (supportedLocales.includes(browser) ? browser : defaultLocale);

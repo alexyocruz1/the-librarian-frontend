@@ -24,7 +24,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { t } = useI18n();
+  const { locale, setLocale, t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
@@ -102,8 +102,17 @@ export default function LoginPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md relative"
       >
-        {/* Theme Toggle */}
-        <div className="absolute top-0 right-0">
+        {/* Theme + Language Toggles */}
+        <div className="absolute top-2 right-2 sm:top-0 sm:right-0 flex items-center gap-2 p-1 sm:p-0">
+          <select
+            aria-label={t('auth.language')}
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as any)}
+            className="h-9 px-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white/95 dark:bg-gray-800/90 text-sm text-gray-900 dark:text-gray-100 shadow-sm backdrop-blur-sm min-w-[110px] sm:min-w-[120px] max-w-[40vw] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          >
+            <option value="en">{t('auth.language.en')}</option>
+            <option value="es">{t('auth.language.es')}</option>
+          </select>
           <ThemeToggle />
         </div>
 

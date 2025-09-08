@@ -143,7 +143,10 @@
   "auth.register.studentApproval.body": "Tu cuenta quedará pendiente hasta que un administrador la apruebe.",
   "auth.register.button": "Crear cuenta",
   "auth.register.haveAccount": "¿Ya tienes una cuenta?",
-  "auth.register.signinLink": "Inicia sesión aquí"
+  "auth.register.signinLink": "Inicia sesión aquí",
+  "auth.language": "Idioma",
+  "auth.language.en": "Inglés",
+  "auth.language.es": "Español"
 }
 
 
