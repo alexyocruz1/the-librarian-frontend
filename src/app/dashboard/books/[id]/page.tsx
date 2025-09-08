@@ -22,11 +22,13 @@ import { Title, Inventory, Copy } from '@/types';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 export default function BookDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useI18n();
   const [title, setTitle] = useState<Title | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [copies, setCopies] = useState<Copy[]>([]);
@@ -44,18 +46,43 @@ export default function BookDetailPage() {
 
   const fetchBookDetails = async () => {
     try {
-      const [titleResponse, inventoryResponse, copiesResponse] = await Promise.all([
-        api.get(`/titles/${bookId}`),
+      // Fetch title first to detect 404 without noisy toasts
+      const titleResponse = await api.get(`/titles/${bookId}`);
+      if (!titleResponse.success || !titleResponse.data?.title) {
+        setTitle(null);
+        setLoading(false);
+        return;
+      }
+      setTitle(titleResponse.data.title || titleResponse.data.data);
+
+      // Fetch related data, tolerate partial failures
+      const results = await Promise.allSettled([
         api.get(`/inventories/title/${bookId}`),
         api.get(`/copies/title/${bookId}`)
       ]);
 
-      setTitle(titleResponse.data.data);
-      setInventory(inventoryResponse.data.data);
-      setCopies(copiesResponse.data.data || []);
-    } catch (error) {
-      console.error('Error fetching book details:', error);
-      toast.error('Failed to fetch book details');
+      const invRes = results[0];
+      const copRes = results[1];
+
+      if (invRes.status === 'fulfilled') {
+        setInventory((invRes as any).value.data.data || null);
+      } else {
+        setInventory(null);
+      }
+
+      if (copRes.status === 'fulfilled') {
+        setCopies((copRes as any).value.data.data || []);
+      } else {
+        setCopies([]);
+      }
+    } catch (error: any) {
+      // Suppress toast on 404 (not found); show toast for other errors
+      const status = error?.response?.status;
+      if (status !== 404) {
+        console.error('Error fetching book details:', error);
+        toast.error(t('bookDetail.errors.fetch'));
+      }
+      setTitle(null);
     } finally {
       setLoading(false);
     }
@@ -161,10 +188,10 @@ export default function BookDetailPage() {
   if (!title) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Book not found</h2>
-        <p className="text-gray-600 mb-4">The book you&apos;re looking for doesn&apos;t exist.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('bookDetail.notFound.title')}</h2>
+        <p className="text-gray-600 mb-4">{t('bookDetail.notFound.description')}</p>
         <Button onClick={() => router.back()}>
-          Go Back
+          {t('bookDetail.notFound.back')}
         </Button>
       </div>
     );

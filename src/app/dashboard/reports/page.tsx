@@ -79,6 +79,7 @@ interface ReportStats {
 
 const RecentActivity = dynamic(() => import('./recent-activity').then(m => m.default), { ssr: false, loading: () => null });
 const PopularBooks = dynamic(() => import('./popular-books').then(m => m.default), { ssr: false, loading: () => null });
+const QuickActions = dynamic(() => import('./quick-actions').then(m => m.default), { ssr: false, loading: () => null });
 
 export default function ReportsPage() {
   const { user } = useAuth();
@@ -415,37 +416,7 @@ export default function ReportsPage() {
           </CardBody>
         </Card>
 
-        <Card>
-          <CardHeader title={t('reports.quickActions.title')} />
-          <CardBody>
-            <div className="space-y-3">
-              <Button
-                fullWidth
-                variant="outline"
-                leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
-                onClick={() => handleExportReport('Books')}
-              >
-                {t('reports.quickActions.exportBooks')}
-              </Button>
-              <Button
-                fullWidth
-                variant="outline"
-                leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
-                onClick={() => handleExportReport('Users')}
-              >
-                {t('reports.quickActions.exportUsers')}
-              </Button>
-              <Button
-                fullWidth
-                variant="outline"
-                leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
-                onClick={() => handleExportReport('Loans')}
-              >
-                {t('reports.quickActions.exportLoans')}
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
+        <QuickActions onExport={handleExportReport} />
 
         <Card>
           <CardHeader title={t('reports.systemHealth.title')} />

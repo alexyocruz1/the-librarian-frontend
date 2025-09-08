@@ -25,7 +25,11 @@ export default function BooksPage() {
   const { user } = useAuth();
   const [titles, setTitles] = useState<Title[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingTitles, setLoadingTitles] = useState(true);
+  const [loadingInventories, setLoadingInventories] = useState(true);
+  const loading = loadingTitles || loadingInventories;
+  const [titlesError, setTitlesError] = useState<string | null>(null);
+  const [inventoriesError, setInventoriesError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLibrary, setSelectedLibrary] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
@@ -52,23 +56,31 @@ export default function BooksPage() {
 
   const fetchTitles = async () => {
     try {
+      setLoadingTitles(true);
+      setTitlesError(null);
       const response = await api.get('/titles');
       setTitles(response.data.data || []);
     } catch (error) {
       console.error('Error fetching titles:', error);
-      toast.error(getErrorMessage(error));
+      const msg = getErrorMessage(error);
+      setTitlesError(msg);
+    } finally {
+      setLoadingTitles(false);
     }
   };
 
   const fetchInventories = async () => {
     try {
+      setLoadingInventories(true);
+      setInventoriesError(null);
       const response = await api.get('/inventories');
       setInventories(response.data.data || []);
     } catch (error) {
       console.error('Error fetching inventories:', error);
-      toast.error(getErrorMessage(error));
+      const msg = getErrorMessage(error);
+      setInventoriesError(msg);
     } finally {
-      setLoading(false);
+      setLoadingInventories(false);
     }
   };
 
@@ -223,6 +235,27 @@ export default function BooksPage() {
         onSearch={handleAdvancedSearch}
       />
 
+      {/* Errors */}
+      {(titlesError || inventoriesError) && (
+        <Card>
+          <CardBody>
+            <div className="space-y-2">
+              {titlesError && (
+                <p className="text-sm text-error-600">{titlesError}</p>
+              )}
+              {inventoriesError && (
+                <p className="text-sm text-error-600">{inventoriesError}</p>
+              )}
+              <div className="pt-2">
+                <Button variant="outline" onClick={() => { fetchTitles(); fetchInventories(); }}>
+                  {t('common.retry')}
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
       {/* Books Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredTitles.map((title) => {
@@ -294,15 +327,24 @@ export default function BooksPage() {
         })}
       </div>
 
-      {filteredTitles.length === 0 && !loading && (
+      {filteredTitles.length === 0 && !loading && !titlesError && !inventoriesError && (
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
             <MagnifyingGlassIcon className="w-16 h-16 mx-auto" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('books.noResults.title')}</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+            {searchTerm ? t('books.noResults.title') : t('books.empty.title')}
+          </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {searchTerm ? t('books.noResults.descriptionWithTerm', { term: searchTerm }) : t('books.noResults.descriptionEmpty')}
+            {searchTerm 
+              ? t('books.noResults.descriptionWithTerm', { term: searchTerm }) 
+              : t('books.empty.description')}
           </p>
+          {(user?.role === 'admin' || user?.role === 'superadmin') && !searchTerm && (
+            <div className="mt-4">
+              <Button onClick={handleAddBook}>{t('books.empty.cta')}</Button>
+            </div>
+          )}
         </div>
       )}
 
