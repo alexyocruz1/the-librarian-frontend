@@ -16,6 +16,8 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { User } from '@/types';
 import toast from 'react-hot-toast';
+import AppLoader from '@/components/ui/AppLoader';
+import { getErrorMessage } from '@/lib/errorMessages';
 
 export default function PendingStudentsPage() {
   const { user } = useAuth();
@@ -40,12 +42,12 @@ export default function PendingStudentsPage() {
 
   const handleApproveUser = async (userId: string) => {
     try {
-      await api.put(`/users/${userId}/approve`);
+      await api.approveStudent(userId);
       toast.success('User approved successfully');
       fetchPendingUsers();
     } catch (error: any) {
       console.error('Error approving user:', error);
-      toast.error(error.response?.data?.message || 'Failed to approve user');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -53,12 +55,12 @@ export default function PendingStudentsPage() {
     if (!confirm('Are you sure you want to reject this user? They will not be able to access the system.')) return;
 
     try {
-      await api.put(`/users/${userId}/reject`);
+      await api.rejectStudent(userId);
       toast.success('User rejected successfully');
       fetchPendingUsers();
     } catch (error: any) {
       console.error('Error rejecting user:', error);
-      toast.error(error.response?.data?.message || 'Failed to reject user');
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -75,11 +77,7 @@ export default function PendingStudentsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <AppLoader subtitle="Loading pending students…" size="md" />;
   }
 
   return (
