@@ -273,6 +273,17 @@ class ApiClient {
     const params = limit ? { limit } : {};
     return this.get('/dashboard/activity', { params });
   }
+
+  // Reports API methods
+  async getReportsData(dateRange?: string) {
+    const params = dateRange ? { dateRange } : {};
+    return this.get('/reports', { params });
+  }
+
+  async getReportData(type: string, dateRange?: string) {
+    const params = dateRange ? { dateRange } : {};
+    return this.get(`/reports/${type}`, { params });
+  }
 }
 
 // Create and export a singleton instance

@@ -21,22 +21,55 @@ import { getErrorMessage, getSuccessMessage, getInfoMessage } from '@/lib/errorM
 import toast from 'react-hot-toast';
 
 interface ReportStats {
-  totalBooks: number;
-  totalUsers: number;
-  totalLibraries: number;
-  activeLoans: number;
-  overdueBooks: number;
-  pendingRequests: number;
-  totalBorrows: number;
+  summary: {
+    totalBooks: number;
+    totalUsers: number;
+    totalLibraries: number;
+    totalInventories: number;
+    totalCopies: number;
+    activeLoans: number;
+    overdueBooks: number;
+    pendingRequests: number;
+    totalBorrows: number;
+    dateRange: number;
+  };
   popularBooks: Array<{
     title: string;
     borrowCount: number;
   }>;
   recentActivity: Array<{
     type: string;
-    description: string;
+    message: string;
     timestamp: string;
+    user?: string;
+    book?: string;
+    library?: string;
   }>;
+  borrowTrends: Array<{
+    _id: string;
+    count: number;
+  }>;
+  userActivityStats: Array<{
+    name: string;
+    email: string;
+    role: string;
+    borrowCount: number;
+    lastActivity: string;
+  }>;
+  libraryStats: Array<{
+    name: string;
+    code: string;
+    totalBorrows: number;
+    activeLoans: number;
+    overdueCount: number;
+    overdueRate: number;
+  }>;
+  systemHealth: {
+    overdueRate: number;
+    requestProcessingRate: string;
+    systemStatus: string;
+    lastUpdated: string;
+  };
 }
 
 export default function ReportsPage() {
@@ -51,67 +84,14 @@ export default function ReportsPage() {
 
   const fetchReportData = async () => {
     try {
-      // Fetch all data in parallel
-      const [titlesResponse, usersResponse, librariesResponse, borrowRequestsResponse, borrowRecordsResponse, activeLoansResponse] = await Promise.all([
-        api.get('/titles'),
-        api.get('/users'),
-        api.get('/libraries'),
-        api.get('/borrow-requests/pending'),
-        api.get('/borrow-records/overdue'),
-        api.get('/borrow-records/active'),
-      ]);
-
-      const totalBooks = titlesResponse.data?.data?.titles?.length || 0;
-      const totalUsers = usersResponse.data?.data?.users?.length || 0;
-      const totalLibraries = librariesResponse.data?.data?.libraries?.length || 0;
-      const pendingRequests = borrowRequestsResponse.data?.data?.requests?.length || 0;
-      const overdueBooks = borrowRecordsResponse.data?.data?.overdueRecords?.length || 0;
-      const activeLoans = activeLoansResponse.data?.data?.loans?.length || 0;
-
-      // For popular books, we'll create a simple list based on available titles
-      const titles = titlesResponse.data?.data?.titles || [];
-      const popularBooks = titles.slice(0, 5).map((title: any, index: number) => ({
-        title: title.title,
-        borrowCount: Math.floor(Math.random() * 50) + 10, // Mock borrow count for now
-      }));
-
-      // For recent activity, we'll create a simple list based on available data
-      const recentActivity = [
-        ...(pendingRequests > 0 ? [{
-          type: 'request',
-          description: `${pendingRequests} pending borrow request${pendingRequests > 1 ? 's' : ''}`,
-          timestamp: new Date().toISOString(),
-        }] : []),
-        ...(overdueBooks > 0 ? [{
-          type: 'overdue',
-          description: `${overdueBooks} overdue book${overdueBooks > 1 ? 's' : ''}`,
-          timestamp: new Date().toISOString(),
-        }] : []),
-        ...(activeLoans > 0 ? [{
-          type: 'borrow',
-          description: `${activeLoans} active loan${activeLoans > 1 ? 's' : ''}`,
-          timestamp: new Date().toISOString(),
-        }] : []),
-        {
-          type: 'system',
-          description: 'Library system is running smoothly',
-          timestamp: new Date().toISOString(),
-        },
-      ];
-
-      const reportStats: ReportStats = {
-        totalBooks,
-        totalUsers,
-        totalLibraries,
-        activeLoans,
-        overdueBooks,
-        pendingRequests,
-        totalBorrows: activeLoans + Math.floor(Math.random() * 1000), // Mock total borrows
-        popularBooks,
-        recentActivity,
-      };
+      setLoading(true);
+      const response = await api.getReportsData(dateRange);
       
-      setStats(reportStats);
+      if (response.success && response.data) {
+        setStats(response.data);
+      } else {
+        throw new Error('Failed to fetch reports data');
+      }
     } catch (error) {
       console.error('Error fetching report data:', error);
       toast.error(getErrorMessage(error));
@@ -122,8 +102,45 @@ export default function ReportsPage() {
 
   const handleExportReport = async (type: string) => {
     try {
-      // TODO: Implement actual report export
-      toast.success(getSuccessMessage('report_exported'));
+      let data: any = null;
+      let filename = '';
+
+      switch (type) {
+        case 'Full':
+          data = stats;
+          filename = `full-report-${dateRange}days-${new Date().toISOString().split('T')[0]}.json`;
+          break;
+        case 'Books':
+          const booksResponse = await api.getReportData('books', dateRange);
+          data = booksResponse.data;
+          filename = `books-report-${dateRange}days-${new Date().toISOString().split('T')[0]}.json`;
+          break;
+        case 'Users':
+          const usersResponse = await api.getReportData('users', dateRange);
+          data = usersResponse.data;
+          filename = `users-report-${dateRange}days-${new Date().toISOString().split('T')[0]}.json`;
+          break;
+        case 'Loans':
+          const loansResponse = await api.getReportData('loans', dateRange);
+          data = loansResponse.data;
+          filename = `loans-report-${dateRange}days-${new Date().toISOString().split('T')[0]}.json`;
+          break;
+        default:
+          throw new Error('Invalid report type');
+      }
+
+      // Create and download the file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`${type} report exported successfully!`);
     } catch (error) {
       console.error('Error exporting report:', error);
       toast.error(getErrorMessage(error));
@@ -203,7 +220,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Books</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.totalBooks.toLocaleString()}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalBooks.toLocaleString()}</p>
                 </div>
               </div>
             </CardBody>
@@ -223,7 +240,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.totalUsers.toLocaleString()}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalUsers.toLocaleString()}</p>
                 </div>
               </div>
             </CardBody>
@@ -243,7 +260,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Loans</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.activeLoans}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.activeLoans}</p>
                 </div>
               </div>
             </CardBody>
@@ -263,7 +280,7 @@ export default function ReportsPage() {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue Books</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.overdueBooks}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.summary.overdueBooks}</p>
                 </div>
               </div>
             </CardBody>
@@ -330,7 +347,7 @@ export default function ReportsPage() {
                     {activity.type === 'approval' && <UsersIcon className="w-4 h-4 text-success-600" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900 dark:text-gray-100">{activity.description}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100">{activity.message}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       {new Date(activity.timestamp).toLocaleString()}
                     </p>
@@ -350,15 +367,15 @@ export default function ReportsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Total Libraries</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.totalLibraries}</span>
+                <span className="text-lg font-semibold text-gray-900">{stats.summary.totalLibraries}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Pending Requests</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.pendingRequests}</span>
+                <span className="text-lg font-semibold text-gray-900">{stats.summary.pendingRequests}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Total Borrows</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.totalBorrows.toLocaleString()}</span>
+                <span className="text-lg font-semibold text-gray-900">{stats.summary.totalBorrows.toLocaleString()}</span>
               </div>
             </div>
           </CardBody>
@@ -402,24 +419,100 @@ export default function ReportsPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Overdue Rate</span>
-                <Badge variant={stats.overdueBooks > 20 ? 'error' : 'success'}>
-                  {((stats.overdueBooks / stats.activeLoans) * 100).toFixed(1)}%
+                <Badge variant={stats.systemHealth.overdueRate > 20 ? 'error' : 'success'}>
+                  {stats.systemHealth.overdueRate.toFixed(1)}%
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Request Processing</span>
-                <Badge variant={stats.pendingRequests > 50 ? 'warning' : 'success'}>
-                  {stats.pendingRequests > 50 ? 'High' : 'Normal'}
+                <Badge variant={stats.systemHealth.requestProcessingRate === 'High' ? 'warning' : 'success'}>
+                  {stats.systemHealth.requestProcessingRate}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">System Status</span>
-                <Badge variant="success">Healthy</Badge>
+                <Badge variant={stats.systemHealth.systemStatus === 'Healthy' ? 'success' : 'warning'}>
+                  {stats.systemHealth.systemStatus}
+                </Badge>
               </div>
             </div>
           </CardBody>
         </Card>
       </div>
+
+      {/* Additional Analytics Sections */}
+      {stats.userActivityStats && stats.userActivityStats.length > 0 && (
+        <Card>
+          <CardHeader 
+            title="Top Active Users" 
+            subtitle="Users with most borrowing activity in the selected period"
+          />
+          <CardBody>
+            <div className="space-y-4">
+              {stats.userActivityStats.slice(0, 5).map((user, index) => (
+                <motion.div
+                  key={user.email}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-success-100 dark:bg-success-900 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-success-700 dark:text-success-300">#{index + 1}</span>
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{user.name}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{user.role} • {user.borrowCount} borrows</p>
+                    </div>
+                  </div>
+                  <Badge variant="success" size="sm">
+                    {user.borrowCount}
+                  </Badge>
+                </motion.div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Library Performance */}
+      {stats.libraryStats && stats.libraryStats.length > 0 && (
+        <Card>
+          <CardHeader 
+            title="Library Performance" 
+            subtitle="Borrowing activity by library"
+          />
+          <CardBody>
+            <div className="space-y-4">
+              {stats.libraryStats.map((library, index) => (
+                <motion.div
+                  key={library.code}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <BuildingLibraryIcon className="w-5 h-5 text-primary-600" />
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{library.name}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {library.totalBorrows} total borrows • {library.activeLoans} active loans
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Badge variant={library.overdueRate > 10 ? 'error' : 'success'} size="sm">
+                      {library.overdueRate.toFixed(1)}% overdue
+                    </Badge>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
     </div>
   );
 }
