@@ -49,6 +49,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+    --toast-bg: #1f2937;
+    --toast-color: #f9fafb;
+    --toast-border: #374151;
   }
 }
 
@@ -69,11 +72,11 @@
   }
   
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 antialiased;
   }
   
   * {
-    @apply border-gray-200;
+    @apply border-gray-200 dark:border-gray-700;
   }
 }
 
@@ -89,7 +92,7 @@
   }
   
   .btn-secondary {
-    @apply btn bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:ring-primary-500;
+    @apply btn bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 focus:ring-primary-500;
   }
   
   .btn-success {
@@ -105,7 +108,7 @@
   }
   
   .btn-ghost {
-    @apply btn bg-transparent text-gray-700 border-transparent hover:bg-gray-100 focus:ring-primary-500;
+    @apply btn bg-transparent text-gray-700 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-primary-500;
   }
   
   .btn-sm {
@@ -118,7 +121,7 @@
   
   /* Input Components */
   .input {
-    @apply block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200;
+    @apply block w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200;
   }
   
   .input-error {
@@ -135,11 +138,11 @@
   
   /* Card Components */
   .card {
-    @apply bg-white rounded-xl shadow-soft border border-gray-200 overflow-hidden;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-soft border border-gray-200 dark:border-gray-700 overflow-hidden;
   }
   
   .card-header {
-    @apply px-6 py-4 border-b border-gray-200 bg-gray-50;
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
   }
   
   .card-body {
@@ -147,7 +150,7 @@
   }
   
   .card-footer {
-    @apply px-6 py-4 border-t border-gray-200 bg-gray-50;
+    @apply px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
   }
   
   /* Badge Components */
@@ -156,23 +159,23 @@
   }
   
   .badge-primary {
-    @apply badge bg-primary-100 text-primary-800;
+    @apply badge bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200;
   }
   
   .badge-secondary {
-    @apply badge bg-gray-100 text-gray-800;
+    @apply badge bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200;
   }
   
   .badge-success {
-    @apply badge bg-success-100 text-success-800;
+    @apply badge bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200;
   }
   
   .badge-warning {
-    @apply badge bg-warning-100 text-warning-800;
+    @apply badge bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200;
   }
   
   .badge-error {
-    @apply badge bg-error-100 text-error-800;
+    @apply badge bg-error-100 dark:bg-error-900 text-error-800 dark:text-error-200;
   }
   
   /* Status Badges */
@@ -181,64 +184,64 @@
   }
   
   .status-active {
-    @apply bg-success-100 text-success-800;
+    @apply bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200;
   }
   
   .status-pending {
-    @apply bg-warning-100 text-warning-800;
+    @apply bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200;
   }
   
   .status-rejected {
-    @apply bg-error-100 text-error-800;
+    @apply bg-error-100 dark:bg-error-900 text-error-800 dark:text-error-200;
   }
   
   .status-suspended {
-    @apply bg-gray-100 text-gray-800;
+    @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200;
   }
   
   .status-available {
-    @apply bg-success-100 text-success-800;
+    @apply bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200;
   }
   
   .status-borrowed {
-    @apply bg-primary-100 text-primary-800;
+    @apply bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200;
   }
   
   .status-reserved {
-    @apply bg-warning-100 text-warning-800;
+    @apply bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200;
   }
   
   .status-lost {
-    @apply bg-error-100 text-error-800;
+    @apply bg-error-100 dark:bg-error-900 text-error-800 dark:text-error-200;
   }
   
   .status-maintenance {
-    @apply bg-gray-100 text-gray-800;
+    @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200;
   }
   
   /* Table Components */
   .table {
-    @apply min-w-full divide-y divide-gray-200;
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
   }
   
   .table-header {
-    @apply bg-gray-50;
+    @apply bg-gray-50 dark:bg-gray-800;
   }
   
   .table-header-cell {
-    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    @apply px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider;
   }
   
   .table-body {
-    @apply bg-white divide-y divide-gray-200;
+    @apply bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700;
   }
   
   .table-row {
-    @apply hover:bg-gray-50 transition-colors duration-150;
+    @apply hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150;
   }
   
   .table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100;
   }
   
   /* Modal Components */
@@ -247,11 +250,11 @@
   }
   
   .modal-content {
-    @apply bg-white rounded-xl shadow-strong max-w-md w-full max-h-[90vh] overflow-y-auto;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-strong max-w-md w-full max-h-[90vh] overflow-y-auto;
   }
   
   .modal-header {
-    @apply px-6 py-4 border-b border-gray-200 flex items-center justify-between;
+    @apply px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between;
   }
   
   .modal-body {
@@ -259,12 +262,12 @@
   }
   
   .modal-footer {
-    @apply px-6 py-4 border-t border-gray-200 flex items-center justify-end space-x-3;
+    @apply px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-end space-x-3;
   }
   
   /* Loading Components */
   .spinner {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary-600;
+    @apply animate-spin rounded-full border-2 border-gray-300 dark:border-gray-600 border-t-primary-600;
   }
   
   .spinner-sm {
@@ -281,7 +284,7 @@
   
   /* Skeleton Components */
   .skeleton {
-    @apply animate-pulse bg-gray-200 rounded;
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
   }
   
   .skeleton-text {
@@ -302,11 +305,11 @@
   }
   
   .nav-link-active {
-    @apply nav-link bg-primary-100 text-primary-700;
+    @apply nav-link bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-200;
   }
   
   .nav-link-inactive {
-    @apply nav-link text-gray-600 hover:bg-gray-100 hover:text-gray-900;
+    @apply nav-link text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100;
   }
   
   /* Form Components */
@@ -315,7 +318,7 @@
   }
   
   .form-label {
-    @apply block text-sm font-medium text-gray-700;
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
   }
   
   .form-error {
@@ -323,20 +326,20 @@
   }
   
   .form-help {
-    @apply text-sm text-gray-500;
+    @apply text-sm text-gray-500 dark:text-gray-400;
   }
   
   /* Layout Components */
   .page-header {
-    @apply bg-white border-b border-gray-200 px-6 py-4;
+    @apply bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4;
   }
   
   .page-title {
-    @apply text-2xl font-bold text-gray-900;
+    @apply text-2xl font-bold text-gray-900 dark:text-gray-100;
   }
   
   .page-subtitle {
-    @apply text-sm text-gray-600 mt-1;
+    @apply text-sm text-gray-600 dark:text-gray-400 mt-1;
   }
   
   .page-content {

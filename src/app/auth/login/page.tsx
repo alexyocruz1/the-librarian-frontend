@@ -11,6 +11,7 @@ import { EyeIcon, EyeSlashIcon, BookOpenIcon } from '@heroicons/react/24/outline
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
@@ -92,13 +93,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative"
       >
+        {/* Theme Toggle */}
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
+        </div>
+
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <motion.div
@@ -113,7 +119,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-3xl font-bold text-gray-900 mb-2"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
             The Librarian
           </motion.h1>
@@ -121,7 +127,7 @@ export default function LoginPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="text-gray-600"
+            className="text-gray-600 dark:text-gray-400"
           >
             Sign in to your account
           </motion.p>
@@ -176,7 +182,7 @@ export default function LoginPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="w-4 h-4" />
@@ -194,9 +200,9 @@ export default function LoginPage() {
                       id="remember-me"
                       type="checkbox"
                       {...register('rememberMe')}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
                     />
-                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                       Remember me
                     </label>
                   </div>
@@ -232,7 +238,7 @@ export default function LoginPage() {
             transition={{ delay: 0.7, duration: 0.5 }}
             className="mt-6 text-center"
           >
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Don&apos;t have an account?{' '}
               <Link
                 href="/auth/register"

@@ -102,7 +102,7 @@ export default function AssignAdminModal({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl"
+              className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl"
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
@@ -141,8 +141,8 @@ export default function AssignAdminModal({
                       {filteredAdmins.length === 0 ? (
                         <div className="text-center py-8">
                           <div className="text-gray-400 text-4xl mb-2">👥</div>
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">No administrators found</h3>
-                          <p className="text-gray-600">
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No administrators found</h3>
+                          <p className="text-gray-600 dark:text-gray-400">
                             {searchTerm ? 'Try adjusting your search terms' : 'No administrators available to assign'}
                           </p>
                         </div>
@@ -167,8 +167,8 @@ export default function AssignAdminModal({
                                   </div>
                                 </div>
                                 <div>
-                                  <h4 className="text-sm font-medium text-gray-900">{admin.name}</h4>
-                                  <p className="text-sm text-gray-500">{admin.email}</p>
+                                  <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{admin.name}</h4>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">{admin.email}</p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">

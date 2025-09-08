@@ -49,10 +49,10 @@ export default function RootLayout({
               toastOptions={{
                 duration: 4000,
                 style: {
-                  background: '#fff',
-                  color: '#374151',
+                  background: 'var(--toast-bg, #fff)',
+                  color: 'var(--toast-color, #374151)',
                   boxShadow: '0 10px 40px -10px rgba(0, 0, 0, 0.15)',
-                  border: '1px solid #e5e7eb',
+                  border: '1px solid var(--toast-border, #e5e7eb)',
                   borderRadius: '12px',
                   padding: '16px',
                 },

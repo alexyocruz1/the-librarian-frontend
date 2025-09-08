@@ -178,7 +178,7 @@ export default function DashboardPage() {
       case 'system':
         return <ChartBarIcon className="w-4 h-4 text-primary-600" />;
       default:
-        return <ClockIcon className="w-4 h-4 text-gray-600" />;
+        return <ClockIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />;
     }
   };
 
@@ -217,9 +217,9 @@ export default function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-6 shadow-sm border animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border dark:border-gray-700 animate-pulse">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -365,33 +365,33 @@ export default function DashboardPage() {
               <div className="space-y-3">
                 <a
                   href="/dashboard/books/browse"
-                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <BookOpenIcon className="w-5 h-5 text-primary-600 mr-3" />
-                  <span className="text-sm font-medium text-gray-900">Browse Books</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Browse Books</span>
                 </a>
                 <a
                   href="/dashboard/books/requests"
-                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <ClipboardDocumentListIcon className="w-5 h-5 text-warning-600 mr-3" />
-                  <span className="text-sm font-medium text-gray-900">My Requests</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">My Requests</span>
                 </a>
                 {hasRole(['admin', 'superadmin']) && (
                   <>
                     <a
                       href="/dashboard/users/pending"
-                      className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <UsersIcon className="w-5 h-5 text-success-600 mr-3" />
-                      <span className="text-sm font-medium text-gray-900">Pending Students</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Pending Students</span>
                     </a>
                     <a
                       href="/dashboard/reports"
-                      className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <ChartBarIcon className="w-5 h-5 text-purple-600 mr-3" />
-                      <span className="text-sm font-medium text-gray-900">View Reports</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">View Reports</span>
                     </a>
                   </>
                 )}

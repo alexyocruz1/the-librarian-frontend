@@ -11,6 +11,7 @@ import { EyeIcon, EyeSlashIcon, BookOpenIcon, UserIcon } from '@heroicons/react/
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 
 const registerSchema = z.object({
@@ -76,13 +77,18 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        className="w-full max-w-md relative"
       >
+        {/* Theme Toggle */}
+        <div className="absolute top-0 right-0">
+          <ThemeToggle />
+        </div>
+
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <motion.div
@@ -97,7 +103,7 @@ export default function RegisterPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
-            className="text-3xl font-bold text-gray-900 mb-2"
+            className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
             Join The Librarian
           </motion.h1>
@@ -105,7 +111,7 @@ export default function RegisterPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="text-gray-600"
+            className="text-gray-600 dark:text-gray-400"
           >
             Create your account to get started
           </motion.p>
@@ -151,7 +157,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Account Type
                   </label>
                   <div className="grid grid-cols-2 gap-3">
@@ -162,10 +168,10 @@ export default function RegisterPage() {
                         value="guest"
                         className="sr-only peer"
                       />
-                      <div className="p-3 border-2 border-gray-200 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 hover:border-gray-300">
+                      <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-900">Guest</div>
-                          <div className="text-xs text-gray-500 mt-1">Browse & request books</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Guest</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Browse & request books</div>
                         </div>
                       </div>
                     </label>
@@ -176,10 +182,10 @@ export default function RegisterPage() {
                         value="student"
                         className="sr-only peer"
                       />
-                      <div className="p-3 border-2 border-gray-200 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 hover:border-gray-300">
+                      <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-900">Student</div>
-                          <div className="text-xs text-gray-500 mt-1">Full access + history</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Student</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Full access + history</div>
                         </div>
                       </div>
                     </label>
@@ -207,7 +213,7 @@ export default function RegisterPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                       >
                         {showPassword ? (
                           <EyeSlashIcon className="w-4 h-4" />
@@ -237,7 +243,7 @@ export default function RegisterPage() {
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                       >
                         {showConfirmPassword ? (
                           <EyeSlashIcon className="w-4 h-4" />
@@ -255,13 +261,13 @@ export default function RegisterPage() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="p-3 bg-warning-50 border border-warning-200 rounded-lg"
+                    className="p-3 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg"
                   >
                     <div className="flex items-start">
-                      <svg className="w-5 h-5 text-warning-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-warning-600 dark:text-warning-400 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <div className="text-sm text-warning-700">
+                      <div className="text-sm text-warning-700 dark:text-warning-300">
                         <p className="font-medium">Student accounts require approval</p>
                         <p className="mt-1">Your account will be pending until an administrator approves it.</p>
                       </div>
@@ -289,7 +295,7 @@ export default function RegisterPage() {
             transition={{ delay: 0.7, duration: 0.5 }}
             className="mt-6 text-center"
           >
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <Link
                 href="/auth/login"

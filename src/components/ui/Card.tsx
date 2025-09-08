@@ -9,9 +9,9 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', padding = 'md', children, ...props }, ref) => {
     const variants = {
-      default: 'bg-white border border-gray-200',
-      elevated: 'bg-white shadow-soft border border-gray-200',
-      outlined: 'bg-white border-2 border-gray-200',
+      default: 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700',
+      elevated: 'bg-white dark:bg-gray-800 shadow-soft border border-gray-200 dark:border-gray-700',
+      outlined: 'bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700',
     };
 
     const paddings = {
@@ -51,17 +51,17 @@ const CardHeader = React.forwardRef<HTMLDivElement, CardHeaderProps>(
     return (
       <div
         ref={ref}
-        className={cn('px-6 py-4 border-b border-gray-200 bg-gray-50', className)}
+        className={cn('px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900', className)}
         {...props}
       >
         {(title || subtitle || action) && (
           <div className="flex items-center justify-between">
             <div>
               {title && (
-                <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
               )}
               {subtitle && (
-                <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{subtitle}</p>
               )}
             </div>
             {action && <div>{action}</div>}
@@ -108,7 +108,7 @@ const CardFooter = React.forwardRef<HTMLDivElement, CardFooterProps>(
       <div
         ref={ref}
         className={cn(
-          'px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center space-x-3',
+          'px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center space-x-3',
           justifyClasses[justify],
           className
         )}

@@ -135,7 +135,7 @@ export default function CopyModal({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl"
+              className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl"
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
@@ -155,7 +155,7 @@ export default function CopyModal({
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Status *
                         </label>
                         <select
@@ -174,7 +174,7 @@ export default function CopyModal({
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Condition *
                         </label>
                         <select

@@ -139,8 +139,8 @@ export default function BooksPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Books</h1>
-          <p className="text-gray-600 mt-1">Manage your library&apos;s book collection</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Books</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your library&apos;s book collection</p>
         </div>
         {user?.role === 'admin' || user?.role === 'superadmin' ? (
           <Button
@@ -204,10 +204,10 @@ export default function BooksPage() {
                 <CardBody className="p-6">
                   <div className="flex flex-col h-full">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
                         {title.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                         by {title.authors.join(', ')}
                       </p>
                       {title.categories && title.categories.length > 0 && (
@@ -221,8 +221,8 @@ export default function BooksPage() {
                       )}
                     </div>
                     
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
                         <span>Total Copies: {totalCopies}</span>
                         <span className="text-green-600 font-medium">
                           Available: {availableCopies}
@@ -262,8 +262,8 @@ export default function BooksPage() {
           <div className="text-gray-400 mb-4">
             <MagnifyingGlassIcon className="w-16 h-16 mx-auto" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
-          <p className="text-gray-600">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No books found</h3>
+          <p className="text-gray-600 dark:text-gray-400">
             {searchTerm ? `No books match "${searchTerm}"` : 'No books available'}
           </p>
         </div>

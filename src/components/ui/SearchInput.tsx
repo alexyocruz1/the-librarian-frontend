@@ -160,7 +160,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                 <button
                   type="button"
                   onClick={clearSearch}
-                  className="hover:text-gray-600 transition-colors"
+                  className="hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
                   aria-label="Clear search"
                 >
                   <XMarkIcon className="w-5 h-5" />
@@ -185,7 +185,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+              className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto"
             >
               {filteredSuggestions.map((suggestion, index) => (
                 <motion.div
@@ -194,10 +194,10 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
                   className={cn(
-                    'px-4 py-3 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors',
+                    'px-4 py-3 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 transition-colors',
                     index === highlightedIndex
-                      ? 'bg-primary-50 text-primary-700'
-                      : 'hover:bg-gray-50'
+                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
                   )}
                   onClick={() => handleSelectSuggestion(suggestion)}
                   onMouseEnter={() => setHighlightedIndex(index)}
@@ -219,7 +219,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
                         </span>
                       </div>
                       {suggestion.subtitle && (
-                        <p className="text-sm text-gray-500 truncate mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
                           {suggestion.subtitle}
                         </p>
                       )}
@@ -236,9 +236,9 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4"
           >
-            <p className="text-sm text-gray-500 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
               No results found for &quot;{value}&quot;
             </p>
           </motion.div>

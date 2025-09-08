@@ -7,15 +7,15 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-primary-100 text-primary-800',
-        secondary: 'bg-gray-100 text-gray-800',
-        success: 'bg-success-100 text-success-800',
-        warning: 'bg-warning-100 text-warning-800',
-        error: 'bg-error-100 text-error-800',
-        info: 'bg-blue-100 text-blue-800',
-        purple: 'bg-purple-100 text-purple-800',
-        pink: 'bg-pink-100 text-pink-800',
-        indigo: 'bg-indigo-100 text-indigo-800',
+        primary: 'bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200',
+        secondary: 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200',
+        success: 'bg-success-100 dark:bg-success-900 text-success-800 dark:text-success-200',
+        warning: 'bg-warning-100 dark:bg-warning-900 text-warning-800 dark:text-warning-200',
+        error: 'bg-error-100 dark:bg-error-900 text-error-800 dark:text-error-200',
+        info: 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200',
+        purple: 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200',
+        pink: 'bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200',
+        indigo: 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200',
       },
       size: {
         sm: 'px-2 py-0.5 text-xs',

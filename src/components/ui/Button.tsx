@@ -8,12 +8,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary: 'bg-primary-600 text-white border border-primary-600 hover:bg-primary-700 hover:border-primary-700 focus:ring-primary-500',
-        secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:ring-primary-500',
+        secondary: 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 focus:ring-primary-500',
         success: 'bg-success-600 text-white border border-success-600 hover:bg-success-700 hover:border-success-700 focus:ring-success-500',
         warning: 'bg-warning-600 text-white border border-warning-600 hover:bg-warning-700 hover:border-warning-700 focus:ring-warning-500',
         error: 'bg-error-600 text-white border border-error-600 hover:bg-error-700 hover:border-error-700 focus:ring-error-500',
-        ghost: 'bg-transparent text-gray-700 border border-transparent hover:bg-gray-100 focus:ring-primary-500',
-        outline: 'bg-transparent text-primary-600 border border-primary-600 hover:bg-primary-50 focus:ring-primary-500',
+        ghost: 'bg-transparent text-gray-700 dark:text-gray-300 border border-transparent hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-primary-500',
+        outline: 'bg-transparent text-primary-600 dark:text-primary-400 border border-primary-600 dark:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 focus:ring-primary-500',
       },
       size: {
         sm: 'px-3 py-1.5 text-xs',

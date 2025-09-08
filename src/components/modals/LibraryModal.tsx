@@ -119,7 +119,7 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white rounded-xl shadow-xl"
+              className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl"
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
@@ -170,12 +170,12 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
 
                     {/* Code Preview */}
                     {codeValue && (
-                      <div className="p-4 bg-gray-50 rounded-lg">
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Library Code Preview</h4>
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Library Code Preview</h4>
                         <div className="text-lg font-mono text-primary-600">
                           {codeValue.toUpperCase()}
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           This code will be used for book barcodes and identification
                         </p>
                       </div>
