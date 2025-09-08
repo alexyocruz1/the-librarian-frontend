@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/context/I18nContext';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -30,6 +31,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,7 +107,7 @@ export default function RegisterPage() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            Join The Librarian
+            {t('auth.register.title', { app: t('app.title') })}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -113,7 +115,7 @@ export default function RegisterPage() {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="text-gray-600 dark:text-gray-400"
           >
-            Create your account to get started
+            {t('auth.register.subtitle')}
           </motion.p>
         </div>
 
@@ -130,8 +132,8 @@ export default function RegisterPage() {
                   <Input
                     {...register('name')}
                     type="text"
-                    label="Full name"
-                    placeholder="Enter your full name"
+                    label={t('auth.register.name.label')}
+                    placeholder={t('auth.register.name.placeholder')}
                     error={errors.name?.message}
                     autoComplete="name"
                     name="name"
@@ -143,8 +145,8 @@ export default function RegisterPage() {
                   <Input
                     {...register('email')}
                     type="email"
-                    label="Email address"
-                    placeholder="Enter your email"
+                    label={t('auth.register.email.label')}
+                    placeholder={t('auth.register.email.placeholder')}
                     error={errors.email?.message}
                     autoComplete="email"
                     name="email"
@@ -158,7 +160,7 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Account Type
+                    {t('auth.register.accountType')}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <label className="relative">
@@ -170,8 +172,8 @@ export default function RegisterPage() {
                       />
                       <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Guest</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Browse & request books</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('auth.register.role.guest')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('auth.register.role.guest.desc')}</div>
                         </div>
                       </div>
                     </label>
@@ -184,8 +186,8 @@ export default function RegisterPage() {
                       />
                       <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
                         <div className="text-center">
-                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">Student</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Full access + history</div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('auth.register.role.student')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('auth.register.role.student.desc')}</div>
                         </div>
                       </div>
                     </label>
@@ -199,8 +201,8 @@ export default function RegisterPage() {
                   <Input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
-                    label="Password"
-                    placeholder="Create a password"
+                    label={t('auth.register.password.label')}
+                    placeholder={t('auth.register.password.placeholder')}
                     error={errors.password?.message}
                     autoComplete="new-password"
                     name="password"
@@ -229,8 +231,8 @@ export default function RegisterPage() {
                   <Input
                     {...register('confirmPassword')}
                     type={showConfirmPassword ? 'text' : 'password'}
-                    label="Confirm password"
-                    placeholder="Confirm your password"
+                    label={t('auth.register.confirm.label')}
+                    placeholder={t('auth.register.confirm.placeholder')}
                     error={errors.confirmPassword?.message}
                     autoComplete="new-password"
                     name="confirmPassword"
@@ -268,8 +270,8 @@ export default function RegisterPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       <div className="text-sm text-warning-700 dark:text-warning-300">
-                        <p className="font-medium">Student accounts require approval</p>
-                        <p className="mt-1">Your account will be pending until an administrator approves it.</p>
+                        <p className="font-medium">{t('auth.register.studentApproval.title')}</p>
+                        <p className="mt-1">{t('auth.register.studentApproval.body')}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -282,7 +284,7 @@ export default function RegisterPage() {
                   loading={isLoading}
                   className="gradient-primary shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  Create account
+                  {t('auth.register.button')}
                 </Button>
               </form>
             </CardBody>
@@ -296,12 +298,12 @@ export default function RegisterPage() {
             className="mt-6 text-center"
           >
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
+              {t('auth.register.haveAccount')}{' '}
               <Link
                 href="/auth/login"
                 className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
               >
-                Sign in here
+                {t('auth.register.signinLink')}
               </Link>
             </p>
           </motion.div>

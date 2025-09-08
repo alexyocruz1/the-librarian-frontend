@@ -16,6 +16,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate, formatDateTime } from '@/lib/utils';
+import { useI18n } from '@/context/I18nContext';
+import { useLocaleFormat } from '@/hooks/useLocaleFormat';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
@@ -94,6 +96,8 @@ const getStatusColor = (status: string) => {
 
 export default function MyRequestsPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
+  const { formatDateTime: formatDT } = useLocaleFormat();
   const [requests, setRequests] = useState<BorrowRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -190,17 +194,17 @@ export default function MyRequestsPage() {
         <BookmarkIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        No requests found
+        {t('requests.empty.title')}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        You haven't made any book requests yet. Browse our collection and request books you'd like to borrow.
+        {t('requests.empty.description')}
       </p>
       <Button
         onClick={() => window.location.href = '/dashboard/books'}
         className="inline-flex items-center"
       >
         <BookOpenIcon className="w-4 h-4 mr-2" />
-        Browse Books
+        {t('requests.empty.cta')}
       </Button>
     </motion.div>
   );
@@ -216,10 +220,10 @@ export default function MyRequestsPage() {
         <ExclamationTriangleIcon className="w-12 h-12 text-error-600 dark:text-error-400" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        Unable to load requests
+        {t('requests.error.title')}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        {error || 'Something went wrong while fetching your requests. Please try again.'}
+        {error || t('requests.error.description')}
       </p>
       <Button
         onClick={fetchRequests}
@@ -227,7 +231,7 @@ export default function MyRequestsPage() {
         className="inline-flex items-center"
       >
         <PlusIcon className="w-4 h-4 mr-2" />
-        Try Again
+        {t('requests.error.retry')}
       </Button>
     </motion.div>
   );
@@ -255,10 +259,10 @@ export default function MyRequestsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          My Requests
+          {t('requests.title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          Track your book borrowing requests and their status
+          {t('requests.subtitle')}
         </p>
       </div>
 
@@ -267,11 +271,11 @@ export default function MyRequestsPage() {
         <CardBody>
           <div className="flex flex-wrap gap-2">
             {[
-              { key: 'all', label: 'All Requests' },
-              { key: 'pending', label: 'Pending' },
-              { key: 'approved', label: 'Approved' },
-              { key: 'rejected', label: 'Rejected' },
-              { key: 'cancelled', label: 'Cancelled' },
+              { key: 'all', label: t('requests.filters.all') },
+              { key: 'pending', label: t('requests.filters.pending') },
+              { key: 'approved', label: t('requests.filters.approved') },
+              { key: 'rejected', label: t('requests.filters.rejected') },
+              { key: 'cancelled', label: t('requests.filters.cancelled') },
             ].map(({ key, label }) => (
               <button
                 key={key}
@@ -338,20 +342,21 @@ export default function MyRequestsPage() {
             <BookmarkIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No {filter === 'all' ? '' : filter} requests found
+            {filter === 'all' 
+              ? t('requests.empty.title') 
+              : t('requests.filteredEmpty.title', { status: filter })}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
             {filter === 'all' 
-              ? "You haven't made any book requests yet. Browse our collection and request books you'd like to borrow."
-              : `You don't have any ${filter} requests. Try selecting a different filter or browse books to make new requests.`
-            }
+              ? t('requests.empty.description')
+              : t('requests.filteredEmpty.description', { status: filter })}
           </p>
           <Button
             onClick={() => window.location.href = '/dashboard/books'}
             className="inline-flex items-center"
           >
             <BookOpenIcon className="w-4 h-4 mr-2" />
-            Browse Books
+            {t('requests.empty.cta')}
           </Button>
         </motion.div>
       ) : (
@@ -372,7 +377,7 @@ export default function MyRequestsPage() {
                           {getStatusIcon(request.status)}
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          {request.title?.title || 'Unknown Book'}
+                          {request.title?.title || t('requests.unknown.book')}
                         </h3>
                         <Badge variant={getStatusVariant(request.status)}>
                           {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
@@ -381,26 +386,26 @@ export default function MyRequestsPage() {
                       
                       <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                         <p>
-                          <span className="font-medium">Authors:</span>{' '}
-                          {request.title?.authors?.join(', ') || 'Unknown'}
+                          <span className="font-medium">{t('requests.labels.authors')}</span>{' '}
+                          {request.title?.authors?.join(', ') || t('requests.unknown.value')}
                         </p>
                         <p>
-                          <span className="font-medium">Library:</span>{' '}
-                          {request.library?.name || 'Unknown Library'}
+                          <span className="font-medium">{t('requests.labels.library')}</span>{' '}
+                          {request.library?.name || t('requests.unknown.library')}
                         </p>
                         <p>
-                          <span className="font-medium">Requested:</span>{' '}
-                          {formatDateTime(request.requestedAt)}
+                          <span className="font-medium">{t('requests.labels.requested')}</span>{' '}
+                          {formatDT(request.requestedAt)}
                         </p>
                         {request.decidedAt && (
                           <p>
-                            <span className="font-medium">Decided:</span>{' '}
-                            {formatDateTime(request.decidedAt)}
+                            <span className="font-medium">{t('requests.labels.decided')}</span>{' '}
+                            {formatDT(request.decidedAt)}
                           </p>
                         )}
                         {request.notes && (
                           <p>
-                            <span className="font-medium">Notes:</span>{' '}
+                            <span className="font-medium">{t('requests.labels.notes')}</span>{' '}
                             {request.notes}
                           </p>
                         )}
@@ -414,7 +419,7 @@ export default function MyRequestsPage() {
                         onClick={() => handleCancelRequest(request._id)}
                         className="ml-4"
                       >
-                        Cancel Request
+                        {t('requests.actions.cancel')}
                       </Button>
                     )}
                   </div>

@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { PreferencesProvider } from '@/context/PreferencesContext';
+import { I18nProvider } from '@/context/I18nContext';
 import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -43,8 +44,9 @@ export default function RootLayout({
         <ThemeProvider>
           <AuthProvider>
             <PreferencesProvider>
-              {children}
-              <Toaster
+              <I18nProvider>
+                {children}
+                <Toaster
               position="top-right"
               toastOptions={{
                 duration: 4000,
@@ -70,6 +72,7 @@ export default function RootLayout({
                 },
               }}
             />
+              </I18nProvider>
             </PreferencesProvider>
           </AuthProvider>
         </ThemeProvider>

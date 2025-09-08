@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
+import { useI18n } from '@/context/I18nContext';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -23,6 +24,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
@@ -121,7 +123,7 @@ export default function LoginPage() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2"
           >
-            The Librarian
+            {t('auth.login.title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -129,7 +131,7 @@ export default function LoginPage() {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="text-gray-600 dark:text-gray-400"
           >
-            Sign in to your account
+            {t('auth.login.subtitle')}
           </motion.p>
         </div>
 
@@ -146,8 +148,8 @@ export default function LoginPage() {
                   <Input
                     {...register('email')}
                     type="email"
-                    label="Email address"
-                    placeholder="Enter your email"
+                    label={t('auth.login.email.label')}
+                    placeholder={t('auth.login.email.placeholder')}
                     error={errors.email?.message}
                     autoComplete="email"
                     name="email"
@@ -159,7 +161,7 @@ export default function LoginPage() {
                   />
                   {localStorage.getItem('rememberedEmail') && (
                     <p className="text-xs text-gray-400 mt-1">
-                      ✓ Email remembered from previous login
+                      {t('auth.login.emailRemembered')}
                     </p>
                   )}
                 </div>
@@ -168,8 +170,8 @@ export default function LoginPage() {
                   <Input
                     {...register('password')}
                     type={showPassword ? 'text' : 'password'}
-                    label="Password"
-                    placeholder="Enter your password"
+                    label={t('auth.login.password.label')}
+                    placeholder={t('auth.login.password.placeholder')}
                     error={errors.password?.message}
                     autoComplete="current-password"
                     name="password"
@@ -203,7 +205,7 @@ export default function LoginPage() {
                       className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded"
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                      Remember me
+                      {t('auth.login.remember')}
                     </label>
                   </div>
 
@@ -212,7 +214,7 @@ export default function LoginPage() {
                       href="/auth/forgot-password"
                       className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
                     >
-                      Forgot password?
+                      {t('auth.login.forgot')}
                     </Link>
                   </div>
                 </div>
@@ -225,7 +227,7 @@ export default function LoginPage() {
                   disabled={isLoading}
                   className="gradient-primary shadow-lg hover:shadow-xl transition-all duration-200"
                 >
-                  {isLoading ? 'Signing in... (This may take a moment)' : 'Sign in'}
+                  {isLoading ? t('auth.login.button.loading') : t('auth.login.button.idle')}
                 </Button>
               </form>
             </CardBody>
@@ -239,12 +241,12 @@ export default function LoginPage() {
             className="mt-6 text-center"
           >
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don&apos;t have an account?{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link
                 href="/auth/register"
                 className="font-medium text-primary-600 hover:text-primary-500 transition-colors"
               >
-                Sign up here
+                {t('auth.login.signupLink')}
               </Link>
             </p>
           </motion.div>

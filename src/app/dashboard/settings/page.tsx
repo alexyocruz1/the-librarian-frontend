@@ -29,6 +29,7 @@ import { api } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 // Form schemas
 const profileSchema = z.object({
@@ -51,6 +52,7 @@ type PasswordFormData = z.infer<typeof passwordSchema>;
 
 export default function SettingsPage() {
   const { user, refreshUser } = useAuth();
+  const { t, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
   const { preferences, updatePreference, updateNotificationPreference, savePreferences, isLoading: preferencesLoading } = usePreferences();
   const [activeTab, setActiveTab] = useState('profile');
@@ -210,10 +212,10 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                Settings
+                {t('settings.title')}
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
-                Manage your account settings and preferences
+                {t('settings.subtitle')}
               </p>
             </div>
             <div className="flex items-center space-x-3">
@@ -444,11 +446,10 @@ export default function SettingsPage() {
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                           aria-label="Select language"
                           value={preferences.language}
-                          onChange={(e) => updatePreference('language', e.target.value)}
+                          onChange={(e) => { updatePreference('language', e.target.value); setLocale(e.target.value as any); }}
                         >
                           <option value="en">English</option>
                           <option value="es">Español</option>
-                          <option value="fr">Français</option>
                         </select>
                       </div>
                       <div>

@@ -15,6 +15,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDate, formatDateTime } from '@/lib/utils';
+import { useI18n } from '@/context/I18nContext';
+import { useLocaleFormat } from '@/hooks/useLocaleFormat';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
@@ -103,6 +105,8 @@ const getStatusColor = (status: string) => {
 
 export default function MyHistoryPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
+  const { formatDateTime: formatDT, formatCurrency } = useLocaleFormat();
   const [records, setRecords] = useState<BorrowRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -188,17 +192,17 @@ export default function MyHistoryPage() {
         <BookOpenIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        No borrow history found
+        {t('history.empty.title')}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        You haven't borrowed any books yet. Browse our collection and request books you'd like to borrow.
+        {t('history.empty.description')}
       </p>
       <Button
         onClick={() => window.location.href = '/dashboard/books'}
         className="inline-flex items-center"
       >
         <BookOpenIcon className="w-4 h-4 mr-2" />
-        Browse Books
+        {t('history.empty.cta')}
       </Button>
     </motion.div>
   );
@@ -214,10 +218,10 @@ export default function MyHistoryPage() {
         <ExclamationTriangleIcon className="w-12 h-12 text-error-600 dark:text-error-400" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-        Unable to load history
+        {t('history.error.title')}
       </h3>
       <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        {error || 'Something went wrong while fetching your borrow history. Please try again.'}
+        {error || t('history.error.description')}
       </p>
       <Button
         onClick={fetchHistory}
@@ -225,7 +229,7 @@ export default function MyHistoryPage() {
         className="inline-flex items-center"
       >
         <ClockIcon className="w-4 h-4 mr-2" />
-        Try Again
+        {t('history.error.retry')}
       </Button>
     </motion.div>
   );
@@ -253,10 +257,10 @@ export default function MyHistoryPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-          My Borrow History
+          {t('history.title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          View your complete borrowing history and track current loans
+          {t('history.subtitle')}
         </p>
       </div>
 
@@ -265,11 +269,11 @@ export default function MyHistoryPage() {
         <CardBody>
           <div className="flex flex-wrap gap-2">
             {[
-              { key: 'all', label: 'All Records' },
-              { key: 'borrowed', label: 'Currently Borrowed' },
-              { key: 'returned', label: 'Returned' },
-              { key: 'overdue', label: 'Overdue' },
-              { key: 'lost', label: 'Lost' },
+              { key: 'all', label: t('history.filters.all') },
+              { key: 'borrowed', label: t('history.filters.borrowed') },
+              { key: 'returned', label: t('history.filters.returned') },
+              { key: 'overdue', label: t('history.filters.overdue') },
+              { key: 'lost', label: t('history.filters.lost') },
             ].map(({ key, label }) => (
               <button
                 key={key}
@@ -307,20 +311,19 @@ export default function MyHistoryPage() {
             <BookOpenIcon className="w-12 h-12 text-gray-400 dark:text-gray-500" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            No {filter === 'all' ? '' : filter} records found
+            {filter === 'all' ? t('history.empty.title') : t('history.filteredEmpty.title', { status: filter })}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
             {filter === 'all' 
-              ? "You haven't borrowed any books yet. Browse our collection and request books you'd like to borrow."
-              : `You don't have any ${filter} records. Try selecting a different filter or browse books to make new requests.`
-            }
+              ? t('history.empty.description')
+              : t('history.filteredEmpty.description', { status: filter })}
           </p>
           <Button
             onClick={() => window.location.href = '/dashboard/books'}
             className="inline-flex items-center"
           >
             <BookOpenIcon className="w-4 h-4 mr-2" />
-            Browse Books
+            {t('history.empty.cta')}
           </Button>
         </motion.div>
       ) : (
@@ -341,52 +344,52 @@ export default function MyHistoryPage() {
                           {getStatusIcon(record.status)}
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                          {record.title?.title || 'Unknown Book'}
+                          {record.title?.title || t('history.unknown.book')}
                         </h3>
                         <Badge variant={getStatusVariant(record.status)}>
                           {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
                         </Badge>
                         {isOverdue(record.dueDate, record.status) && (
                           <Badge variant="error">
-                            Overdue
+                            {t('history.badge.overdue')}
                           </Badge>
                         )}
                       </div>
                       
                       <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                         <p>
-                          <span className="font-medium">Authors:</span>{' '}
-                          {record.title?.authors?.join(', ') || 'Unknown'}
+                          <span className="font-medium">{t('history.labels.authors')}</span>{' '}
+                          {record.title?.authors?.join(', ') || t('history.unknown.value')}
                         </p>
                         <p>
-                          <span className="font-medium">Library:</span>{' '}
-                          {record.library?.name || 'Unknown Library'}
+                          <span className="font-medium">{t('history.labels.library')}</span>{' '}
+                          {record.library?.name || t('history.unknown.library')}
                         </p>
                         {record.copy?.barcode && (
                           <p>
-                            <span className="font-medium">Barcode:</span>{' '}
+                            <span className="font-medium">{t('history.labels.barcode')}</span>{' '}
                             {record.copy.barcode}
                           </p>
                         )}
                         <p>
-                          <span className="font-medium">Borrowed:</span>{' '}
-                          {formatDateTime(record.borrowDate)}
+                          <span className="font-medium">{t('history.labels.borrowed')}</span>{' '}
+                          {formatDT(record.borrowDate)}
                         </p>
                         <p>
-                          <span className="font-medium">Due Date:</span>{' '}
+                          <span className="font-medium">{t('history.labels.dueDate')}</span>{' '}
                           <span className={isOverdue(record.dueDate, record.status) ? 'text-error-600 dark:text-error-400 font-medium' : ''}>
-                            {formatDateTime(record.dueDate)}
+                            {formatDT(record.dueDate)}
                           </span>
                         </p>
                         {record.returnDate && (
                           <p>
-                            <span className="font-medium">Returned:</span>{' '}
-                            {formatDateTime(record.returnDate)}
+                            <span className="font-medium">{t('history.labels.returned')}</span>{' '}
+                            {formatDT(record.returnDate)}
                           </p>
                         )}
                         {record.fees && (record.fees.lateFee || record.fees.damageFee) && (
                           <p>
-                            <span className="font-medium">Fees:</span>{' '}
+                            <span className="font-medium">{t('history.labels.fees')}</span>{' '}
                             <span className="text-warning-600 dark:text-warning-400">
                               {record.fees.currency || 'USD'} {((record.fees.lateFee || 0) + (record.fees.damageFee || 0)).toFixed(2)}
                             </span>

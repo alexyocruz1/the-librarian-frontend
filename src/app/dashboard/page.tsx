@@ -19,6 +19,8 @@ import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import { useI18n } from '@/context/I18nContext';
+import { useLocaleFormat } from '@/hooks/useLocaleFormat';
 
 interface DashboardStats {
   totalBooks: number;
@@ -36,39 +38,41 @@ interface DashboardStats {
   }>;
 }
 
-const getStatCards = (stats: DashboardStats) => [
+const getStatCards = (stats: DashboardStats, t: (k: string)=>string) => [
   {
-    name: 'Total Books',
+    name: t('dashboard.stats.totalBooks'),
     value: stats.totalBooks,
     icon: BookOpenIcon,
     color: 'primary',
-    description: 'In catalog',
+    description: t('dashboard.stats.desc.inCatalog'),
   },
   {
-    name: 'Total Users',
+    name: t('dashboard.stats.totalUsers'),
     value: stats.totalUsers,
     icon: UsersIcon,
     color: 'success',
-    description: 'Registered',
+    description: t('dashboard.stats.desc.registered'),
   },
   {
-    name: 'Libraries',
+    name: t('dashboard.stats.libraries'),
     value: stats.totalLibraries,
     icon: BuildingLibraryIcon,
     color: 'warning',
-    description: 'Branches',
+    description: t('dashboard.stats.desc.branches'),
   },
   {
-    name: 'Pending Requests',
+    name: t('dashboard.stats.pendingRequests'),
     value: stats.pendingRequests,
     icon: ClipboardDocumentListIcon,
     color: 'error',
-    description: 'Awaiting approval',
+    description: t('dashboard.stats.desc.awaitingApproval'),
   },
 ];
 
 export default function DashboardPage() {
   const { user, hasRole } = useAuth();
+  const { t } = useI18n();
+  const { formatDateTime: ldt } = useLocaleFormat();
   const [stats, setStats] = useState<DashboardStats>({
     totalBooks: 0,
     totalUsers: 0,
@@ -219,17 +223,17 @@ export default function DashboardPage() {
       >
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white">
           <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {user?.name}! 👋
+            {t('dashboard.welcome.title', { name: user?.name || '' })} 👋
           </h1>
           <p className="text-primary-100 text-lg">
-            Here&apos;s what&apos;s happening in your library system today.
+            {t('dashboard.welcome.subtitle')}
           </p>
           <div className="mt-4 flex items-center space-x-4">
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
               {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'}
             </Badge>
             <span className="text-primary-100 text-sm">
-              {user?.lastLoginAt ? `Last login: ${formatDateTime(user.lastLoginAt)}` : 'First login'}
+              {user?.lastLoginAt ? `Last login: ${ldt(user.lastLoginAt)}` : 'First login'}
             </span>
           </div>
         </div>
@@ -242,7 +246,7 @@ export default function DashboardPage() {
         transition={{ duration: 0.5, delay: 0.1 }}
         className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6"
       >
-        {getStatCards(stats).map((stat, index) => (
+        {getStatCards(stats, t).map((stat, index) => (
           <motion.div
             key={stat.name}
             initial={{ opacity: 0, y: 20 }}
@@ -308,7 +312,7 @@ export default function DashboardPage() {
           className="lg:col-span-2"
         >
           <Card variant="elevated">
-            <CardHeader title="Recent Activity" />
+            <CardHeader title={t('dashboard.recentActivity.title')} />
             <CardBody>
               <div className="space-y-4">
                 {stats.recentActivity.map((activity, index) => (
@@ -325,7 +329,7 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{activity.message}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {formatDateTime(activity.timestamp)}
+                        {ldt(activity.timestamp)}
                       </p>
                     </div>
                   </motion.div>
@@ -342,7 +346,7 @@ export default function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Card variant="elevated">
-            <CardHeader title="Quick Actions" />
+            <CardHeader title={t('dashboard.quickActions.title')} />
             <CardBody>
               <div className="space-y-3">
                 <a
@@ -350,14 +354,14 @@ export default function DashboardPage() {
                   className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <BookOpenIcon className="w-5 h-5 text-primary-600 mr-3" />
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Browse Books</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('dashboard.quickActions.browseBooks')}</span>
                 </a>
                 <a
                   href="/dashboard/books/requests"
                   className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   <ClipboardDocumentListIcon className="w-5 h-5 text-warning-600 mr-3" />
-                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">My Requests</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('dashboard.quickActions.myRequests')}</span>
                 </a>
                 {hasRole(['admin', 'superadmin']) && (
                   <>
@@ -366,14 +370,14 @@ export default function DashboardPage() {
                       className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <UsersIcon className="w-5 h-5 text-success-600 mr-3" />
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Pending Students</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('dashboard.quickActions.pendingStudents')}</span>
                     </a>
                     <a
                       href="/dashboard/reports"
                       className="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                       <ChartBarIcon className="w-5 h-5 text-purple-600 mr-3" />
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">View Reports</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('dashboard.quickActions.viewReports')}</span>
                     </a>
                   </>
                 )}

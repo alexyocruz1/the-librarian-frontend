@@ -21,6 +21,8 @@ import { getErrorMessage, getSuccessMessage, getInfoMessage } from '@/lib/errorM
 import toast from 'react-hot-toast';
 import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import AppLoader from '@/components/ui/AppLoader';
+import { useI18n } from '@/context/I18nContext';
+import { useLocaleFormat } from '@/hooks/useLocaleFormat';
 
 interface ReportStats {
   summary: {
@@ -76,6 +78,8 @@ interface ReportStats {
 
 export default function ReportsPage() {
   const { user } = useAuth();
+  const { t } = useI18n();
+  const { formatNumber, formatPercentage } = useLocaleFormat();
   const [stats, setStats] = useState<ReportStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('30'); // days
@@ -253,8 +257,8 @@ export default function ReportsPage() {
   if (!stats) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">No data available</h2>
-        <p className="text-gray-600">Unable to load report data.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('reports.noData.title')}</h2>
+        <p className="text-gray-600">{t('reports.noData.subtitle')}</p>
       </div>
     );
   }
@@ -264,26 +268,26 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Reports & Analytics</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Library performance and usage statistics</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('reports.title')}</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('reports.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-            aria-label="Select date range"
+            aria-label={t('reports.title')}
           >
-            <option value="7">Last 7 days</option>
-            <option value="30">Last 30 days</option>
-            <option value="90">Last 90 days</option>
-            <option value="365">Last year</option>
+            <option value="7">{t('reports.dateRange.7')}</option>
+            <option value="30">{t('reports.dateRange.30')}</option>
+            <option value="90">{t('reports.dateRange.90')}</option>
+            <option value="365">{t('reports.dateRange.365')}</option>
           </select>
           <Button
             leftIcon={<ArrowDownTrayIcon className="w-5 h-5" />}
             onClick={() => handleExportReport('Full')}
           >
-            Export Report
+            {t('reports.export')}
           </Button>
         </div>
       </div>
@@ -303,8 +307,8 @@ export default function ReportsPage() {
                   <BookOpenIcon className="h-8 w-8 text-primary-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Books</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.totalBooks.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('reports.metrics.totalBooks')}</p>
+                  <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{formatNumber(stats.summary.totalBooks)}</p>
                 </div>
               </div>
             </CardBody>
@@ -324,7 +328,7 @@ export default function ReportsPage() {
                   <UsersIcon className="h-8 w-8 text-success-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('reports.metrics.totalUsers')}</p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.totalUsers.toLocaleString()}</p>
                 </div>
               </div>
@@ -345,7 +349,7 @@ export default function ReportsPage() {
                   <ClockIcon className="h-8 w-8 text-warning-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Active Loans</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('reports.metrics.activeLoans')}</p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.activeLoans}</p>
                 </div>
               </div>
@@ -366,7 +370,7 @@ export default function ReportsPage() {
                   <ExclamationTriangleIcon className="h-8 w-8 text-error-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Overdue Books</p>
+                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{t('reports.metrics.overdueBooks')}</p>
                   <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">{stats.summary.overdueBooks}</p>
                 </div>
               </div>
@@ -379,8 +383,8 @@ export default function ReportsPage() {
         {/* Popular Books */}
         <Card>
           <CardHeader 
-            title="Most Popular Books" 
-            subtitle="Top borrowed books in the selected period"
+            title={t('reports.popular.title')} 
+            subtitle={t('reports.popular.subtitle')}
           />
           <CardBody>
             <div className="space-y-4">
@@ -398,7 +402,7 @@ export default function ReportsPage() {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{book.title}</h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{book.borrowCount} borrows</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{formatNumber(book.borrowCount)} borrows</p>
                     </div>
                   </div>
                   <Badge variant="success" size="sm">
@@ -413,8 +417,8 @@ export default function ReportsPage() {
         {/* Recent Activity */}
         <Card>
           <CardHeader 
-            title="Recent Activity" 
-            subtitle="Latest library activities"
+            title={t('reports.recent.title')} 
+            subtitle={t('reports.recent.subtitle')}
           />
           <CardBody>
             <div className="space-y-4">
@@ -436,7 +440,7 @@ export default function ReportsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-900 dark:text-gray-100">{activity.message}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {new Date(activity.timestamp).toLocaleString()}
+                      {t('reports.activity.timestamp', { date: new Date(activity.timestamp).toLocaleString() })}
                     </p>
                   </div>
                 </motion.div>
@@ -449,27 +453,27 @@ export default function ReportsPage() {
       {/* Additional Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
-          <CardHeader title="Library Statistics" />
+          <CardHeader title={t('reports.libraryStats.title')} />
           <CardBody>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Libraries</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.libraryStats.totalLibraries')}</span>
                 <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalLibraries}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Pending Requests</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.libraryStats.pendingRequests')}</span>
                 <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.pendingRequests}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Borrows</span>
-                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalBorrows.toLocaleString()}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.libraryStats.totalBorrows')}</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{formatNumber(stats.summary.totalBorrows)}</span>
               </div>
             </div>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader title="Quick Actions" />
+          <CardHeader title={t('reports.quickActions.title')} />
           <CardBody>
             <div className="space-y-3">
               <Button
@@ -478,7 +482,7 @@ export default function ReportsPage() {
                 leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
                 onClick={() => handleExportReport('Books')}
               >
-                Export Books Report
+                {t('reports.quickActions.exportBooks')}
               </Button>
               <Button
                 fullWidth
@@ -486,7 +490,7 @@ export default function ReportsPage() {
                 leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
                 onClick={() => handleExportReport('Users')}
               >
-                Export Users Report
+                {t('reports.quickActions.exportUsers')}
               </Button>
               <Button
                 fullWidth
@@ -494,30 +498,30 @@ export default function ReportsPage() {
                 leftIcon={<ArrowDownTrayIcon className="w-4 h-4" />}
                 onClick={() => handleExportReport('Loans')}
               >
-                Export Loans Report
+                {t('reports.quickActions.exportLoans')}
               </Button>
             </div>
           </CardBody>
         </Card>
 
         <Card>
-          <CardHeader title="System Health" />
+          <CardHeader title={t('reports.systemHealth.title')} />
           <CardBody>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Overdue Rate</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.systemHealth.overdueRate')}</span>
                 <Badge variant={stats.systemHealth.overdueRate > 20 ? 'error' : 'success'}>
-                  {stats.systemHealth.overdueRate.toFixed(1)}%
+                  {formatPercentage(stats.systemHealth.overdueRate / 100)}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Request Processing</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.systemHealth.requestProcessing')}</span>
                 <Badge variant={stats.systemHealth.requestProcessingRate === 'High' ? 'warning' : 'success'}>
                   {stats.systemHealth.requestProcessingRate}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">System Status</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{t('reports.systemHealth.systemStatus')}</span>
                 <Badge variant={stats.systemHealth.systemStatus === 'Healthy' ? 'success' : 'warning'}>
                   {stats.systemHealth.systemStatus}
                 </Badge>
@@ -531,8 +535,8 @@ export default function ReportsPage() {
       {stats.userActivityStats && stats.userActivityStats.length > 0 && (
         <Card>
           <CardHeader 
-            title="Top Active Users" 
-            subtitle="Users with most borrowing activity in the selected period"
+            title={t('reports.topUsers.title')} 
+            subtitle={t('reports.topUsers.subtitle')}
           />
           <CardBody>
             <div className="space-y-4">
@@ -567,8 +571,8 @@ export default function ReportsPage() {
       {stats.libraryStats && stats.libraryStats.length > 0 && (
         <Card>
           <CardHeader 
-            title="Library Performance" 
-            subtitle="Borrowing activity by library"
+            title={t('reports.libraryPerf.title')} 
+            subtitle={t('reports.libraryPerf.subtitle')}
           />
           <CardBody>
             <div className="space-y-4">
@@ -585,13 +589,13 @@ export default function ReportsPage() {
                     <div>
                       <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{library.name}</h4>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {library.totalBorrows} total borrows • {library.activeLoans} active loans
+                        {t('reports.libraryPerf.summary', { totalBorrows: formatNumber(library.totalBorrows), activeLoans: formatNumber(library.activeLoans) })}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <Badge variant={library.overdueRate > 10 ? 'error' : 'success'} size="sm">
-                      {library.overdueRate.toFixed(1)}% overdue
+                      {t('reports.overduePercent', { percent: library.overdueRate.toFixed(1) })}
                     </Badge>
                   </div>
                 </motion.div>
