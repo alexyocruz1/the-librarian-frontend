@@ -139,9 +139,7 @@ class ApiClient {
       const response: AxiosResponse<ApiResponse<T>> = await this.retryRequest(config);
       return response.data;
     } catch (error: any) {
-      if (error.response?.data) {
-        return error.response.data;
-      }
+      // Always throw the error so the frontend can handle it properly
       throw error;
     }
   }

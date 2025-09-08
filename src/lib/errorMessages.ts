@@ -18,6 +18,11 @@ export const getErrorMessage = (error: any): string => {
   const status = error.response?.status;
   const errorData = error.response?.data;
 
+  // Handle validation errors with details
+  if (errorData?.details && Array.isArray(errorData.details) && errorData.details.length > 0) {
+    return errorData.details[0].msg || errorData.error || 'Validation failed';
+  }
+
   // Handle specific error messages from the API
   if (errorData?.error) {
     return errorData.error;

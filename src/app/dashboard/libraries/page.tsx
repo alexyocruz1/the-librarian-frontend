@@ -13,7 +13,9 @@ import {
   BookOpenIcon,
   PencilIcon,
   TrashIcon,
-  UserPlusIcon
+  UserPlusIcon,
+  Squares2X2Icon,
+  ListBulletIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -38,6 +40,7 @@ export default function LibrariesPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showLibraryModal, setShowLibraryModal] = useState(false);
   const [editingLibrary, setEditingLibrary] = useState<Library | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
     fetchLibraries();
@@ -45,8 +48,10 @@ export default function LibrariesPage() {
 
   const fetchLibraries = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/libraries');
-      setLibraries(response.data.data || []);
+      console.log('Libraries response:', response);
+      setLibraries(response.data.libraries || []);
     } catch (error) {
       console.error('Error fetching libraries:', error);
       toast.error(getErrorMessage(error));
@@ -79,7 +84,10 @@ export default function LibrariesPage() {
   };
 
   const handleLibraryModalSuccess = () => {
-    fetchLibraries();
+    // Small delay to ensure backend has processed the creation
+    setTimeout(() => {
+      fetchLibraries();
+    }, 100);
   };
 
   const handleLibraryModalClose = () => {
@@ -97,6 +105,11 @@ export default function LibrariesPage() {
                            library.location.country?.toLowerCase().includes(searchTerm.toLowerCase())));
     return matchesSearch;
   });
+
+  // Debug logging
+  console.log('Libraries state:', libraries);
+  console.log('Search term:', searchTerm);
+  console.log('Filtered libraries:', filteredLibraries);
 
   const canManage = user?.role === 'admin' || user?.role === 'superadmin';
 
@@ -131,12 +144,12 @@ export default function LibrariesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('libraries.title')}</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('libraries.subtitle')}</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">{t('libraries.subtitle')}</p>
         </div>
         {canManage && (
           <Button
@@ -160,19 +173,46 @@ export default function LibrariesPage() {
                 leftIcon={<MagnifyingGlassIcon className="w-5 h-5" />}
               />
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowFilters(!showFilters)}
-              leftIcon={<FunnelIcon className="w-5 h-5" />}
-            >
-              {t('libraries.filters')}
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* View Mode Toggle */}
+              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                <Button
+                  variant={viewMode === 'grid' ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('grid')}
+                  className="h-8 w-8 p-0"
+                >
+                  <Squares2X2Icon className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="h-8 w-8 p-0"
+                >
+                  <ListBulletIcon className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                leftIcon={<FunnelIcon className="w-5 h-5" />}
+              >
+                {t('libraries.filters')}
+              </Button>
+            </div>
           </div>
         </CardBody>
       </Card>
 
-      {/* Libraries Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Libraries Display */}
+      {viewMode === 'grid' ? (
+        <div className={`grid gap-8 ${
+          filteredLibraries.length === 1 
+            ? 'grid-cols-1 max-w-4xl mx-auto' 
+            : 'grid-cols-1 lg:grid-cols-2'
+        }`}>
         {filteredLibraries.map((library, index) => (
           <motion.div
             key={library._id}
@@ -180,98 +220,131 @@ export default function LibrariesPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardHeader
-                title={library.name}
-                subtitle={t('libraries.code', { code: library.code })}
-                action={
-                  canManage && (
-                    <div className="flex items-center gap-2">
+            <Card className="h-full hover:shadow-lg transition-all duration-200 hover:scale-[1.02] group">
+              {/* Header with Library Code Badge */}
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-primary-600 transition-colors mb-2">
+                      {library.name}
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <Badge variant="secondary" className="text-sm px-3 py-1">
+                        {library.code}
+                      </Badge>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(library.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  {canManage && (
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleEditLibrary(library)}
-                        leftIcon={<PencilIcon className="w-4 h-4" />}
+                        className="h-8 w-8 p-0"
                       >
-                        {t('common.edit', { default: 'Edit' })}
+                        <PencilIcon className="w-4 h-4" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDeleteLibrary(library._id)}
-                        leftIcon={<TrashIcon className="w-4 h-4" />}
-                        className="text-error-600 hover:text-error-700"
+                        className="h-8 w-8 p-0 text-error-600 hover:text-error-700"
                       >
-                        {t('common.delete', { default: 'Delete' })}
+                        <TrashIcon className="w-4 h-4" />
                       </Button>
                     </div>
-                  )
-                }
-              />
-              <CardBody>
-                <div className="space-y-4">
-                  {/* Location */}
-                  <div className="flex items-start gap-3">
-                    <MapPinIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraries.location')}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                  )}
+                </div>
+              </CardHeader>
+
+              <CardBody className="pt-2">
+                <div className="space-y-6">
+                  {/* Location - Enhanced Design */}
+                  <div className="flex items-start gap-4 pt-4">
+                    <div className="flex-shrink-0 w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
+                      <MapPinIcon className="w-5 h-5 text-primary-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                        {t('libraries.location')}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {library.location ? (
                           <>
-                            {library.location.address && <div>{library.location.address}</div>}
+                            {library.location.address && <div className="mb-1">{library.location.address}</div>}
                             {library.location.city && library.location.state && (
-                              <div>{library.location.city}, {library.location.state}</div>
+                              <div className="mb-1">{library.location.city}, {library.location.state}</div>
                             )}
                             {library.location.country && <div>{library.location.country}</div>}
                           </>
                         ) : (
-                          t('libraries.location.none')
+                          <span className="text-gray-400 italic">{t('libraries.location.none')}</span>
                         )}
                       </p>
                     </div>
                   </div>
 
-                  {/* Contact */}
+                  {/* Contact - Enhanced Design */}
                   {library.contact && (
-                    <div className="flex items-start gap-3">
-                      <PhoneIcon className="w-5 h-5 text-gray-400 dark:text-gray-500 mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraries.contact')}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {library.contact?.email && <div>{t('libraries.contact.email', { email: library.contact.email })}</div>}
-                          {library.contact?.phone && <div>{t('libraries.contact.phone', { phone: library.contact.phone })}</div>}
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-success-100 dark:bg-success-900 rounded-xl flex items-center justify-center">
+                        <PhoneIcon className="w-5 h-5 text-success-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                          {t('libraries.contact')}
                         </p>
+                        <div className="space-y-2">
+                          {library.contact?.email && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {library.contact.email}
+                            </p>
+                          )}
+                          {library.contact?.phone && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {library.contact.phone}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <UsersIcon className="w-4 h-4 text-primary-600" />
-                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
+                  {/* Stats - Enhanced Design */}
+                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100 dark:border-gray-700">
+                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <UsersIcon className="w-5 h-5 text-primary-600" />
+                        <span className="text-xl font-bold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('libraries.stats.admins')}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        {t('libraries.stats.admins')}
+                      </p>
                     </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1 mb-1">
-                        <BookOpenIcon className="w-4 h-4 text-success-600" />
-                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">0</span>
+                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <BookOpenIcon className="w-5 h-5 text-success-600" />
+                        <span className="text-xl font-bold text-gray-900 dark:text-gray-100">0</span>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{t('libraries.stats.books')}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                        {t('libraries.stats.books')}
+                      </p>
                     </div>
                   </div>
 
-                  {/* Actions */}
+                  {/* Actions - Improved Design */}
                   {canManage && (
-                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
                       <Button
                         fullWidth
                         variant="outline"
                         size="sm"
                         leftIcon={<UserPlusIcon className="w-4 h-4" />}
                         onClick={() => {/* TODO: Open assign admin modal */}}
+                        className="hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 transition-colors"
                       >
                         {t('libraries.manageAdmins')}
                       </Button>
@@ -282,7 +355,123 @@ export default function LibrariesPage() {
             </Card>
           </motion.div>
         ))}
-      </div>
+        </div>
+      ) : (
+        /* List View */
+        <div className="space-y-4">
+          {filteredLibraries.map((library, index) => (
+            <motion.div
+              key={library._id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <Card className="hover:shadow-md transition-all duration-200 group">
+                <CardBody className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                      {/* Library Icon */}
+                      <div className="flex-shrink-0 w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
+                        <BuildingLibraryIcon className="w-6 h-6 text-primary-600" />
+                      </div>
+                      
+                      {/* Library Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-1">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            {library.name}
+                          </h3>
+                          <Badge variant="secondary" className="text-xs">
+                            {library.code}
+                          </Badge>
+                        </div>
+                        
+                        <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                          {/* Location */}
+                          <div className="flex items-center gap-1">
+                            <MapPinIcon className="w-4 h-4" />
+                            <span className="truncate">
+                              {library.location ? (
+                                `${library.location.city || ''}${library.location.city && library.location.state ? ', ' : ''}${library.location.state || ''}`
+                              ) : (
+                                t('libraries.location.none')
+                              )}
+                            </span>
+                          </div>
+                          
+                          {/* Contact */}
+                          {library.contact?.email && (
+                            <div className="flex items-center gap-1">
+                              <PhoneIcon className="w-4 h-4" />
+                              <span className="truncate">{library.contact.email}</span>
+                            </div>
+                          )}
+                          
+                          {/* Created Date */}
+                          <div className="text-xs text-gray-500">
+                            {new Date(library.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Stats and Actions */}
+                    <div className="flex items-center gap-6">
+                      {/* Stats */}
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="text-center">
+                          <div className="flex items-center gap-1">
+                            <UsersIcon className="w-4 h-4 text-primary-600" />
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">0</span>
+                          </div>
+                          <p className="text-xs text-gray-500">{t('libraries.stats.admins')}</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center gap-1">
+                            <BookOpenIcon className="w-4 h-4 text-success-600" />
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">0</span>
+                          </div>
+                          <p className="text-xs text-gray-500">{t('libraries.stats.books')}</p>
+                        </div>
+                      </div>
+                      
+                      {/* Actions */}
+                      {canManage && (
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            leftIcon={<UserPlusIcon className="w-4 h-4" />}
+                            onClick={() => {/* TODO: Open assign admin modal */}}
+                          >
+                            {t('libraries.manageAdmins')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEditLibrary(library)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <PencilIcon className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteLibrary(library._id)}
+                            className="h-8 w-8 p-0 text-error-600 hover:text-error-700"
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {filteredLibraries.length === 0 && (
         <Card>

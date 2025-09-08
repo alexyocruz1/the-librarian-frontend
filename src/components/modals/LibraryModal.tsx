@@ -18,8 +18,12 @@ import toast from 'react-hot-toast';
 const createLibrarySchema = (t: (key: string) => string) => z.object({
   name: z.string().min(1, t('libraryModal.validation.nameRequired')),
   code: z.string().min(1, t('libraryModal.validation.codeRequired')).max(10, t('libraryModal.validation.codeMaxLength')),
-  location: z.string().min(1, t('libraryModal.validation.locationRequired')),
-  contact: z.string().optional(),
+  address: z.string().optional().or(z.literal('')),
+  city: z.string().optional().or(z.literal('')),
+  state: z.string().optional().or(z.literal('')),
+  country: z.string().optional().or(z.literal('')),
+  email: z.string().email(t('libraryModal.validation.emailInvalid')).optional().or(z.literal('')),
+  phone: z.string().regex(/^\+?[\d\s\-\(\)]+$/, t('libraryModal.validation.phoneInvalid')).optional().or(z.literal('')),
 });
 
 type LibraryFormData = z.infer<ReturnType<typeof createLibrarySchema>>;
@@ -48,8 +52,12 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
     defaultValues: {
       name: '',
       code: '',
-      location: '',
-      contact: '',
+      address: '',
+      city: '',
+      state: '',
+      country: '',
+      email: '',
+      phone: '',
     }
   });
 
@@ -60,10 +68,12 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
       if (mode === 'edit' && library) {
         setValue('name', library.name);
         setValue('code', library.code);
-        setValue('location', library.location ? 
-          `${library.location.address || ''} ${library.location.city || ''} ${library.location.state || ''} ${library.location.country || ''}`.trim() : '');
-        setValue('contact', library.contact ? 
-          `${library.contact.email || ''} ${library.contact.phone || ''}`.trim() : '');
+        setValue('address', library.location?.address || '');
+        setValue('city', library.location?.city || '');
+        setValue('state', library.location?.state || '');
+        setValue('country', library.location?.country || '');
+        setValue('email', library.contact?.email || '');
+        setValue('phone', library.contact?.phone || '');
       } else {
         reset();
       }
@@ -81,9 +91,18 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
     setLoading(true);
     try {
       const libraryData = {
-        ...data,
+        name: data.name,
         code: data.code.toUpperCase(),
-        contact: data.contact || undefined,
+        location: {
+          address: data.address || undefined,
+          city: data.city || undefined,
+          state: data.state || undefined,
+          country: data.country || undefined,
+        },
+        contact: {
+          email: data.email || undefined,
+          phone: data.phone || undefined,
+        },
       };
 
       if (mode === 'create') {
@@ -156,19 +175,57 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                       />
                     </div>
 
-                    <Input
-                      label={t('libraryModal.fields.location')}
-                      {...register('location')}
-                      error={errors.location?.message}
-                      placeholder={t('libraryModal.placeholders.location')}
-                    />
+                    {/* Location Fields */}
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraryModal.sections.location')}</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Input
+                          label={t('libraryModal.fields.address')}
+                          {...register('address')}
+                          error={errors.address?.message}
+                          placeholder={t('libraryModal.placeholders.address')}
+                        />
+                        <Input
+                          label={t('libraryModal.fields.city')}
+                          {...register('city')}
+                          error={errors.city?.message}
+                          placeholder={t('libraryModal.placeholders.city')}
+                        />
+                        <Input
+                          label={t('libraryModal.fields.state')}
+                          {...register('state')}
+                          error={errors.state?.message}
+                          placeholder={t('libraryModal.placeholders.state')}
+                        />
+                        <Input
+                          label={t('libraryModal.fields.country')}
+                          {...register('country')}
+                          error={errors.country?.message}
+                          placeholder={t('libraryModal.placeholders.country')}
+                        />
+                      </div>
+                    </div>
 
-                    <Input
-                      label={t('libraryModal.fields.contact')}
-                      {...register('contact')}
-                      error={errors.contact?.message}
-                      placeholder={t('libraryModal.placeholders.contact')}
-                    />
+                    {/* Contact Fields */}
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('libraryModal.sections.contact')}</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Input
+                          label={t('libraryModal.fields.email')}
+                          type="email"
+                          {...register('email')}
+                          error={errors.email?.message}
+                          placeholder={t('libraryModal.placeholders.email')}
+                        />
+                        <Input
+                          label={t('libraryModal.fields.phone')}
+                          type="tel"
+                          {...register('phone')}
+                          error={errors.phone?.message}
+                          placeholder={t('libraryModal.placeholders.phone')}
+                        />
+                      </div>
+                    </div>
 
                     {/* Code Preview */}
                     {codeValue && (
