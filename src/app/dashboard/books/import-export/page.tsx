@@ -18,8 +18,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useI18n } from '@/context/I18nContext';
 
 export default function ImportExportPage() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [importFile, setImportFile] = useState<File | null>(null);
   const [importing, setImporting] = useState(false);
@@ -56,7 +58,7 @@ export default function ImportExportPage() {
         },
       });
 
-      toast.success(`Successfully imported ${response.data.data.imported} books`);
+      toast.success(t('books.import.success', { count: response.data?.data?.imported ?? 0 }));
       setImportFile(null);
       // Reset file input
       const fileInput = document.getElementById('csv-file') as HTMLInputElement;
@@ -125,8 +127,8 @@ export default function ImportExportPage() {
     return (
       <div className="text-center py-12">
         <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🚫</div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Access Denied</h2>
-        <p className="text-gray-600 dark:text-gray-400">You don&apos;t have permission to access this page.</p>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('common.accessDenied.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('common.accessDenied.description')}</p>
       </div>
     );
   }
@@ -135,16 +137,16 @@ export default function ImportExportPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Import & Export</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage bulk book operations with CSV files</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('books.importExport.title')}</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">{t('books.importExport.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Import Section */}
         <Card>
           <CardHeader
-            title="Import Books"
-            subtitle="Upload a CSV file to add multiple books at once"
+            title={t('books.import.title')}
+            subtitle={t('books.import.subtitle')}
           />
           <CardBody>
             <div className="space-y-6">
@@ -153,9 +155,9 @@ export default function ImportExportPage() {
                 <div className="flex items-start gap-3">
                   <DocumentTextIcon className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5" />
                   <div className="flex-1">
-                    <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Need a template?</h3>
+                    <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-1">{t('books.import.template.title')}</h3>
                     <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
-                      Download our CSV template to ensure your file has the correct format.
+                      {t('books.import.template.description')}
                     </p>
                     <Button
                       variant="outline"
@@ -164,7 +166,7 @@ export default function ImportExportPage() {
                       onClick={handleDownloadTemplate}
                       loading={downloadTemplate}
                     >
-                      Download Template
+                      {t('books.import.template.download')}
                     </Button>
                   </div>
                 </div>
@@ -173,7 +175,7 @@ export default function ImportExportPage() {
               {/* File Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select CSV File
+                  {t('books.import.selectFile')}
                 </label>
                 <Input
                   id="csv-file"
@@ -199,10 +201,9 @@ export default function ImportExportPage() {
                 <div className="flex items-start gap-3">
                   <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-1">Import Process</h3>
+                    <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-1">{t('books.import.process.title')}</h3>
                     <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                      All records will be validated before import. If any record fails validation, 
-                      the entire import will be cancelled. Check the template format carefully.
+                      {t('books.import.process.description')}
                     </p>
                   </div>
                 </div>
@@ -216,7 +217,7 @@ export default function ImportExportPage() {
                 loading={importing}
                 disabled={!importFile}
               >
-                Import Books
+                {t('books.import.action')}
               </Button>
             </div>
           </CardBody>
@@ -225,8 +226,8 @@ export default function ImportExportPage() {
         {/* Export Section */}
         <Card>
           <CardHeader
-            title="Export Catalog"
-            subtitle="Download your library's book catalog as a CSV file"
+            title={t('books.export.title')}
+            subtitle={t('books.export.subtitle')}
           />
           <CardBody>
             <div className="space-y-6">
@@ -235,10 +236,9 @@ export default function ImportExportPage() {
                 <div className="flex items-start gap-3">
                   <DocumentTextIcon className="w-6 h-6 text-green-600 dark:text-green-400 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-green-900 dark:text-green-100 mb-1">Export Format</h3>
+                    <h3 className="font-medium text-green-900 dark:text-green-100 mb-1">{t('books.export.format.title')}</h3>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      The exported file will include all book information, inventory details, 
-                      and copy information in a structured CSV format.
+                      {t('books.export.format.description')}
                     </p>
                   </div>
                 </div>
@@ -246,27 +246,27 @@ export default function ImportExportPage() {
 
               {/* Export Features */}
               <div className="space-y-3">
-                <h3 className="font-medium text-gray-900 dark:text-gray-100">Export includes:</h3>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">{t('books.export.includes.title')}</h3>
                 <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    Book titles and metadata
+                    {t('books.export.includes.item.titles')}
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    Author and publisher information
+                    {t('books.export.includes.item.authorsPublishers')}
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    ISBN and categorization
+                    {t('books.export.includes.item.isbnCategories')}
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    Inventory and copy details
+                    {t('books.export.includes.item.inventoryCopies')}
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    Barcode and shelf locations
+                    {t('books.export.includes.item.barcodesShelves')}
                   </li>
                 </ul>
               </div>
@@ -278,7 +278,7 @@ export default function ImportExportPage() {
                 onClick={handleExport}
                 loading={exporting}
               >
-                Export Catalog
+                {t('books.export.action')}
               </Button>
             </div>
           </CardBody>
@@ -287,37 +287,37 @@ export default function ImportExportPage() {
 
       {/* Instructions */}
       <Card>
-        <CardHeader title="CSV Format Instructions" />
+        <CardHeader title={t('books.importExport.instructions.title')} />
         <CardBody>
           <div className="prose prose-sm max-w-none">
-            <h3>Required Fields:</h3>
+            <h3>{t('books.importExport.instructions.required.title')}</h3>
             <ul>
-              <li><strong>isbn13</strong> - 13-digit ISBN (required)</li>
-              <li><strong>title</strong> - Book title (required)</li>
-              <li><strong>authors</strong> - Author names separated by semicolons (required)</li>
-              <li><strong>publisher</strong> - Publisher name (required)</li>
-              <li><strong>publishedYear</strong> - Publication year (required)</li>
-              <li><strong>language</strong> - Book language (required)</li>
-              <li><strong>categories</strong> - Categories separated by semicolons (required)</li>
+              <li>{t('books.importExport.instructions.required.isbn13')}</li>
+              <li>{t('books.importExport.instructions.required.titleField')}</li>
+              <li>{t('books.importExport.instructions.required.authors')}</li>
+              <li>{t('books.importExport.instructions.required.publisher')}</li>
+              <li>{t('books.importExport.instructions.required.publishedYear')}</li>
+              <li>{t('books.importExport.instructions.required.language')}</li>
+              <li>{t('books.importExport.instructions.required.categories')}</li>
             </ul>
             
-            <h3>Optional Fields:</h3>
+            <h3>{t('books.importExport.instructions.optional.title')}</h3>
             <ul>
-              <li><strong>isbn10</strong> - 10-digit ISBN</li>
-              <li><strong>subtitle</strong> - Book subtitle</li>
-              <li><strong>description</strong> - Book description</li>
-              <li><strong>coverUrl</strong> - Cover image URL</li>
-              <li><strong>totalCopies</strong> - Number of copies to create (default: 1)</li>
-              <li><strong>shelfLocation</strong> - Default shelf location for copies</li>
+              <li>{t('books.importExport.instructions.optional.isbn10')}</li>
+              <li>{t('books.importExport.instructions.optional.subtitle')}</li>
+              <li>{t('books.importExport.instructions.optional.description')}</li>
+              <li>{t('books.importExport.instructions.optional.coverUrl')}</li>
+              <li>{t('books.importExport.instructions.optional.totalCopies')}</li>
+              <li>{t('books.importExport.instructions.optional.shelfLocation')}</li>
             </ul>
 
-            <h3>Important Notes:</h3>
+            <h3>{t('books.importExport.instructions.notes.title')}</h3>
             <ul>
-              <li>All records must pass validation before any are imported</li>
-              <li>ISBN-13 must be unique across your library</li>
-              <li>Authors and categories should be separated by semicolons (;)</li>
-              <li>Published year must be a valid 4-digit year</li>
-              <li>If totalCopies is specified, that many copies will be created automatically</li>
+              <li>{t('books.importExport.instructions.notes.validation')}</li>
+              <li>{t('books.importExport.instructions.notes.isbnUnique')}</li>
+              <li>{t('books.importExport.instructions.notes.separators')}</li>
+              <li>{t('books.importExport.instructions.notes.year')}</li>
+              <li>{t('books.importExport.instructions.notes.copies')}</li>
             </ul>
           </div>
         </CardBody>
