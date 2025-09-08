@@ -123,9 +123,9 @@ export default function ImportExportPage() {
   if (!canManage) {
     return (
       <div className="text-center py-12">
-        <div className="text-gray-400 text-6xl mb-4">🚫</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h2>
-        <p className="text-gray-600">You don&apos;t have permission to access this page.</p>
+        <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🚫</div>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Access Denied</h2>
+        <p className="text-gray-600 dark:text-gray-400">You don&apos;t have permission to access this page.</p>
       </div>
     );
   }
@@ -134,8 +134,8 @@ export default function ImportExportPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Import & Export</h1>
-        <p className="text-gray-600 mt-1">Manage bulk book operations with CSV files</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Import & Export</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Manage bulk book operations with CSV files</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -148,12 +148,12 @@ export default function ImportExportPage() {
           <CardBody>
             <div className="space-y-6">
               {/* Download Template */}
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
                 <div className="flex items-start gap-3">
-                  <DocumentTextIcon className="w-6 h-6 text-blue-600 mt-0.5" />
+                  <DocumentTextIcon className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5" />
                   <div className="flex-1">
-                    <h3 className="font-medium text-blue-900 mb-1">Need a template?</h3>
-                    <p className="text-sm text-blue-700 mb-3">
+                    <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-1">Need a template?</h3>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
                       Download our CSV template to ensure your file has the correct format.
                     </p>
                     <Button
@@ -171,7 +171,7 @@ export default function ImportExportPage() {
 
               {/* File Upload */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select CSV File
                 </label>
                 <Input
@@ -186,7 +186,7 @@ export default function ImportExportPage() {
                     <Badge variant="success" size="sm">
                       {importFile.name}
                     </Badge>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       ({(importFile.size / 1024).toFixed(1)} KB)
                     </span>
                   </div>
@@ -194,12 +194,12 @@ export default function ImportExportPage() {
               </div>
 
               {/* Import Warning */}
-              <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
                 <div className="flex items-start gap-3">
-                  <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600 mt-0.5" />
+                  <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-yellow-900 mb-1">Import Process</h3>
-                    <p className="text-sm text-yellow-700">
+                    <h3 className="font-medium text-yellow-900 dark:text-yellow-100 mb-1">Import Process</h3>
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
                       All records will be validated before import. If any record fails validation, 
                       the entire import will be cancelled. Check the template format carefully.
                     </p>
@@ -230,12 +230,12 @@ export default function ImportExportPage() {
           <CardBody>
             <div className="space-y-6">
               {/* Export Info */}
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                 <div className="flex items-start gap-3">
-                  <DocumentTextIcon className="w-6 h-6 text-green-600 mt-0.5" />
+                  <DocumentTextIcon className="w-6 h-6 text-green-600 dark:text-green-400 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-green-900 mb-1">Export Format</h3>
-                    <p className="text-sm text-green-700">
+                    <h3 className="font-medium text-green-900 dark:text-green-100 mb-1">Export Format</h3>
+                    <p className="text-sm text-green-700 dark:text-green-300">
                       The exported file will include all book information, inventory details, 
                       and copy information in a structured CSV format.
                     </p>
@@ -245,8 +245,8 @@ export default function ImportExportPage() {
 
               {/* Export Features */}
               <div className="space-y-3">
-                <h3 className="font-medium text-gray-900">Export includes:</h3>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <h3 className="font-medium text-gray-900 dark:text-gray-100">Export includes:</h3>
+                <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                   <li className="flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
                     Book titles and metadata

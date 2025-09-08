@@ -118,11 +118,23 @@ export default function DashboardLayout({
     return item.roles.some((role) => hasRole(role));
   });
 
-  const isActive = (href: string) => {
+  const isActive = (href: string, isChild: boolean = false) => {
     if (href === '/dashboard') {
       return pathname === '/dashboard';
     }
-    return pathname.startsWith(href);
+    
+    // For exact matches
+    if (pathname === href) {
+      return true;
+    }
+    
+    // For parent routes, check if the pathname starts with href + '/'
+    // This prevents /dashboard/books from matching /dashboard/books/import-export
+    if (!isChild && pathname.startsWith(href + '/')) {
+      return true;
+    }
+    
+    return false;
   };
 
   return (
@@ -165,7 +177,7 @@ export default function DashboardLayout({
                       href={item.href}
                       className={cn(
                         'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                        isActive(item.href)
+                        isActive(item.href, false)
                           ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                           : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                       )}
@@ -186,7 +198,7 @@ export default function DashboardLayout({
                               href={child.href}
                               className={cn(
                                 'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
-                                isActive(child.href)
+                                isActive(child.href, true)
                                   ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
                                   : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
                               )}
@@ -219,7 +231,7 @@ export default function DashboardLayout({
                   href={item.href}
                   className={cn(
                     'flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors',
-                    isActive(item.href)
+                    isActive(item.href, false)
                       ? 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300'
                       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100'
                   )}
@@ -240,7 +252,7 @@ export default function DashboardLayout({
                           href={child.href}
                           className={cn(
                             'flex items-center px-3 py-2 text-sm rounded-lg transition-colors',
-                            isActive(child.href)
+                            isActive(child.href, true)
                               ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
                               : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200'
                           )}
