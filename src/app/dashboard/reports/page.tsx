@@ -178,14 +178,14 @@ export default function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
-          <p className="text-gray-600 mt-1">Library performance and usage statistics</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Reports & Analytics</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">Library performance and usage statistics</p>
         </div>
         <div className="flex items-center gap-3">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             aria-label="Select date range"
           >
             <option value="7">Last 7 days</option>
@@ -304,15 +304,15 @@ export default function ReportsPage() {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-primary-700">#{index + 1}</span>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900">{book.title}</h4>
-                      <p className="text-xs text-gray-500">{book.borrowCount} borrows</p>
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">{book.title}</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{book.borrowCount} borrows</p>
                     </div>
                   </div>
                   <Badge variant="success" size="sm">
@@ -338,7 +338,7 @@ export default function ReportsPage() {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg"
+                  className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
                 >
                   <div className="flex-shrink-0 mt-1">
                     {activity.type === 'borrow' && <BookOpenIcon className="w-4 h-4 text-primary-600" />}
@@ -367,16 +367,16 @@ export default function ReportsPage() {
           <CardBody>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total Libraries</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.summary.totalLibraries}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Total Libraries</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalLibraries}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Pending Requests</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.summary.pendingRequests}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Pending Requests</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.pendingRequests}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total Borrows</span>
-                <span className="text-lg font-semibold text-gray-900">{stats.summary.totalBorrows.toLocaleString()}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Total Borrows</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">{stats.summary.totalBorrows.toLocaleString()}</span>
               </div>
             </div>
           </CardBody>
@@ -419,19 +419,19 @@ export default function ReportsPage() {
           <CardBody>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Overdue Rate</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Overdue Rate</span>
                 <Badge variant={stats.systemHealth.overdueRate > 20 ? 'error' : 'success'}>
                   {stats.systemHealth.overdueRate.toFixed(1)}%
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Request Processing</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Request Processing</span>
                 <Badge variant={stats.systemHealth.requestProcessingRate === 'High' ? 'warning' : 'success'}>
                   {stats.systemHealth.requestProcessingRate}
                 </Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">System Status</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">System Status</span>
                 <Badge variant={stats.systemHealth.systemStatus === 'Healthy' ? 'success' : 'warning'}>
                   {stats.systemHealth.systemStatus}
                 </Badge>
