@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/useAuth';
 import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/context/I18nContext';
 
 interface NavItem {
   name: string;
@@ -34,44 +35,44 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   {
-    name: 'Dashboard',
+    name: 'dashboard.menu.dashboard',
     href: '/dashboard',
     icon: HomeIcon,
   },
   {
-    name: 'Libraries',
+    name: 'dashboard.menu.libraries',
     href: '/dashboard/libraries',
     icon: BuildingLibraryIcon,
   },
   {
-    name: 'Books',
+    name: 'dashboard.menu.books',
     href: '/dashboard/books',
     icon: BookOpenIcon,
     children: [
-      { name: 'All Books', href: '/dashboard/books', icon: BookOpenIcon },
-      { name: 'Import/Export', href: '/dashboard/books/import-export', icon: ClipboardDocumentListIcon, roles: ['admin', 'superadmin'] },
-      { name: 'My Requests', href: '/dashboard/books/requests', icon: BookmarkIcon },
-      { name: 'My History', href: '/dashboard/books/history', icon: ClipboardDocumentListIcon },
+      { name: 'dashboard.menu.allBooks', href: '/dashboard/books', icon: BookOpenIcon },
+      { name: 'dashboard.menu.importExport', href: '/dashboard/books/import-export', icon: ClipboardDocumentListIcon, roles: ['admin', 'superadmin'] },
+      { name: 'dashboard.menu.myRequests', href: '/dashboard/books/requests', icon: BookmarkIcon },
+      { name: 'dashboard.menu.myHistory', href: '/dashboard/books/history', icon: ClipboardDocumentListIcon },
     ],
   },
   {
-    name: 'Users',
+    name: 'dashboard.menu.users',
     href: '/dashboard/users',
     icon: UsersIcon,
     roles: ['admin', 'superadmin'],
     children: [
-      { name: 'All Users', href: '/dashboard/users', icon: UsersIcon },
-      { name: 'Pending Students', href: '/dashboard/users/pending', icon: ClipboardDocumentListIcon },
+      { name: 'dashboard.menu.allUsers', href: '/dashboard/users', icon: UsersIcon },
+      { name: 'dashboard.menu.pendingStudents', href: '/dashboard/users/pending', icon: ClipboardDocumentListIcon },
     ],
   },
   {
-    name: 'Reports',
+    name: 'dashboard.menu.reports',
     href: '/dashboard/reports',
     icon: ChartBarIcon,
     roles: ['admin', 'superadmin'],
   },
   {
-    name: 'Settings',
+    name: 'dashboard.menu.settings',
     href: '/dashboard/settings',
     icon: Cog6ToothIcon,
   },
@@ -84,6 +85,7 @@ export default function DashboardLayout({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout, hasRole, isAuthenticated, isLoading } = useAuth();
+  const { t, locale, setLocale } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -183,7 +185,7 @@ export default function DashboardLayout({
                       )}
                     >
                       <item.icon className="w-5 h-5 mr-3" />
-                      {item.name}
+                      {t(item.name)}
                     </Link>
                     {item.children && (
                       <div className="ml-8 mt-2 space-y-1">
@@ -204,7 +206,7 @@ export default function DashboardLayout({
                               )}
                             >
                               <child.icon className="w-4 h-4 mr-3" />
-                              {child.name}
+                              {t(child.name)}
                             </Link>
                           ))}
                       </div>
@@ -222,7 +224,7 @@ export default function DashboardLayout({
         <div className="flex flex-col flex-grow bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
           <div className="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-700">
             <BookOpenIcon className="w-8 h-8 text-primary-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-100">The Librarian</span>
+            <span className="ml-2 text-xl font-bold text-gray-900 dark:text-gray-100">{t('app.title')}</span>
           </div>
           <nav className="flex-1 mt-6 px-3 space-y-1">
             {filteredNavigation.map((item) => (
@@ -237,7 +239,7 @@ export default function DashboardLayout({
                   )}
                 >
                   <item.icon className="w-5 h-5 mr-3" />
-                  {item.name}
+                  {t(item.name)}
                 </Link>
                 {item.children && (
                   <div className="ml-8 mt-2 space-y-1">
@@ -258,7 +260,7 @@ export default function DashboardLayout({
                           )}
                         >
                           <child.icon className="w-4 h-4 mr-3" />
-                          {child.name}
+                          {t(child.name)}
                         </Link>
                       ))}
                   </div>

@@ -233,7 +233,7 @@ export default function DashboardPage() {
               {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'User'}
             </Badge>
             <span className="text-primary-100 text-sm">
-              {user?.lastLoginAt ? `Last login: ${ldt(user.lastLoginAt)}` : 'First login'}
+              {user?.lastLoginAt ? t('dashboard.lastLogin', { date: ldt(user.lastLoginAt) }) : t('dashboard.firstLogin')}
             </span>
           </div>
         </div>

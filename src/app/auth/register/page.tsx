@@ -171,30 +171,30 @@ export default function RegisterPage() {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {t('auth.register.accountType')}
                   </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <label className="relative">
+                  <div className="grid grid-cols-2 gap-3 items-stretch">
+                    <label className="relative h-full">
                       <input
                         {...register('role')}
                         type="radio"
                         value="guest"
                         className="sr-only peer"
                       />
-                      <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
-                        <div className="text-center">
+                      <div className="h-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500 flex items-center justify-center">
+                        <div className="text-center flex flex-col items-center justify-center">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('auth.register.role.guest')}</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('auth.register.role.guest.desc')}</div>
                         </div>
                       </div>
                     </label>
-                    <label className="relative">
+                    <label className="relative h-full">
                       <input
                         {...register('role')}
                         type="radio"
                         value="student"
                         className="sr-only peer"
                       />
-                      <div className="p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500">
-                        <div className="text-center">
+                      <div className="h-full p-3 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900/20 hover:border-gray-300 dark:hover:border-gray-500 flex items-center justify-center">
+                        <div className="text-center flex flex-col items-center justify-center">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('auth.register.role.student')}</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('auth.register.role.student.desc')}</div>
                         </div>
