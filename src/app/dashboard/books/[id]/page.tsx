@@ -20,6 +20,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { Title, Inventory, Copy } from '@/types';
 import toast from 'react-hot-toast';
+import AppLoader from '@/components/ui/AppLoader';
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -102,11 +103,7 @@ export default function BookDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
+    return <AppLoader subtitle="Loading book details…" size="md" />;
   }
 
   if (!title) {

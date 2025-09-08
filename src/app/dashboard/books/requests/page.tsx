@@ -19,6 +19,7 @@ import { formatDate, formatDateTime } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
+import AppLoader from '@/components/ui/AppLoader';
 
 interface BorrowRequest {
   _id: string;
@@ -292,7 +293,7 @@ export default function MyRequestsPage() {
 
       {/* Content */}
       {loading ? (
-        <LoadingState />
+        <AppLoader subtitle="Fetching your requests…" size="md" />
       ) : error ? (
         <ErrorState />
       ) : requests.length === 0 ? (

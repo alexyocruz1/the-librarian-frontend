@@ -18,6 +18,7 @@ import { api } from '@/lib/api';
 import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import AppLoader from '@/components/ui/AppLoader';
 
 interface DashboardStats {
   totalBooks: number;
@@ -205,26 +206,7 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-8 text-white">
-          <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {user?.name}! 👋
-          </h1>
-          <p className="text-primary-100 text-lg">
-            Loading your library system data...
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border dark:border-gray-700 animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <AppLoader title="The Librarian" subtitle="Loading your dashboard…" size="md" />;
   }
 
   return (

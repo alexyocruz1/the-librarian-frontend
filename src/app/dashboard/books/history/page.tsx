@@ -18,6 +18,7 @@ import { formatDate, formatDateTime } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
+import AppLoader from '@/components/ui/AppLoader';
 
 interface BorrowRecord {
   _id: string;
@@ -290,7 +291,7 @@ export default function MyHistoryPage() {
 
       {/* Content */}
       {loading ? (
-        <LoadingState />
+        <AppLoader subtitle="Fetching your history…" size="md" />
       ) : error ? (
         <ErrorState />
       ) : records.length === 0 ? (
