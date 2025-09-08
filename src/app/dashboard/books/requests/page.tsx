@@ -19,7 +19,7 @@ import { formatDate, formatDateTime } from '@/lib/utils';
 import { api } from '@/lib/api';
 import { getErrorMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
-import AppLoader from '@/components/ui/AppLoader';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 interface BorrowRequest {
   _id: string;
@@ -293,7 +293,36 @@ export default function MyRequestsPage() {
 
       {/* Content */}
       {loading ? (
-        <AppLoader subtitle="Fetching your requests…" size="md" />
+        <div className="space-y-6">
+          <div>
+            <div className="skeleton h-8 w-32 rounded mb-2" />
+            <div className="skeleton h-4 w-80 rounded" />
+          </div>
+          <Card>
+            <CardBody>
+              <div className="flex flex-wrap gap-2">
+                {[1,2,3,4,5].map((i)=> (
+                  <div key={i} className="skeleton h-8 w-28 rounded" />
+                ))}
+              </div>
+            </CardBody>
+          </Card>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardBody>
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                    </div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                  </div>
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        </div>
       ) : error ? (
         <ErrorState />
       ) : requests.length === 0 ? (

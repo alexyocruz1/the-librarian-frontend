@@ -19,6 +19,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { getErrorMessage, getSuccessMessage, getInfoMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
+import { Skeleton, SkeletonText } from '@/components/ui/Skeleton';
 import AppLoader from '@/components/ui/AppLoader';
 
 interface ReportStats {
@@ -161,7 +162,92 @@ export default function ReportsPage() {
   }
 
   if (loading) {
-    return <AppLoader subtitle="Loading reports…" size="md" />;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="skeleton h-8 w-48 rounded mb-2" />
+            <div className="skeleton h-4 w-72 rounded" />
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="skeleton h-10 w-40 rounded" />
+            <div className="skeleton h-10 w-36 rounded" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
+          {[1,2,3,4].map((i) => (
+            <div key={i} className="card p-6">
+              <div className="flex items-center gap-4">
+                <div className="skeleton h-10 w-10 rounded-full" />
+                <div className="flex-1">
+                  <div className="skeleton h-4 w-24 rounded mb-2" />
+                  <div className="skeleton h-6 w-16 rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="card p-6">
+            <div className="skeleton h-5 w-40 rounded mb-4" />
+            <div className="space-y-3">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3">
+                    <div className="skeleton h-8 w-8 rounded-full" />
+                    <div>
+                      <div className="skeleton h-4 w-40 rounded mb-2" />
+                      <div className="skeleton h-3 w-24 rounded" />
+                    </div>
+                  </div>
+                  <div className="skeleton h-6 w-10 rounded" />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="card p-6">
+            <div className="skeleton h-5 w-40 rounded mb-4" />
+            <div className="space-y-3">
+              {[1,2,3,4].map((i) => (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="skeleton h-5 w-5 rounded-full" />
+                  <div className="flex-1">
+                    <div className="skeleton h-4 w-64 rounded mb-2" />
+                    <div className="skeleton h-3 w-32 rounded" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="card p-6 space-y-4">
+            {[1,2,3].map((i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="skeleton h-4 w-32 rounded" />
+                <div className="skeleton h-5 w-12 rounded" />
+              </div>
+            ))}
+          </div>
+          <div className="card p-6 space-y-3">
+            {[1,2,3].map((i) => (
+              <div key={i} className="skeleton h-10 w-full rounded" />
+            ))}
+          </div>
+          <div className="card p-6 space-y-4">
+            {[1,2,3].map((i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="skeleton h-4 w-40 rounded" />
+                <div className="skeleton h-6 w-16 rounded" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!stats) {

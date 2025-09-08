@@ -17,6 +17,7 @@ import { Title, Inventory, Copy } from '@/types';
 import { getErrorMessage, getInfoMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function BooksPage() {
   const { user } = useAuth();
@@ -128,7 +129,44 @@ export default function BooksPage() {
   };
 
   if (loading) {
-    return <AppLoader subtitle="Loading books…" size="md" />;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="skeleton h-8 w-28 rounded mb-2" />
+            <div className="skeleton h-4 w-72 rounded" />
+          </div>
+          <div className="skeleton h-10 w-28 rounded" />
+        </div>
+        <div className="card p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="skeleton h-10 w-full rounded" />
+            </div>
+            <div className="skeleton h-10 w-28 rounded" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="card p-6 space-y-3">
+              <div className="skeleton h-5 w-3/4 rounded" />
+              <div className="skeleton h-4 w-1/2 rounded" />
+              <div className="flex gap-2">
+                <div className="skeleton h-6 w-16 rounded" />
+                <div className="skeleton h-6 w-16 rounded" />
+              </div>
+              <div className="pt-3 border-t dark:border-gray-700">
+                <div className="skeleton h-4 w-40 rounded mb-2" />
+                <div className="flex gap-2">
+                  <div className="skeleton h-8 w-full rounded" />
+                  <div className="skeleton h-8 w-20 rounded" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

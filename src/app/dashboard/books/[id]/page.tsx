@@ -21,6 +21,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Title, Inventory, Copy } from '@/types';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -103,7 +104,58 @@ export default function BookDetailPage() {
   };
 
   if (loading) {
-    return <AppLoader subtitle="Loading book details…" size="md" />;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="skeleton h-10 w-24 rounded" />
+          <div className="skeleton h-8 w-64 rounded" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="card p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  {[1,2,3,4].map((i)=> (
+                    <div key={i}>
+                      <div className="skeleton h-4 w-32 rounded mb-2" />
+                      <div className="skeleton h-5 w-48 rounded" />
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-4">
+                  {[1,2,3,4].map((i)=> (
+                    <div key={i}>
+                      <div className="skeleton h-4 w-32 rounded mb-2" />
+                      <div className="skeleton h-5 w-48 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="skeleton h-4 w-40 rounded mb-3" />
+                <div className="space-y-2">
+                  {[...Array(4)].map((_,i)=>(<div key={i} className="skeleton h-4 w-full rounded" />))}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-6">
+            <div className="card p-4 h-[360px] flex items-center justify-center">
+              <div className="skeleton h-64 w-48 rounded" />
+            </div>
+            <div className="card p-6 space-y-3">
+              <div className="skeleton h-5 w-32 rounded" />
+              <div className="skeleton h-10 w-full rounded" />
+              <div className="skeleton h-10 w-full rounded" />
+            </div>
+          </div>
+        </div>
+        <div className="card p-6">
+          <div className="skeleton h-5 w-40 rounded mb-4" />
+          <div className="skeleton h-32 w-full rounded" />
+        </div>
+      </div>
+    );
   }
 
   if (!title) {

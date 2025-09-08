@@ -26,6 +26,7 @@ import { Library } from '@/types';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function LibrariesPage() {
   const { user } = useAuth();
@@ -98,7 +99,33 @@ export default function LibrariesPage() {
   const canManage = user?.role === 'admin' || user?.role === 'superadmin';
 
   if (loading) {
-    return <AppLoader subtitle="Loading libraries…" size="md" />;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="skeleton h-8 w-40 rounded mb-2" />
+            <div className="skeleton h-4 w-80 rounded" />
+          </div>
+          <div className="skeleton h-10 w-32 rounded" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="card p-6 space-y-4">
+              <div className="skeleton h-6 w-1/2 rounded" />
+              <div className="skeleton h-4 w-1/3 rounded" />
+              <div className="space-y-3">
+                <div className="skeleton h-4 w-3/4 rounded" />
+                <div className="skeleton h-4 w-2/3 rounded" />
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4">
+                <div className="skeleton h-6 w-full rounded" />
+                <div className="skeleton h-6 w-full rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (

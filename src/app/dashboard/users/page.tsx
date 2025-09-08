@@ -23,6 +23,7 @@ import { User, UserRole, UserStatus } from '@/types';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function UsersPage() {
   const { user: currentUser } = useAuth();
@@ -140,7 +141,29 @@ export default function UsersPage() {
   const isSuperAdmin = currentUser?.role === 'superadmin';
 
   if (loading) {
-    return <AppLoader subtitle="Loading users…" size="md" />;
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="skeleton h-8 w-24 rounded mb-2" />
+            <div className="skeleton h-4 w-64 rounded" />
+          </div>
+          <div className="skeleton h-10 w-28 rounded" />
+        </div>
+        <div className="card p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="skeleton h-10 w-full rounded" />
+            </div>
+            <div className="skeleton h-10 w-24 rounded" />
+          </div>
+        </div>
+        <div className="card p-6">
+          <div className="skeleton h-5 w-32 rounded mb-4" />
+          <div className="skeleton h-64 w-full rounded" />
+        </div>
+      </div>
+    );
   }
 
   return (
