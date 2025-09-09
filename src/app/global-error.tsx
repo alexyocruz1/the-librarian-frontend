@@ -67,7 +67,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                     Our library system has encountered a serious issue.
                   </p>
                   <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
-                    Don't panic! Our technical team has been notified and is working on a fix.
+                    Don&apos;t panic! Our technical team has been notified and is working on a fix.
                   </p>
                 </motion.div>
 
@@ -104,9 +104,9 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 >
                   <div className="bg-error-50 dark:bg-error-900/20 rounded-lg p-3 md:p-4 mb-3 md:mb-4">
                     <p className="text-xs sm:text-sm text-error-700 dark:text-error-300 italic">
-                      "Even the most well-organized libraries can have a shelf collapse. We're rebuilding!"
+                      &ldquo;Even the most well-organized libraries can have a shelf collapse. We&apos;re rebuilding!&rdquo;
                       <br />
-                      <span className="text-xs">- The Librarian's Guide to Crisis Management</span>
+                      <span className="text-xs">- The Librarian&apos;s Guide to Crisis Management</span>
                     </p>
                   </div>
                   
@@ -161,7 +161,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                     Error Code: CRITICAL_SYSTEM_ERROR_500
                     <br />
                     <span className="text-error-600 dark:text-error-400">
-                      🚨 "When the library needs emergency repairs, we call in the experts!"
+                      🚨 &ldquo;When the library needs emergency repairs, we call in the experts!&rdquo;
                     </span>
                   </p>
                 </motion.div>

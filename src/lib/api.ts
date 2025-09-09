@@ -42,17 +42,22 @@ class ApiClient {
         if (error.response?.status === 401 && 
             !originalRequest._retry && 
             !originalRequest.url?.includes('/auth/login') &&
-            !originalRequest.url?.includes('/auth/register')) {
+            !originalRequest.url?.includes('/auth/register') &&
+            !originalRequest.url?.includes('/auth/refresh')) {
+          
+          console.log('🔄 Token expired, attempting refresh...');
           originalRequest._retry = true;
 
           try {
             await this.refreshToken();
             const newToken = this.getAccessToken();
             if (newToken) {
+              console.log('✅ Token refreshed successfully');
               originalRequest.headers.Authorization = `Bearer ${newToken}`;
               return this.client(originalRequest);
             }
           } catch (refreshError) {
+            console.error('❌ Token refresh failed:', refreshError);
             this.clearTokens();
             window.location.href = '/auth/login';
             return Promise.reject(refreshError);
@@ -116,6 +121,7 @@ class ApiClient {
 
   private async refreshToken(): Promise<void> {
     try {
+      console.log('🔄 Calling refresh token endpoint...');
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/refresh`,
         {},
@@ -124,10 +130,21 @@ class ApiClient {
         }
       );
 
+      console.log('🔄 Refresh token response:', response.data);
       if (response.data.success && response.data.data.accessToken) {
         this.setAccessToken(response.data.data.accessToken);
+        console.log('✅ New access token stored');
+        
+        // Dispatch a custom event to notify auth context of token refresh
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('tokenRefreshed', {
+            detail: { accessToken: response.data.data.accessToken }
+          }));
+          console.log('📡 Token refresh event dispatched');
+        }
       }
     } catch (error) {
+      console.error('❌ Refresh token error:', error);
       throw error;
     }
   }

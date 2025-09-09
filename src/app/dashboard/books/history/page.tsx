@@ -8,7 +8,6 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   CalendarIcon,
-  LibraryIcon,
 } from '@heroicons/react/24/outline';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -153,7 +152,7 @@ export default function MyHistoryPage() {
       const errorMessage = getErrorMessage(error);
       
       // Check if it's a 404 or similar "no data" error vs a real error
-      if (error.response?.status === 404 || errorMessage.includes('not found')) {
+      if ((error as any)?.response?.status === 404 || errorMessage.includes('not found')) {
         // Treat as empty state, not an error
         setRecords([]);
         setError(null);

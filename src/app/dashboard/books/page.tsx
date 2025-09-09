@@ -390,7 +390,7 @@ export default function BooksPage() {
                                 </Badge>
                               ))}
                               {title.categories.length > 2 && (
-                                <Badge variant="outline" size="sm" className="text-xs">
+                                <Badge variant="secondary" size="sm" className="text-xs">
                                   +{title.categories.length - 2}
                                 </Badge>
                               )}
@@ -530,7 +530,7 @@ export default function BooksPage() {
                                   </Badge>
                                 ))}
                                 {title.categories.length > 3 && (
-                                  <Badge variant="outline" size="sm" className="text-xs">
+                                  <Badge variant="secondary" size="sm" className="text-xs">
                                     +{title.categories.length - 3}
                                   </Badge>
                                 )}

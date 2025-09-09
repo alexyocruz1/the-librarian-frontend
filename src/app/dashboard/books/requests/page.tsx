@@ -144,7 +144,7 @@ export default function MyRequestsPage() {
       const errorMessage = getErrorMessage(error);
       
       // Check if it's a 404 or similar "no data" error vs a real error
-      if (error.response?.status === 404 || errorMessage.includes('not found')) {
+      if ((error as any)?.response?.status === 404 || errorMessage.includes('not found')) {
         // Treat as empty state, not an error
         setRequests([]);
         setError(null);

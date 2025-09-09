@@ -60,6 +60,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     initializeAuth();
+
+    // Listen for token refresh events from API client
+    const handleTokenRefresh = (event: CustomEvent) => {
+      const { accessToken } = event.detail;
+      console.log('📡 Token refresh event received in AuthContext');
+      setAuthState(prev => ({
+        ...prev,
+        accessToken,
+      }));
+    };
+
+    window.addEventListener('tokenRefreshed', handleTokenRefresh as EventListener);
+    
+    return () => {
+      window.removeEventListener('tokenRefreshed', handleTokenRefresh as EventListener);
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<boolean> => {

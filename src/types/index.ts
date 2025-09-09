@@ -173,6 +173,19 @@ export interface AuthUser {
   status: UserStatus;
   libraries?: string[];
   lastLoginAt?: string;
+  profile?: {
+    phone?: string;
+  };
+  preferences?: {
+    language?: string;
+    timezone?: string;
+    notifications?: {
+      email?: boolean;
+      push?: boolean;
+      borrowReminders?: boolean;
+      systemUpdates?: boolean;
+    };
+  };
 }
 
 export interface AuthState {

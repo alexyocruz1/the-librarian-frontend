@@ -90,12 +90,12 @@ export default function BookDetailPage() {
 
   const handlePrintBarcode = (copy: Copy) => {
     // TODO: Implement barcode printing
-    toast.success(t('bookDetail.copies.printSuccess', { barcode: copy.barcode }));
+    toast.success(t('bookDetail.copies.printSuccess', { barcode: copy.barcode || 'N/A' }));
   };
 
   const handleGenerateQR = (copy: Copy) => {
     // TODO: Implement QR code generation
-    toast.success(t('bookDetail.copies.qrSuccess', { barcode: copy.barcode }));
+    toast.success(t('bookDetail.copies.qrSuccess', { barcode: copy.barcode || 'N/A' }));
   };
 
   const handleDeleteCopy = async (copyId: string) => {

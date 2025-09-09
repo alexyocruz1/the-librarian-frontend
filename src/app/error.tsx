@@ -70,7 +70,7 @@ export default function Error({ error, reset }: ErrorProps) {
                 It looks like our library system encountered a technical hiccup.
               </p>
               <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
-                Don't worry, our librarians are working on it! In the meantime, let's get you back on track.
+                Don&apos;t worry, our librarians are working on it! In the meantime, let&apos;s get you back on track.
               </p>
             </motion.div>
 
@@ -107,9 +107,9 @@ export default function Error({ error, reset }: ErrorProps) {
             >
               <div className="bg-warning-50 dark:bg-warning-900/20 rounded-lg p-3 md:p-4 mb-3 md:mb-4">
                 <p className="text-xs sm:text-sm text-warning-700 dark:text-warning-300 italic">
-                  "Even the best libraries need maintenance. Our digital shelves are being reorganized!"
+                  &ldquo;Even the best libraries need maintenance. Our digital shelves are being reorganized!&rdquo;
                   <br />
-                  <span className="text-xs">- The Librarian's Guide to System Maintenance</span>
+                  <span className="text-xs">- The Librarian&apos;s Guide to System Maintenance</span>
                 </p>
               </div>
               
@@ -168,7 +168,7 @@ export default function Error({ error, reset }: ErrorProps) {
                 Error Code: SYSTEM_MAINTENANCE_500
                 <br />
                 <span className="text-warning-600 dark:text-warning-400">
-                  🔧 "Even the best libraries need a little TLC from time to time!"
+                  🔧 &ldquo;Even the best libraries need a little TLC from time to time!&rdquo;
                 </span>
               </p>
             </motion.div>
