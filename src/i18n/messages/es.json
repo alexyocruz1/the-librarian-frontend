@@ -492,7 +492,14 @@
   "bookDetail.copies.deleteSuccess": "Ejemplar eliminado exitosamente",
   "bookDetail.copies.deleteError": "Error al eliminar el ejemplar",
   "bookDetail.copies.printSuccess": "Imprimiendo código de barras para el ejemplar {barcode}",
-  "bookDetail.copies.qrSuccess": "Generando código QR para el ejemplar {barcode}"
+  "bookDetail.copies.qrSuccess": "Generando código QR para el ejemplar {barcode}",
+  "books.available": "Disponible",
+  "books.unavailable": "No Disponible",
+  "books.totalCopies": "Total de Ejemplares",
+  "books.availableCopies": "Ejemplares Disponibles",
+  "books.availability": "Disponibilidad",
+  "books.of": "de",
+  "common.back": "Atrás"
 }
 
 

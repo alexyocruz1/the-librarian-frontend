@@ -492,7 +492,14 @@
   "bookDetail.copies.deleteSuccess": "Copy deleted successfully",
   "bookDetail.copies.deleteError": "Failed to delete copy",
   "bookDetail.copies.printSuccess": "Printing barcode for copy {barcode}",
-  "bookDetail.copies.qrSuccess": "Generating QR code for copy {barcode}"
+  "bookDetail.copies.qrSuccess": "Generating QR code for copy {barcode}",
+  "books.available": "Available",
+  "books.unavailable": "Unavailable",
+  "books.totalCopies": "Total Copies",
+  "books.availableCopies": "Available Copies",
+  "books.availability": "Availability",
+  "books.of": "of",
+  "common.back": "Back"
 }
 
 

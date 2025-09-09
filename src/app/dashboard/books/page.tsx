@@ -299,7 +299,7 @@ export default function BooksPage() {
 
       {/* Books Display */}
       {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
           {filteredTitles.map((title) => {
             const inventory = getInventoryForTitle(title._id);
             const totalCopies = getTotalCopies(title._id);
@@ -313,7 +313,7 @@ export default function BooksPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="h-full hover:shadow-lg transition-all duration-200 group">
+                <Card className="h-full hover:shadow-lg transition-all duration-200 group overflow-hidden">
                   <CardBody className="p-0">
                     <div className="flex flex-col h-full">
                       {/* Book Cover */}
@@ -322,93 +322,93 @@ export default function BooksPage() {
                           <img
                             src={title.coverUrl}
                             alt={title.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
                             <div className="text-center">
-                              <svg className="w-16 h-16 text-primary-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                              </svg>
-                              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">No Cover</p>
+                              <div className="text-6xl mb-2">📚</div>
+                              <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">No Cover</p>
                             </div>
                           </div>
                         )}
+                        
                         {/* Availability Badge */}
                         <div className="absolute top-3 right-3">
                           <Badge 
                             variant={availableCopies > 0 ? "success" : "error"}
                             size="sm"
+                            className="shadow-md"
                           >
-                            {availableCopies > 0 ? `${availableCopies} Available` : 'Unavailable'}
+                            {availableCopies > 0 ? `${availableCopies}/${totalCopies}` : '0/' + totalCopies}
                           </Badge>
                         </div>
                       </div>
 
                       {/* Book Info */}
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                      <div className="p-4 flex-1 flex flex-col">
+                        {/* Title and Author */}
+                        <div className="mb-3">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                             {title.title}
                           </h3>
                           {title.subtitle && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
                               {title.subtitle}
                             </p>
                           )}
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                             {t('books.by')} {title.authors.join(', ')}
                           </p>
-                          
-                          {/* Book Metadata */}
-                          <div className="space-y-1 mb-3">
-                            {title.publisher && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                <span className="font-medium">{t('books.publisher')}:</span> {title.publisher}
-                              </p>
-                            )}
-                            {title.publishedYear && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                <span className="font-medium">{t('books.year')}:</span> {title.publishedYear}
-                              </p>
-                            )}
-                            {title.isbn13 && (
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                <span className="font-medium">ISBN-13:</span> {title.isbn13}
-                              </p>
-                            )}
-                          </div>
+                        </div>
+                        
+                        {/* Key Info Grid */}
+                        <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                          {title.publishedYear && (
+                            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                              <div className="text-gray-500 dark:text-gray-400 font-medium">{t('books.year')}</div>
+                              <div className="text-gray-900 dark:text-gray-100 font-bold">{title.publishedYear}</div>
+                            </div>
+                          )}
+                          {title.publisher && (
+                            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                              <div className="text-gray-500 dark:text-gray-400 font-medium">{t('books.publisher')}</div>
+                              <div className="text-gray-900 dark:text-gray-100 font-bold truncate" title={title.publisher}>
+                                {title.publisher}
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
-                          {/* Categories */}
-                          {title.categories && title.categories.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mb-3">
+                        {/* Categories */}
+                        {title.categories && title.categories.length > 0 && (
+                          <div className="mb-3">
+                            <div className="flex flex-wrap gap-1">
                               {title.categories.slice(0, 2).map((category) => (
-                                <Badge key={category} variant="secondary" size="sm">
+                                <Badge key={category} variant="secondary" size="sm" className="text-xs">
                                   {category}
                                 </Badge>
                               ))}
                               {title.categories.length > 2 && (
-                                <Badge variant="outline" size="sm">
+                                <Badge variant="outline" size="sm" className="text-xs">
                                   +{title.categories.length - 2}
                                 </Badge>
                               )}
                             </div>
-                          )}
-                        </div>
-                        
-                        {/* Availability Stats */}
-                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center justify-between text-sm mb-3">
-                            <span className="text-gray-600 dark:text-gray-400">
-                              {t('books.totalCopies')}: <span className="font-medium">{totalCopies}</span>
+                          </div>
+                        )}
+
+                        {/* Availability Status */}
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between text-sm mb-2">
+                            <span className="text-gray-600 dark:text-gray-400 font-medium">
+                              {t('books.availability')}
                             </span>
-                            <span className={`font-medium ${availableCopies > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {t('books.availableCopies')}: {availableCopies}
+                            <span className={`font-bold ${availableCopies > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {availableCopies} {t('books.of')} {totalCopies}
                             </span>
                           </div>
-                          
-                          {/* Availability Bar */}
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-3">
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div 
                               className={`h-2 rounded-full transition-all duration-300 ${
                                 availabilityRate >= 50 ? 'bg-green-500' : 
@@ -417,27 +417,28 @@ export default function BooksPage() {
                               style={{ width: `${availabilityRate}%` }}
                             />
                           </div>
-                          
-                          {/* Actions */}
-                          <div className="flex space-x-2">
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex space-x-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-sm font-medium"
+                            onClick={() => handleViewBookDetails(title)}
+                          >
+                            {t('books.viewDetails')}
+                          </Button>
+                          {(user?.role === 'admin' || user?.role === 'superadmin') && (
                             <Button
-                              variant="outline"
+                              variant="secondary"
                               size="sm"
-                              className="flex-1"
-                              onClick={() => handleViewBookDetails(title)}
+                              className="text-sm font-medium"
+                              onClick={() => handleEditBook(title)}
                             >
-                              {t('books.viewDetails')}
+                              {t('common.edit')}
                             </Button>
-                            {(user?.role === 'admin' || user?.role === 'superadmin') && (
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleEditBook(title)}
-                              >
-                                {t('common.edit')}
-                              </Button>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -464,11 +465,11 @@ export default function BooksPage() {
                 transition={{ duration: 0.3 }}
               >
                 <Card className="hover:shadow-md transition-shadow duration-200">
-                  <CardBody className="p-6">
-                    <div className="flex items-center space-x-4">
+                  <CardBody className="p-4">
+                    <div className="flex items-start space-x-4">
                       {/* Book Cover Thumbnail */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden">
+                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden shadow-sm">
                           {title.coverUrl ? (
                             <img
                               src={title.coverUrl}
@@ -477,9 +478,10 @@ export default function BooksPage() {
                             />
                           ) : (
                             <div className="flex items-center justify-center h-full">
-                              <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                              </svg>
+                              <div className="text-center">
+                                <div className="text-2xl mb-1">📚</div>
+                                <div className="text-xs text-primary-600 dark:text-primary-400 font-medium">No Cover</div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -489,62 +491,69 @@ export default function BooksPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
                               {title.title}
                             </h3>
                             {title.subtitle && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
                                 {title.subtitle}
                               </p>
                             )}
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
                               {t('books.by')} {title.authors.join(', ')}
                             </p>
                             
-                            {/* Metadata Row */}
-                            <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
-                              {title.publisher && (
-                                <span><span className="font-medium">{t('books.publisher')}:</span> {title.publisher}</span>
-                              )}
+                            {/* Key Info */}
+                            <div className="flex items-center space-x-4 mb-3 text-sm">
                               {title.publishedYear && (
-                                <span><span className="font-medium">{t('books.year')}:</span> {title.publishedYear}</span>
+                                <div className="flex items-center">
+                                  <span className="text-gray-500 dark:text-gray-400 font-medium mr-1">{t('books.year')}:</span>
+                                  <span className="font-bold text-gray-900 dark:text-gray-100">{title.publishedYear}</span>
+                                </div>
                               )}
-                              {title.isbn13 && (
-                                <span><span className="font-medium">ISBN-13:</span> {title.isbn13}</span>
+                              {title.publisher && (
+                                <div className="flex items-center">
+                                  <span className="text-gray-500 dark:text-gray-400 font-medium mr-1">{t('books.publisher')}:</span>
+                                  <span className="font-bold text-gray-900 dark:text-gray-100" title={title.publisher}>
+                                    {title.publisher}
+                                  </span>
+                                </div>
                               )}
                             </div>
 
                             {/* Categories */}
                             {title.categories && title.categories.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-2">
+                              <div className="flex flex-wrap gap-1 mb-3">
                                 {title.categories.slice(0, 3).map((category) => (
-                                  <Badge key={category} variant="secondary" size="sm">
+                                  <Badge key={category} variant="secondary" size="sm" className="text-xs">
                                     {category}
                                   </Badge>
                                 ))}
                                 {title.categories.length > 3 && (
-                                  <Badge variant="outline" size="sm">
+                                  <Badge variant="outline" size="sm" className="text-xs">
                                     +{title.categories.length - 3}
                                   </Badge>
                                 )}
                               </div>
                             )}
-                          </div>
 
-                          {/* Availability & Actions */}
-                          <div className="flex items-center space-x-4 ml-4">
-                            <div className="text-right">
-                              <div className="flex items-center space-x-2 mb-1">
+                            {/* Availability Status */}
+                            <div className="flex items-center space-x-3">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                                  {t('books.availability')}:
+                                </span>
                                 <Badge 
                                   variant={availableCopies > 0 ? "success" : "error"}
                                   size="sm"
+                                  className="font-bold"
                                 >
                                   {availableCopies}/{totalCopies}
                                 </Badge>
                               </div>
-                              <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                              <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                 <div 
-                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                  className={`h-2 rounded-full transition-all duration-300 ${
                                     availabilityRate >= 50 ? 'bg-green-500' : 
                                     availabilityRate >= 25 ? 'bg-yellow-500' : 'bg-red-500'
                                   }`}
@@ -552,25 +561,28 @@ export default function BooksPage() {
                                 />
                               </div>
                             </div>
-                            
-                            <div className="flex space-x-2">
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex flex-col space-y-2 ml-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-sm font-medium w-24"
+                              onClick={() => handleViewBookDetails(title)}
+                            >
+                              {t('books.viewDetails')}
+                            </Button>
+                            {(user?.role === 'admin' || user?.role === 'superadmin') && (
                               <Button
-                                variant="outline"
+                                variant="secondary"
                                 size="sm"
-                                onClick={() => handleViewBookDetails(title)}
+                                className="text-sm font-medium w-24"
+                                onClick={() => handleEditBook(title)}
                               >
-                                {t('books.viewDetails')}
+                                {t('common.edit')}
                               </Button>
-                              {(user?.role === 'admin' || user?.role === 'superadmin') && (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => handleEditBook(title)}
-                                >
-                                  {t('common.edit')}
-                                </Button>
-                              )}
-                            </div>
+                            )}
                           </div>
                         </div>
                       </div>
