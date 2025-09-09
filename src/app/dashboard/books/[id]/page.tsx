@@ -13,7 +13,8 @@ import {
   QrCodeIcon,
   EyeIcon,
   TrashIcon,
-  BuildingLibraryIcon
+  BuildingLibraryIcon,
+  XCircleIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +29,8 @@ import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useI18n } from '@/context/I18nContext';
+import BarcodeDisplay from '@/components/ui/BarcodeDisplay';
+import QRCodeDisplay from '@/components/ui/QRCodeDisplay';
 
 export default function BookDetailPage() {
   const params = useParams();
@@ -41,6 +44,9 @@ export default function BookDetailPage() {
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [showBookModal, setShowBookModal] = useState(false);
   const [showAssignToLibraryModal, setShowAssignToLibraryModal] = useState(false);
+  const [showBarcodeModal, setShowBarcodeModal] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedCopy, setSelectedCopy] = useState<Copy | null>(null);
   const [editingCopy, setEditingCopy] = useState<Copy | null>(null);
   const [userLibraryId, setUserLibraryId] = useState<string>('');
   const [allInventories, setAllInventories] = useState<Inventory[]>([]);
@@ -132,13 +138,338 @@ export default function BookDetailPage() {
   }, [user]);
 
   const handlePrintBarcode = (copy: Copy) => {
-    // TODO: Implement barcode printing
+    if (!copy.barcode) {
+      toast.error(t('bookDetail.copies.noBarcode', { default: 'No barcode available for this copy' }));
+      return;
+    }
+
+    setSelectedCopy(copy);
+    setShowBarcodeModal(true);
+  };
+
+  const handlePrintBarcodeConfirm = (copy: Copy) => {
+    // Create a new window for printing
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error(t('bookDetail.copies.printBlocked', { default: 'Print blocked by browser. Please allow popups.' }));
+      return;
+    }
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Barcode - ${copy.barcode}</title>
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              text-align: center; 
+              padding: 20px;
+              margin: 0;
+            }
+            .barcode-container {
+              border: 2px solid #000;
+              padding: 20px;
+              margin: 20px auto;
+              max-width: 400px;
+              background: white;
+            }
+            .barcode-label {
+              font-size: 14px;
+              margin: 5px 0;
+              color: #666;
+            }
+            .barcode-display {
+              margin: 15px 0;
+            }
+            .barcode-text {
+              font-size: 16px;
+              font-weight: bold;
+              margin: 10px 0;
+              font-family: 'Courier New', monospace;
+            }
+            .book-info {
+              font-size: 12px;
+              margin: 10px 0;
+              color: #333;
+            }
+            @media print {
+              body { margin: 0; padding: 10px; }
+              .barcode-container { border: 1px solid #000; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="barcode-container">
+            <div class="barcode-label">${t('bookDetail.copies.barcodeLabel', { default: 'Barcode' })}</div>
+            <div class="barcode-display">
+              <svg id="barcode"></svg>
+            </div>
+            <div class="barcode-text">${copy.barcode}</div>
+            <div class="book-info">
+              <div><strong>${title?.title || 'Unknown Book'}</strong></div>
+              <div>${title?.authors?.join(', ') || 'Unknown Author'}</div>
+              <div>Copy ID: ${copy._id}</div>
+            </div>
+          </div>
+          <script>
+            JsBarcode("#barcode", "${copy.barcode}", {
+              format: "CODE128",
+              width: 2,
+              height: 100,
+              displayValue: false,
+              margin: 10
+            });
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Wait for content to load, then print
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 1000);
+
     toast.success(t('bookDetail.copies.printSuccess', { barcode: copy.barcode || 'N/A' }));
   };
 
   const handleGenerateQR = (copy: Copy) => {
-    // TODO: Implement QR code generation
+    if (!copy.barcode) {
+      toast.error(t('bookDetail.copies.noBarcode', { default: 'No barcode available for this copy' }));
+      return;
+    }
+
+    setSelectedCopy(copy);
+    setShowQRModal(true);
+  };
+
+  const handleGenerateQRConfirm = (copy: Copy) => {
+    // Create QR code data URL using a simple text-based QR code
+    const qrData = `Book: ${title?.title || 'Unknown'}\nBarcode: ${copy.barcode}\nCopy ID: ${copy._id}`;
+    
+    // Create a new window for QR code display/printing
+    const qrWindow = window.open('', '_blank');
+    if (!qrWindow) {
+      toast.error(t('bookDetail.copies.printBlocked', { default: 'Print blocked by browser. Please allow popups.' }));
+      return;
+    }
+
+    const qrContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>QR Code - ${copy.barcode}</title>
+          <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              text-align: center; 
+              padding: 20px;
+              margin: 0;
+            }
+            .qr-container {
+              border: 2px solid #000;
+              padding: 20px;
+              margin: 20px auto;
+              max-width: 400px;
+              background: white;
+            }
+            .qr-label {
+              font-size: 14px;
+              margin: 5px 0;
+              color: #666;
+            }
+            .qr-display {
+              margin: 15px 0;
+            }
+            .qr-text {
+              font-size: 12px;
+              font-family: 'Courier New', monospace;
+              white-space: pre-line;
+              margin: 10px 0;
+              padding: 10px;
+              background: #f5f5f5;
+              border: 1px solid #ddd;
+            }
+            .book-info {
+              font-size: 12px;
+              margin: 10px 0;
+              color: #333;
+            }
+            @media print {
+              body { margin: 0; padding: 10px; }
+              .qr-container { border: 1px solid #000; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="qr-container">
+            <div class="qr-label">${t('bookDetail.copies.qrLabel', { default: 'QR Code' })}</div>
+            <div class="qr-display">
+              <canvas id="qrcode"></canvas>
+            </div>
+            <div class="qr-text">${qrData}</div>
+            <div class="book-info">
+              <div><strong>${title?.title || 'Unknown Book'}</strong></div>
+              <div>${title?.authors?.join(', ') || 'Unknown Author'}</div>
+              <div>Copy ID: ${copy._id}</div>
+            </div>
+          </div>
+          <script>
+            QRCode.toCanvas(document.getElementById('qrcode'), '${qrData}', {
+              width: 200,
+              margin: 2,
+              color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+              }
+            }, function (error) {
+              if (error) console.error(error);
+            });
+          </script>
+        </body>
+      </html>
+    `;
+
+    qrWindow.document.write(qrContent);
+    qrWindow.document.close();
+    qrWindow.focus();
+    
+    // Wait for content to load, then print
+    setTimeout(() => {
+      qrWindow.print();
+      qrWindow.close();
+    }, 1000);
+
     toast.success(t('bookDetail.copies.qrSuccess', { barcode: copy.barcode || 'N/A' }));
+  };
+
+  const handlePrintAllBarcodes = () => {
+    if (copies.length === 0) {
+      toast.error(t('bookDetail.copies.noCopies', { default: 'No copies available to print' }));
+      return;
+    }
+
+    const copiesWithBarcodes = copies.filter(copy => copy.barcode);
+    if (copiesWithBarcodes.length === 0) {
+      toast.error(t('bookDetail.copies.noBarcodes', { default: 'No copies have barcodes to print' }));
+      return;
+    }
+
+    // Create a new window for printing all barcodes
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast.error(t('bookDetail.copies.printBlocked', { default: 'Print blocked by browser. Please allow popups.' }));
+      return;
+    }
+
+    const barcodeItems = copiesWithBarcodes.map((copy, index) => `
+      <div class="barcode-item">
+        <div class="barcode-container">
+          <div class="barcode-label">${t('bookDetail.copies.barcodeLabel', { default: 'Barcode' })}</div>
+          <div class="barcode-display">
+            <svg id="barcode-${index}"></svg>
+          </div>
+          <div class="barcode-text">${copy.barcode}</div>
+          <div class="book-info">
+            <div><strong>${title?.title || 'Unknown Book'}</strong></div>
+            <div>${title?.authors?.join(', ') || 'Unknown Author'}</div>
+            <div>Copy ID: ${copy._id}</div>
+            <div>Status: ${copy.status}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>All Barcodes - ${title?.title || 'Unknown Book'}</title>
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 20px;
+              margin: 0;
+            }
+            .barcode-item {
+              page-break-inside: avoid;
+              margin-bottom: 20px;
+            }
+            .barcode-container {
+              border: 2px solid #000;
+              padding: 20px;
+              margin: 20px auto;
+              max-width: 400px;
+              background: white;
+            }
+            .barcode-display {
+              margin: 15px 0;
+            }
+            .barcode-text {
+              font-size: 16px;
+              font-weight: bold;
+              margin: 10px 0;
+              font-family: 'Courier New', monospace;
+            }
+            .barcode-label {
+              font-size: 14px;
+              margin: 5px 0;
+              color: #666;
+            }
+            .book-info {
+              font-size: 12px;
+              margin: 10px 0;
+              color: #333;
+            }
+            @media print {
+              body { margin: 0; padding: 10px; }
+              .barcode-container { border: 1px solid #000; }
+              .barcode-item { page-break-inside: avoid; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1 style="text-align: center; margin-bottom: 30px;">
+            ${t('bookDetail.copies.allBarcodes', { default: 'All Barcodes' })} - ${title?.title || 'Unknown Book'}
+          </h1>
+          ${barcodeItems}
+          <script>
+            ${copiesWithBarcodes.map((copy, index) => `
+              JsBarcode("#barcode-${index}", "${copy.barcode}", {
+                format: "CODE128",
+                width: 2,
+                height: 80,
+                displayValue: false,
+                margin: 10
+              });
+            `).join('')}
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    // Wait for content to load, then print
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 1000);
+
+    toast.success(t('bookDetail.copies.printAllSuccess', { 
+      count: copiesWithBarcodes.length,
+      default: `Successfully printed ${copiesWithBarcodes.length} barcodes` 
+    }));
   };
 
   const handleDeleteCopy = async (copyId: string) => {
@@ -469,7 +800,7 @@ export default function BookDetailPage() {
                     fullWidth
                     variant="outline"
                     leftIcon={<PrinterIcon className="w-5 h-5" />}
-                    onClick={() => {/* TODO: Print all barcodes */}}
+                    onClick={handlePrintAllBarcodes}
                   >
                     {t('bookDetail.actions.printBarcodes')}
                   </Button>
@@ -690,6 +1021,109 @@ export default function BookDetailPage() {
           titleName={title.title}
           existingLibraries={allInventories.map(inv => typeof inv.libraryId === 'string' ? inv.libraryId : (inv.libraryId as any)?._id)}
         />
+      )}
+
+      {/* Barcode Preview Modal */}
+      {showBarcodeModal && selectedCopy && (
+        <div className="modal-overlay">
+          <div className="modal-content max-w-md">
+            <div className="modal-header">
+              <h3 className="text-lg font-semibold">{t('bookDetail.copies.barcodeLabel', { default: 'Barcode' })}</h3>
+              <button
+                onClick={() => setShowBarcodeModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+                title={t('common.close', { default: 'Close' })}
+                aria-label={t('common.close', { default: 'Close' })}
+              >
+                <XCircleIcon className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="modal-body text-center">
+              <div className="mb-4">
+                <BarcodeDisplay
+                  value={selectedCopy.barcode || ''}
+                  format="CODE128"
+                  width={2}
+                  height={100}
+                  displayValue={true}
+                  margin={10}
+                />
+              </div>
+              <div className="text-sm text-gray-600 mb-4">
+                <div><strong>{title?.title}</strong></div>
+                <div>{title?.authors?.join(', ')}</div>
+                <div>Copy ID: {selectedCopy._id}</div>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  onClick={() => {
+                    setShowBarcodeModal(false);
+                    handlePrintBarcodeConfirm(selectedCopy);
+                  }}
+                  leftIcon={<PrinterIcon className="w-4 h-4" />}
+                >
+                  {t('bookDetail.copies.actions.print', { default: 'Print' })}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowBarcodeModal(false)}
+                >
+                  {t('common.cancel', { default: 'Cancel' })}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Preview Modal */}
+      {showQRModal && selectedCopy && (
+        <div className="modal-overlay">
+          <div className="modal-content max-w-md">
+            <div className="modal-header">
+              <h3 className="text-lg font-semibold">{t('bookDetail.copies.qrLabel', { default: 'QR Code' })}</h3>
+              <button
+                onClick={() => setShowQRModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+                title={t('common.close', { default: 'Close' })}
+                aria-label={t('common.close', { default: 'Close' })}
+              >
+                <XCircleIcon className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="modal-body text-center">
+              <div className="mb-4">
+                <QRCodeDisplay
+                  value={`Book: ${title?.title || 'Unknown'}\nBarcode: ${selectedCopy.barcode}\nCopy ID: ${selectedCopy._id}`}
+                  size={200}
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                />
+              </div>
+              <div className="text-sm text-gray-600 mb-4">
+                <div><strong>{title?.title}</strong></div>
+                <div>{title?.authors?.join(', ')}</div>
+                <div>Copy ID: {selectedCopy._id}</div>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  onClick={() => {
+                    setShowQRModal(false);
+                    handleGenerateQRConfirm(selectedCopy);
+                  }}
+                  leftIcon={<PrinterIcon className="w-4 h-4" />}
+                >
+                  {t('bookDetail.copies.actions.print', { default: 'Print' })}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowQRModal(false)}
+                >
+                  {t('common.cancel', { default: 'Cancel' })}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
