@@ -36,6 +36,7 @@ export default function BooksPage() {
   const [showBookModal, setShowBookModal] = useState(false);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [editingBook, setEditingBook] = useState<Title | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   
   const {
     suggestions,
@@ -59,7 +60,8 @@ export default function BooksPage() {
       setLoadingTitles(true);
       setTitlesError(null);
       const response = await api.get('/titles');
-      setTitles(response.data.data || []);
+      console.log('Fetched titles response:', response.data);
+      setTitles(response.data.titles || []);
     } catch (error) {
       console.error('Error fetching titles:', error);
       const msg = getErrorMessage(error);
@@ -74,6 +76,7 @@ export default function BooksPage() {
       setLoadingInventories(true);
       setInventoriesError(null);
       const response = await api.get('/inventories');
+      console.log('Fetched inventories response:', response.data);
       setInventories(response.data.data || []);
     } catch (error) {
       console.error('Error fetching inventories:', error);
@@ -115,6 +118,7 @@ export default function BooksPage() {
   };
 
   const handleBookModalSuccess = () => {
+    console.log('Book modal success - refreshing data...');
     fetchTitles();
     fetchInventories();
   };
