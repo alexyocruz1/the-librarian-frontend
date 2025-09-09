@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,14 +64,7 @@ export default function AssignToLibraryModal({
 
   const selectedLibraryId = watch('libraryId');
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchLibraries();
-      reset();
-    }
-  }, [isOpen, reset]);
-
-  const fetchLibraries = async () => {
+  const fetchLibraries = useCallback(async () => {
     try {
       setLoadingLibraries(true);
       const response = await api.get('/libraries');
@@ -89,7 +82,14 @@ export default function AssignToLibraryModal({
     } finally {
       setLoadingLibraries(false);
     }
-  };
+  }, [existingLibraries]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchLibraries();
+      reset();
+    }
+  }, [isOpen, reset, fetchLibraries]);
 
   const onSubmit = async (data: AssignToLibraryFormData) => {
     setLoading(true);

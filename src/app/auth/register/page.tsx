@@ -321,3 +321,7 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+// Prevent SSR for this page to avoid localStorage issues
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';

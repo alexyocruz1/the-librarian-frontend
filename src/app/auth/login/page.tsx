@@ -41,7 +41,7 @@ export default function LoginPage() {
 
   // Load remembered email on component mount
   React.useEffect(() => {
-    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    const rememberedEmail = typeof window !== 'undefined' ? localStorage.getItem('rememberedEmail') : null;
     if (rememberedEmail) {
       setValue('email', rememberedEmail);
       // Don't auto-check remember me - let user decide each time
@@ -60,11 +60,13 @@ export default function LoginPage() {
     setIsLoading(true);
     
     // Handle remember me functionality
-    if (data.rememberMe) {
-      localStorage.setItem('rememberedEmail', data.email);
-    } else {
-      // If user unchecks remember me, clear the remembered email
-      localStorage.removeItem('rememberedEmail');
+    if (typeof window !== 'undefined') {
+      if (data.rememberMe) {
+        localStorage.setItem('rememberedEmail', data.email);
+      } else {
+        // If user unchecks remember me, clear the remembered email
+        localStorage.removeItem('rememberedEmail');
+      }
     }
     
     try {
@@ -168,7 +170,7 @@ export default function LoginPage() {
                       </svg>
                     }
                   />
-                  {localStorage.getItem('rememberedEmail') && (
+                  {typeof window !== 'undefined' && localStorage.getItem('rememberedEmail') && (
                     <p className="text-xs text-gray-400 mt-1">
                       {t('auth.login.emailRemembered')}
                     </p>
@@ -265,3 +267,7 @@ export default function LoginPage() {
     </div>
   );
 }
+
+// Prevent SSR for this page to avoid localStorage issues
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';

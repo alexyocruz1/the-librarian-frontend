@@ -42,6 +42,7 @@ export function ThemeProvider({
 
   // Load theme from localStorage on mount
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const storedTheme = localStorage.getItem(storageKey) as Theme;
     if (storedTheme && ['light', 'dark', 'system'].includes(storedTheme)) {
       setThemeState(storedTheme);
@@ -69,7 +70,9 @@ export function ThemeProvider({
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem(storageKey, newTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(storageKey, newTheme);
+    }
   };
 
   const resolvedTheme = theme === 'system' ? systemTheme : theme;

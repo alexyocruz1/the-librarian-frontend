@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
@@ -45,28 +45,6 @@ export default function BookDetailPage() {
 
   const bookId = params.id as string;
 
-  useEffect(() => {
-    if (bookId) {
-      fetchBookDetails();
-    }
-  }, [bookId]);
-
-  useEffect(() => {
-    // Determine user's library ID for copy creation
-    if (user) {
-      if (user.role === 'superadmin') {
-        // Super admin can work with any library, get the first one
-        fetchFirstLibrary();
-      } else if (user.role === 'admin' && user.libraries && user.libraries.length > 0) {
-        // Admin uses their assigned libraries
-        setUserLibraryId(user.libraries[0]._id);
-      } else {
-        // Students and guests can work with any library, get the first one
-        fetchFirstLibrary();
-      }
-    }
-  }, [user]);
-
   const fetchFirstLibrary = async () => {
     try {
       const response = await api.get('/libraries');
@@ -79,7 +57,7 @@ export default function BookDetailPage() {
     }
   };
 
-  const fetchBookDetails = async () => {
+  const fetchBookDetails = useCallback(async () => {
     try {
       // Fetch title first to detect 404 without noisy toasts
       const titleResponse = await api.get(`/titles/${bookId}`);
@@ -127,7 +105,29 @@ export default function BookDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookId, t]);
+
+  useEffect(() => {
+    if (bookId) {
+      fetchBookDetails();
+    }
+  }, [bookId, fetchBookDetails]);
+
+  useEffect(() => {
+    // Determine user's library ID for copy creation
+    if (user) {
+      if (user.role === 'superadmin') {
+        // Super admin can work with any library, get the first one
+        fetchFirstLibrary();
+      } else if (user.role === 'admin' && user.libraries && user.libraries.length > 0) {
+        // Admin uses their assigned libraries
+        setUserLibraryId(user.libraries[0]);
+      } else {
+        // Students and guests can work with any library, get the first one
+        fetchFirstLibrary();
+      }
+    }
+  }, [user]);
 
   const handlePrintBarcode = (copy: Copy) => {
     // TODO: Implement barcode printing
@@ -490,10 +490,10 @@ export default function BookDetailPage() {
                 <div key={inventory._id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                      {inventory.libraryId?.name || 'Unknown Library'}
+                      {(inventory.libraryId as any)?.name || 'Unknown Library'}
                     </h4>
                     <Badge variant="secondary">
-                      {inventory.libraryId?.code || 'N/A'}
+                      {(inventory.libraryId as any)?.code || 'N/A'}
                     </Badge>
                   </div>
                   <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">

@@ -33,6 +33,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        if (typeof window === 'undefined') return;
         const token = localStorage.getItem('accessToken');
         if (token) {
           // Verify token by fetching user profile
@@ -46,7 +47,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             });
           } else {
             // Token is invalid, clear it
-            localStorage.removeItem('accessToken');
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('accessToken');
+            }
             setAuthState(prev => ({ ...prev, isLoading: false }));
           }
         } else {
@@ -54,7 +57,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        localStorage.removeItem('accessToken');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('accessToken');
+        }
         setAuthState(prev => ({ ...prev, isLoading: false }));
       }
     };
@@ -88,7 +93,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       if (response.success && response.data) {
         // Store token in localStorage
-        localStorage.setItem('accessToken', response.data.accessToken);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', response.data.accessToken);
+        }
         console.log('🔐 Token stored in localStorage');
         
         setAuthState({
@@ -123,7 +130,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       if (response.success && response.data) {
         // Store token in localStorage
-        localStorage.setItem('accessToken', response.data.accessToken);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('accessToken', response.data.accessToken);
+        }
         
         setAuthState({
           user: response.data.user,
@@ -153,7 +162,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       console.error('Logout error:', error);
     } finally {
       // Clear token from localStorage
-      localStorage.removeItem('accessToken');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+      }
       
       setAuthState({
         user: null,

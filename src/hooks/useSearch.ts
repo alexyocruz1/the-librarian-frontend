@@ -196,6 +196,7 @@ export const useSearch = (options: UseSearchOptions = {}) => {
   // Get search history
   const getSearchHistory = useCallback(() => {
     try {
+      if (typeof window === 'undefined') return [];
       const history = localStorage.getItem('search-history');
       return history ? JSON.parse(history) : [];
     } catch {
@@ -206,6 +207,7 @@ export const useSearch = (options: UseSearchOptions = {}) => {
   // Save search to history
   const saveToHistory = useCallback((searchQuery: string) => {
     try {
+      if (typeof window === 'undefined') return;
       const history = getSearchHistory();
       const newHistory = [searchQuery, ...history.filter((item: string) => item !== searchQuery)].slice(0, 10);
       localStorage.setItem('search-history', JSON.stringify(newHistory));
@@ -217,6 +219,7 @@ export const useSearch = (options: UseSearchOptions = {}) => {
   // Clear search history
   const clearHistory = useCallback(() => {
     try {
+      if (typeof window === 'undefined') return;
       localStorage.removeItem('search-history');
     } catch {
       // Ignore localStorage errors
