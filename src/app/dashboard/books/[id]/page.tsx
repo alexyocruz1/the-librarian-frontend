@@ -10,12 +10,15 @@ import {
   PrinterIcon,
   QrCodeIcon,
   EyeIcon,
-  TrashIcon
+  TrashIcon,
+  BuildingLibraryIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import CopyModal from '@/components/modals/CopyModal';
+import BookModal from '@/components/modals/BookModal';
+import AssignToLibraryModal from '@/components/modals/AssignToLibraryModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { Title, Inventory, Copy } from '@/types';
@@ -34,7 +37,11 @@ export default function BookDetailPage() {
   const [copies, setCopies] = useState<Copy[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCopyModal, setShowCopyModal] = useState(false);
+  const [showBookModal, setShowBookModal] = useState(false);
+  const [showAssignToLibraryModal, setShowAssignToLibraryModal] = useState(false);
   const [editingCopy, setEditingCopy] = useState<Copy | null>(null);
+  const [userLibraryId, setUserLibraryId] = useState<string>('');
+  const [allInventories, setAllInventories] = useState<Inventory[]>([]);
 
   const bookId = params.id as string;
 
@@ -43,6 +50,34 @@ export default function BookDetailPage() {
       fetchBookDetails();
     }
   }, [bookId]);
+
+  useEffect(() => {
+    // Determine user's library ID for copy creation
+    if (user) {
+      if (user.role === 'superadmin') {
+        // Super admin can work with any library, get the first one
+        fetchFirstLibrary();
+      } else if (user.role === 'admin' && user.libraries && user.libraries.length > 0) {
+        // Admin uses their assigned libraries
+        setUserLibraryId(user.libraries[0]._id);
+      } else {
+        // Students and guests can work with any library, get the first one
+        fetchFirstLibrary();
+      }
+    }
+  }, [user]);
+
+  const fetchFirstLibrary = async () => {
+    try {
+      const response = await api.get('/libraries');
+      const libraries = response.data.libraries || response.data.data || [];
+      if (libraries.length > 0) {
+        setUserLibraryId(libraries[0]._id);
+      }
+    } catch (error) {
+      console.error('Error fetching libraries:', error);
+    }
+  };
 
   const fetchBookDetails = async () => {
     try {
@@ -57,21 +92,27 @@ export default function BookDetailPage() {
 
       // Fetch related data, tolerate partial failures
       const results = await Promise.allSettled([
-        api.get(`/inventories/title/${bookId}`),
-        api.get(`/copies/title/${bookId}`)
+        api.get(`/inventories?titleId=${bookId}`),
+        api.get(`/copies?titleId=${bookId}`)
       ]);
 
       const invRes = results[0];
       const copRes = results[1];
 
       if (invRes.status === 'fulfilled') {
-        setInventory((invRes as any).value.data.data || null);
+        const invData = (invRes as any).value.data;
+        const inventories = invData?.inventories || [];
+        setAllInventories(inventories);
+        // Get the first inventory for this title (there should only be one per library)
+        setInventory(inventories[0] || null);
       } else {
+        setAllInventories([]);
         setInventory(null);
       }
 
       if (copRes.status === 'fulfilled') {
-        setCopies((copRes as any).value.data.data || []);
+        const copData = (copRes as any).value.data;
+        setCopies(copData?.copies || []);
       } else {
         setCopies([]);
       }
@@ -128,6 +169,30 @@ export default function BookDetailPage() {
   const handleCopyModalClose = () => {
     setShowCopyModal(false);
     setEditingCopy(null);
+  };
+
+  const handleEditBook = () => {
+    setShowBookModal(true);
+  };
+
+  const handleBookModalClose = () => {
+    setShowBookModal(false);
+  };
+
+  const handleBookModalSuccess = () => {
+    fetchBookDetails();
+  };
+
+  const handleAssignToLibrary = () => {
+    setShowAssignToLibraryModal(true);
+  };
+
+  const handleAssignToLibraryModalClose = () => {
+    setShowAssignToLibraryModal(false);
+  };
+
+  const handleAssignToLibraryModalSuccess = () => {
+    fetchBookDetails();
   };
 
   if (loading) {
@@ -219,7 +284,7 @@ export default function BookDetailPage() {
         {canManage && (
           <Button
             leftIcon={<PencilIcon className="w-5 h-5" />}
-            onClick={() => {/* TODO: Open edit modal */}}
+            onClick={handleEditBook}
           >
             {t('bookDetail.actions.editBook')}
           </Button>
@@ -379,6 +444,14 @@ export default function BookDetailPage() {
                   <Button
                     fullWidth
                     variant="outline"
+                    leftIcon={<BuildingLibraryIcon className="w-5 h-5" />}
+                    onClick={handleAssignToLibrary}
+                  >
+                    {t('bookDetail.actions.assignToLibrary')}
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outline"
                     leftIcon={<PrinterIcon className="w-5 h-5" />}
                     onClick={() => {/* TODO: Print all barcodes */}}
                   >
@@ -390,6 +463,61 @@ export default function BookDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Library Assignments */}
+      <Card>
+        <CardHeader 
+          title={t('bookDetail.libraryAssignments.title')}
+          subtitle={allInventories.length > 0 ? `${allInventories.length} library assignment${allInventories.length > 1 ? 's' : ''}` : ''}
+        />
+        <CardBody>
+          {allInventories.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-gray-400 text-4xl mb-2">🏛️</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('bookDetail.libraryAssignments.none')}</h3>
+              {canManage && (
+                <Button
+                  leftIcon={<BuildingLibraryIcon className="w-5 h-5" />}
+                  onClick={handleAssignToLibrary}
+                >
+                  {t('bookDetail.actions.assignToLibrary')}
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {allInventories.map((inventory) => (
+                <div key={inventory._id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                      {inventory.libraryId?.name || 'Unknown Library'}
+                    </h4>
+                    <Badge variant="secondary">
+                      {inventory.libraryId?.code || 'N/A'}
+                    </Badge>
+                  </div>
+                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex justify-between">
+                      <span>{t('bookDetail.libraryAssignments.totalCopies')}:</span>
+                      <span className="font-medium">{inventory.totalCopies}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>{t('bookDetail.libraryAssignments.availableCopies')}:</span>
+                      <span className="font-medium text-success-600">{inventory.availableCopies}</span>
+                    </div>
+                    {inventory.shelfLocation && (
+                      <div className="flex justify-between">
+                        <span>{t('bookDetail.libraryAssignments.shelfLocation')}:</span>
+                        <span className="font-medium">{inventory.shelfLocation}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
       {/* Copies List */}
       <Card>
@@ -520,7 +648,31 @@ export default function BookDetailPage() {
           copy={editingCopy}
           mode={editingCopy ? 'edit' : 'create'}
           titleId={title._id}
-          libraryId={inventory?.libraryId || ''}
+          libraryId={inventory?.libraryId || userLibraryId}
+          inventoryId={inventory?._id}
+        />
+      )}
+
+      {/* Book Modal */}
+      {title && (
+        <BookModal
+          isOpen={showBookModal}
+          onClose={handleBookModalClose}
+          onSuccess={handleBookModalSuccess}
+          book={title}
+          mode="edit"
+        />
+      )}
+
+      {/* Assign to Library Modal */}
+      {title && (
+        <AssignToLibraryModal
+          isOpen={showAssignToLibraryModal}
+          onClose={handleAssignToLibraryModalClose}
+          onSuccess={handleAssignToLibraryModalSuccess}
+          titleId={title._id}
+          titleName={title.title}
+          existingLibraries={allInventories.map(inv => inv.libraryId)}
         />
       )}
     </div>

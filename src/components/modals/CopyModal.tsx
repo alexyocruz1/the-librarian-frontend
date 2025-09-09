@@ -12,16 +12,17 @@ import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
 import { Copy, CopyStatus, CopyCondition } from '@/types';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
+import { useI18n } from '@/context/I18nContext';
 import toast from 'react-hot-toast';
 
-const copySchema = z.object({
+const createCopySchema = (t: (key: string) => string) => z.object({
   status: z.enum(['available', 'borrowed', 'reserved', 'lost', 'maintenance']),
   condition: z.enum(['new', 'good', 'used', 'worn', 'damaged']),
   shelfLocation: z.string().optional(),
-  acquiredAt: z.string().min(1, 'Acquisition date is required'),
+  acquiredAt: z.string().min(1, t('copyModal.validation.acquiredAtRequired')),
 });
 
-type CopyFormData = z.infer<typeof copySchema>;
+type CopyFormData = z.infer<ReturnType<typeof createCopySchema>>;
 
 interface CopyModalProps {
   isOpen: boolean;
@@ -31,22 +32,23 @@ interface CopyModalProps {
   mode: 'create' | 'edit';
   titleId: string;
   libraryId: string;
+  inventoryId?: string;
 }
 
-const statusOptions: { value: CopyStatus; label: string }[] = [
-  { value: 'available', label: 'Available' },
-  { value: 'borrowed', label: 'Borrowed' },
-  { value: 'reserved', label: 'Reserved' },
-  { value: 'lost', label: 'Lost' },
-  { value: 'maintenance', label: 'Maintenance' },
+const getStatusOptions = (t: (key: string) => string): { value: CopyStatus; label: string }[] => [
+  { value: 'available', label: t('copyModal.status.available') },
+  { value: 'borrowed', label: t('copyModal.status.borrowed') },
+  { value: 'reserved', label: t('copyModal.status.reserved') },
+  { value: 'lost', label: t('copyModal.status.lost') },
+  { value: 'maintenance', label: t('copyModal.status.maintenance') },
 ];
 
-const conditionOptions: { value: CopyCondition; label: string }[] = [
-  { value: 'new', label: 'New' },
-  { value: 'good', label: 'Good' },
-  { value: 'used', label: 'Used' },
-  { value: 'worn', label: 'Worn' },
-  { value: 'damaged', label: 'Damaged' },
+const getConditionOptions = (t: (key: string) => string): { value: CopyCondition; label: string }[] => [
+  { value: 'new', label: t('copyModal.condition.new') },
+  { value: 'good', label: t('copyModal.condition.good') },
+  { value: 'used', label: t('copyModal.condition.used') },
+  { value: 'worn', label: t('copyModal.condition.worn') },
+  { value: 'damaged', label: t('copyModal.condition.damaged') },
 ];
 
 export default function CopyModal({ 
@@ -56,8 +58,10 @@ export default function CopyModal({
   copy, 
   mode, 
   titleId, 
-  libraryId 
+  libraryId,
+  inventoryId
 }: CopyModalProps) {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -67,10 +71,10 @@ export default function CopyModal({
     reset,
     setValue
   } = useForm<CopyFormData>({
-    resolver: zodResolver(copySchema),
+    resolver: zodResolver(createCopySchema(t)),
     defaultValues: {
       status: 'available',
-      condition: 'new',
+      condition: 'good',
       shelfLocation: '',
       acquiredAt: new Date().toISOString().split('T')[0],
     }
@@ -92,8 +96,25 @@ export default function CopyModal({
   const onSubmit = async (data: CopyFormData) => {
     setLoading(true);
     try {
+      let currentInventoryId = inventoryId || copy?.inventoryId;
+
+      // If we're creating a new copy and don't have an inventory, create one first
+      if (mode === 'create' && !currentInventoryId) {
+        const inventoryData = {
+          libraryId,
+          titleId,
+          totalCopies: 1,
+          availableCopies: 1,
+          shelfLocation: data.shelfLocation || undefined,
+        };
+        
+        const inventoryResponse = await api.post('/inventories', inventoryData);
+        currentInventoryId = inventoryResponse.data.inventory._id;
+      }
+
       const copyData = {
         ...data,
+        inventoryId: currentInventoryId,
         titleId,
         libraryId,
         acquiredAt: new Date(data.acquiredAt),
@@ -139,8 +160,8 @@ export default function CopyModal({
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
-                  title={mode === 'create' ? 'Add New Copy' : 'Edit Copy'}
-                  subtitle={mode === 'create' ? 'Add a new physical copy of this book' : 'Update copy information'}
+                  title={mode === 'create' ? t('copyModal.title.create') : t('copyModal.title.edit')}
+                  subtitle={mode === 'create' ? t('copyModal.subtitle.create') : t('copyModal.subtitle.edit')}
                   action={
                     <Button
                       variant="ghost"
@@ -156,13 +177,13 @@ export default function CopyModal({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Status *
+                          {t('copyModal.fields.status')}
                         </label>
                         <select
                           {...register('status')}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         >
-                          {statusOptions.map((option) => (
+                          {getStatusOptions(t).map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
@@ -175,13 +196,13 @@ export default function CopyModal({
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          Condition *
+                          {t('copyModal.fields.condition')}
                         </label>
                         <select
                           {...register('condition')}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         >
-                          {conditionOptions.map((option) => (
+                          {getConditionOptions(t).map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
@@ -194,35 +215,35 @@ export default function CopyModal({
                     </div>
 
                     <Input
-                      label="Shelf Location"
+                      label={t('copyModal.fields.shelfLocation')}
                       {...register('shelfLocation')}
                       error={errors.shelfLocation?.message}
-                      placeholder="Enter shelf location (optional)"
-                      help="e.g., A1-B2, Fiction-001, etc."
+                      placeholder={t('copyModal.placeholders.shelfLocation')}
+                      help={t('copyModal.help.shelfLocation')}
                     />
 
                     <Input
-                      label="Acquisition Date *"
+                      label={t('copyModal.fields.acquiredAt')}
                       type="date"
                       {...register('acquiredAt')}
                       error={errors.acquiredAt?.message}
                     />
 
                     {/* Actions */}
-                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
+                    <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={onClose}
                         disabled={loading}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
                       <Button
                         type="submit"
                         loading={loading}
                       >
-                        {mode === 'create' ? 'Add Copy' : 'Update Copy'}
+                        {mode === 'create' ? t('copyModal.actions.create') : t('copyModal.actions.update')}
                       </Button>
                     </div>
                   </form>
