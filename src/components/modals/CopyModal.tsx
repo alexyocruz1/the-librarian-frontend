@@ -16,6 +16,7 @@ import { useI18n } from '@/context/I18nContext';
 import toast from 'react-hot-toast';
 
 const createCopySchema = (t: (key: string) => string) => z.object({
+  libraryId: z.string().min(1, t('copyModal.validation.libraryRequired')),
   status: z.enum(['available', 'borrowed', 'reserved', 'lost', 'maintenance']),
   condition: z.enum(['new', 'good', 'used', 'worn', 'damaged']),
   shelfLocation: z.string().optional(),
@@ -31,9 +32,10 @@ interface CopyModalProps {
   copy?: Copy | null;
   mode: 'create' | 'edit';
   titleId: string;
-  libraryId: string;
+  libraryId: string; // Default library ID
   inventoryId?: string;
   inventoryShelfLocation?: string; // Shelf location from inventory level
+  availableLibraries?: Array<{ _id: string; name: string; code: string }>; // Available libraries for selection
 }
 
 const getStatusOptions = (t: (key: string) => string): { value: CopyStatus; label: string }[] => [
@@ -61,7 +63,8 @@ export default function CopyModal({
   titleId, 
   libraryId,
   inventoryId,
-  inventoryShelfLocation
+  inventoryShelfLocation,
+  availableLibraries = []
 }: CopyModalProps) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
@@ -71,10 +74,12 @@ export default function CopyModal({
     handleSubmit,
     formState: { errors },
     reset,
-    setValue
+    setValue,
+    watch
   } = useForm<CopyFormData>({
     resolver: zodResolver(createCopySchema(t)),
     defaultValues: {
+      libraryId: libraryId,
       status: 'available',
       condition: 'good',
       shelfLocation: '',
@@ -82,18 +87,27 @@ export default function CopyModal({
     }
   });
 
+  const selectedLibraryId = watch('libraryId');
+
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && copy) {
+        setValue('libraryId', copy.libraryId);
         setValue('status', copy.status);
         setValue('condition', copy.condition);
         setValue('shelfLocation', copy.shelfLocation || '');
         setValue('acquiredAt', copy.acquiredAt ? new Date(copy.acquiredAt).toISOString().split('T')[0] : '');
       } else {
-        reset();
+        reset({
+          libraryId: libraryId,
+          status: 'available',
+          condition: 'good',
+          shelfLocation: '',
+          acquiredAt: new Date().toISOString().split('T')[0],
+        });
       }
     }
-  }, [isOpen, mode, copy, setValue, reset]);
+  }, [isOpen, mode, copy, setValue, reset, libraryId]);
 
   const onSubmit = async (data: CopyFormData) => {
     setLoading(true);
@@ -103,7 +117,7 @@ export default function CopyModal({
       // If we're creating a new copy and don't have an inventory, create one first
       if (mode === 'create' && !currentInventoryId) {
         const inventoryData = {
-          libraryId,
+          libraryId: data.libraryId,
           titleId,
           totalCopies: 0,  // Start with 0 copies - the copy will be created separately
           availableCopies: 0,  // Start with 0 available copies
@@ -118,7 +132,7 @@ export default function CopyModal({
         ...data,
         inventoryId: currentInventoryId,
         titleId,
-        libraryId,
+        libraryId: data.libraryId,
         acquiredAt: new Date(data.acquiredAt),
         shelfLocation: data.shelfLocation || inventoryShelfLocation || undefined,
       };
@@ -176,6 +190,28 @@ export default function CopyModal({
                 
                 <CardBody>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Library Selection - only show if multiple libraries available and creating new copy */}
+                    {mode === 'create' && availableLibraries.length > 1 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          {t('copyModal.fields.library')}
+                        </label>
+                        <select
+                          {...register('libraryId')}
+                          className="input"
+                        >
+                          {availableLibraries.map((library) => (
+                            <option key={library._id} value={library._id}>
+                              {library.name} ({library.code})
+                            </option>
+                          ))}
+                        </select>
+                        {errors.libraryId && (
+                          <p className="form-error">{errors.libraryId.message}</p>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

@@ -250,8 +250,21 @@ export default function BookDetailPage() {
   };
 
   const handleGenerateQRConfirm = (copy: Copy) => {
-    // Create QR code data URL using a simple text-based QR code
-    const qrData = `Book: ${title?.title || 'Unknown'}\nBarcode: ${copy.barcode}\nCopy ID: ${copy._id}`;
+    // Create both structured data and URL for maximum compatibility
+    const structuredData = {
+      type: "library_book",
+      title: title?.title || 'Unknown',
+      authors: title?.authors || [],
+      barcode: copy.barcode,
+      copyId: copy._id,
+      isbn: title?.isbn13 || title?.isbn10 || '',
+      library: "The Librarian System",
+      url: `${window.location.origin}/dashboard/books/${title?._id}`,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Use URL for better QR scanner compatibility
+    const qrData = `${window.location.origin}/dashboard/books/${title?._id}?copy=${copy._id}&barcode=${copy.barcode}`;
     
     // Create a new window for QR code display/printing
     const qrWindow = window.open('', '_blank');
@@ -315,6 +328,10 @@ export default function BookDetailPage() {
               <canvas id="qrcode"></canvas>
             </div>
             <div class="qr-text">${qrData}</div>
+            <div class="qr-text" style="margin-top: 10px; font-size: 10px;">
+              <strong>Structured Data:</strong><br/>
+              ${JSON.stringify(structuredData, null, 2)}
+            </div>
             <div class="book-info">
               <div><strong>${title?.title || 'Unknown Book'}</strong></div>
               <div>${title?.authors?.join(', ') || 'Unknown Author'}</div>
@@ -997,6 +1014,11 @@ export default function BookDetailPage() {
           titleId={title._id}
           libraryId={typeof inventory?.libraryId === 'string' ? inventory.libraryId : (inventory?.libraryId as any)?._id || userLibraryId}
           inventoryId={inventory?._id}
+          availableLibraries={allInventories.map(inv => ({
+            _id: typeof inv.libraryId === 'string' ? inv.libraryId : (inv.libraryId as any)._id,
+            name: typeof inv.libraryId === 'string' ? 'Unknown Library' : (inv.libraryId as any).name,
+            code: typeof inv.libraryId === 'string' ? 'UNK' : (inv.libraryId as any).code
+          }))}
         />
       )}
 
@@ -1094,7 +1116,7 @@ export default function BookDetailPage() {
             <div className="modal-body text-center">
               <div className="mb-4">
                 <QRCodeDisplay
-                  value={`Book: ${title?.title || 'Unknown'}\nBarcode: ${selectedCopy.barcode}\nCopy ID: ${selectedCopy._id}`}
+                  value={`${window.location.origin}/dashboard/books/${title?._id}?copy=${selectedCopy._id}&barcode=${selectedCopy.barcode}`}
                   size={200}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                 />
