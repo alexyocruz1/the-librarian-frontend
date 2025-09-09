@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { PlusIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -23,6 +24,7 @@ import { useI18n } from '@/context/I18nContext';
 export default function BooksPage() {
   const { t } = useI18n();
   const { user } = useAuth();
+  const router = useRouter();
   const [titles, setTitles] = useState<Title[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
   const [loadingTitles, setLoadingTitles] = useState(true);
@@ -112,6 +114,10 @@ export default function BooksPage() {
     setShowBookModal(true);
   };
 
+  const handleViewBookDetails = (book: Title) => {
+    router.push(`/dashboard/books/${book._id}`);
+  };
+
   const handleEditBook = (book: Title) => {
     setEditingBook(book);
     setShowBookModal(true);
@@ -195,14 +201,45 @@ export default function BooksPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('books.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">{t('books.subtitle')}</p>
         </div>
-        {user?.role === 'admin' || user?.role === 'superadmin' ? (
-          <Button
-            leftIcon={<PlusIcon className="w-5 h-5" />}
-            onClick={handleAddBook}
-          >
-            {t('books.add')}
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              title="Grid view"
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              title="List view"
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+          {user?.role === 'admin' || user?.role === 'superadmin' ? (
+            <Button
+              leftIcon={<PlusIcon className="w-5 h-5" />}
+              onClick={handleAddBook}
+            >
+              {t('books.add')}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -260,76 +297,291 @@ export default function BooksPage() {
         </Card>
       )}
 
-      {/* Books Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredTitles.map((title) => {
-          const inventory = getInventoryForTitle(title._id);
-          const totalCopies = getTotalCopies(title._id);
-          const availableCopies = getAvailableCopies(title._id);
+      {/* Books Display */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredTitles.map((title) => {
+            const inventory = getInventoryForTitle(title._id);
+            const totalCopies = getTotalCopies(title._id);
+            const availableCopies = getAvailableCopies(title._id);
+            const availabilityRate = totalCopies > 0 ? (availableCopies / totalCopies) * 100 : 0;
 
-          return (
-            <motion.div
-              key={title._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="h-full hover:shadow-lg transition-shadow duration-200">
-                <CardBody className="p-6">
-                  <div className="flex flex-col h-full">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">
-                        {title.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {t('books.by')} {title.authors.join(', ')}
-                      </p>
-                      {title.categories && title.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {title.categories.slice(0, 2).map((category) => (
-                            <Badge key={category} variant="secondary" size="sm">
-                              {category}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        <span>{t('books.totalCopies')}: {totalCopies}</span>
-                        <span className="text-green-600 font-medium">
-                          {t('books.availableCopies')}: {availableCopies}
-                        </span>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleEditBook(title)}
-                        >
-                          {t('books.viewDetails')}
-                        </Button>
-                        {(user?.role === 'admin' || user?.role === 'superadmin') && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => handleEditBook(title)}
-                          >
-                            {t('common.edit')}
-                          </Button>
+            return (
+              <motion.div
+                key={title._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all duration-200 group">
+                  <CardBody className="p-0">
+                    <div className="flex flex-col h-full">
+                      {/* Book Cover */}
+                      <div className="relative h-48 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 overflow-hidden">
+                        {title.coverUrl ? (
+                          <img
+                            src={title.coverUrl}
+                            alt={title.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-full">
+                            <div className="text-center">
+                              <svg className="w-16 h-16 text-primary-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                              </svg>
+                              <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">No Cover</p>
+                            </div>
+                          </div>
                         )}
+                        {/* Availability Badge */}
+                        <div className="absolute top-3 right-3">
+                          <Badge 
+                            variant={availableCopies > 0 ? "success" : "error"}
+                            size="sm"
+                          >
+                            {availableCopies > 0 ? `${availableCopies} Available` : 'Unavailable'}
+                          </Badge>
+                        </div>
+                      </div>
+
+                      {/* Book Info */}
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                            {title.title}
+                          </h3>
+                          {title.subtitle && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
+                              {title.subtitle}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            {t('books.by')} {title.authors.join(', ')}
+                          </p>
+                          
+                          {/* Book Metadata */}
+                          <div className="space-y-1 mb-3">
+                            {title.publisher && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <span className="font-medium">{t('books.publisher')}:</span> {title.publisher}
+                              </p>
+                            )}
+                            {title.publishedYear && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <span className="font-medium">{t('books.year')}:</span> {title.publishedYear}
+                              </p>
+                            )}
+                            {title.isbn13 && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                <span className="font-medium">ISBN-13:</span> {title.isbn13}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Categories */}
+                          {title.categories && title.categories.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {title.categories.slice(0, 2).map((category) => (
+                                <Badge key={category} variant="secondary" size="sm">
+                                  {category}
+                                </Badge>
+                              ))}
+                              {title.categories.length > 2 && (
+                                <Badge variant="outline" size="sm">
+                                  +{title.categories.length - 2}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Availability Stats */}
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center justify-between text-sm mb-3">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {t('books.totalCopies')}: <span className="font-medium">{totalCopies}</span>
+                            </span>
+                            <span className={`font-medium ${availableCopies > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {t('books.availableCopies')}: {availableCopies}
+                            </span>
+                          </div>
+                          
+                          {/* Availability Bar */}
+                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-3">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                availabilityRate >= 50 ? 'bg-green-500' : 
+                                availabilityRate >= 25 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}
+                              style={{ width: `${availabilityRate}%` }}
+                            />
+                          </div>
+                          
+                          {/* Actions */}
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => handleViewBookDetails(title)}
+                            >
+                              {t('books.viewDetails')}
+                            </Button>
+                            {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleEditBook(title)}
+                              >
+                                {t('common.edit')}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardBody>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
+                  </CardBody>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      ) : (
+        /* List View */
+        <div className="space-y-4">
+          {filteredTitles.map((title) => {
+            const inventory = getInventoryForTitle(title._id);
+            const totalCopies = getTotalCopies(title._id);
+            const availableCopies = getAvailableCopies(title._id);
+            const availabilityRate = totalCopies > 0 ? (availableCopies / totalCopies) * 100 : 0;
+
+            return (
+              <motion.div
+                key={title._id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="hover:shadow-md transition-shadow duration-200">
+                  <CardBody className="p-6">
+                    <div className="flex items-center space-x-4">
+                      {/* Book Cover Thumbnail */}
+                      <div className="flex-shrink-0">
+                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden">
+                          {title.coverUrl ? (
+                            <img
+                              src={title.coverUrl}
+                              alt={title.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center h-full">
+                              <svg className="w-8 h-8 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Book Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+                              {title.title}
+                            </h3>
+                            {title.subtitle && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                                {title.subtitle}
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              {t('books.by')} {title.authors.join(', ')}
+                            </p>
+                            
+                            {/* Metadata Row */}
+                            <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                              {title.publisher && (
+                                <span><span className="font-medium">{t('books.publisher')}:</span> {title.publisher}</span>
+                              )}
+                              {title.publishedYear && (
+                                <span><span className="font-medium">{t('books.year')}:</span> {title.publishedYear}</span>
+                              )}
+                              {title.isbn13 && (
+                                <span><span className="font-medium">ISBN-13:</span> {title.isbn13}</span>
+                              )}
+                            </div>
+
+                            {/* Categories */}
+                            {title.categories && title.categories.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {title.categories.slice(0, 3).map((category) => (
+                                  <Badge key={category} variant="secondary" size="sm">
+                                    {category}
+                                  </Badge>
+                                ))}
+                                {title.categories.length > 3 && (
+                                  <Badge variant="outline" size="sm">
+                                    +{title.categories.length - 3}
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Availability & Actions */}
+                          <div className="flex items-center space-x-4 ml-4">
+                            <div className="text-right">
+                              <div className="flex items-center space-x-2 mb-1">
+                                <Badge 
+                                  variant={availableCopies > 0 ? "success" : "error"}
+                                  size="sm"
+                                >
+                                  {availableCopies}/{totalCopies}
+                                </Badge>
+                              </div>
+                              <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                <div 
+                                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                                    availabilityRate >= 50 ? 'bg-green-500' : 
+                                    availabilityRate >= 25 ? 'bg-yellow-500' : 'bg-red-500'
+                                  }`}
+                                  style={{ width: `${availabilityRate}%` }}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleViewBookDetails(title)}
+                              >
+                                {t('books.viewDetails')}
+                              </Button>
+                              {(user?.role === 'admin' || user?.role === 'superadmin') && (
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleEditBook(title)}
+                                >
+                                  {t('common.edit')}
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
 
       {filteredTitles.length === 0 && !loading && !titlesError && !inventoriesError && (
         <div className="text-center py-12">

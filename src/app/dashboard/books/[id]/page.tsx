@@ -90,24 +90,24 @@ export default function BookDetailPage() {
 
   const handlePrintBarcode = (copy: Copy) => {
     // TODO: Implement barcode printing
-    toast.success(`Printing barcode for copy ${copy.barcode}`);
+    toast.success(t('bookDetail.copies.printSuccess', { barcode: copy.barcode }));
   };
 
   const handleGenerateQR = (copy: Copy) => {
     // TODO: Implement QR code generation
-    toast.success(`Generating QR code for copy ${copy.barcode}`);
+    toast.success(t('bookDetail.copies.qrSuccess', { barcode: copy.barcode }));
   };
 
   const handleDeleteCopy = async (copyId: string) => {
-    if (!confirm('Are you sure you want to delete this copy?')) return;
+    if (!confirm(t('bookDetail.copies.deleteConfirm'))) return;
 
     try {
       await api.delete(`/copies/${copyId}`);
-      toast.success('Copy deleted successfully');
+      toast.success(t('bookDetail.copies.deleteSuccess'));
       fetchBookDetails();
     } catch (error) {
       console.error('Error deleting copy:', error);
-      toast.error('Failed to delete copy');
+      toast.error(t('bookDetail.copies.deleteError'));
     }
   };
 
@@ -208,7 +208,7 @@ export default function BookDetailPage() {
           onClick={() => router.back()}
           leftIcon={<ArrowLeftIcon className="w-5 h-5" />}
         >
-          Back
+          {t('common.back')}
         </Button>
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-gray-900">{title.title}</h1>
@@ -221,7 +221,7 @@ export default function BookDetailPage() {
             leftIcon={<PencilIcon className="w-5 h-5" />}
             onClick={() => {/* TODO: Open edit modal */}}
           >
-            Edit Book
+            {t('bookDetail.actions.editBook')}
           </Button>
         )}
       </div>
@@ -230,34 +230,34 @@ export default function BookDetailPage() {
         {/* Book Information */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardHeader title="Book Information" />
+            <CardHeader title={t('bookDetail.information.title')} />
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Authors
+                      {t('bookDetail.information.authors')}
                     </label>
                     <p className="text-gray-900">{title.authors.join(', ')}</p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Publisher
+                      {t('bookDetail.information.publisher')}
                     </label>
                     <p className="text-gray-900">{title.publisher}</p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Published Year
+                      {t('bookDetail.information.publishedYear')}
                     </label>
                     <p className="text-gray-900">{title.publishedYear}</p>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Language
+                      {t('bookDetail.information.language')}
                     </label>
                     <p className="text-gray-900">{title.language}</p>
                   </div>
@@ -266,7 +266,7 @@ export default function BookDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      ISBN-13
+                      {t('bookDetail.information.isbn13')}
                     </label>
                     <p className="text-gray-900 font-mono">{title.isbn13}</p>
                   </div>
@@ -274,7 +274,7 @@ export default function BookDetailPage() {
                   {title.isbn10 && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        ISBN-10
+                        {t('bookDetail.information.isbn10')}
                       </label>
                       <p className="text-gray-900 font-mono">{title.isbn10}</p>
                     </div>
@@ -282,7 +282,7 @@ export default function BookDetailPage() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Categories
+                      {t('bookDetail.information.categories')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {title.categories?.map((category) => (
@@ -298,7 +298,7 @@ export default function BookDetailPage() {
               {title.description && (
                 <div className="mt-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
+                    {t('bookDetail.information.description')}
                   </label>
                   <p className="text-gray-900 leading-relaxed">{title.description}</p>
                 </div>
@@ -309,32 +309,32 @@ export default function BookDetailPage() {
           {/* Inventory Summary */}
           {inventory && (
             <Card>
-              <CardHeader title="Inventory Summary" />
+              <CardHeader title={t('bookDetail.inventory.title')} />
               <CardBody>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary-600">
                       {inventory.totalCopies}
                     </div>
-                    <div className="text-sm text-gray-600">Total Copies</div>
+                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.totalCopies')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-success-600">
                       {inventory.availableCopies}
                     </div>
-                    <div className="text-sm text-gray-600">Available</div>
+                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-warning-600">
                       {inventory.totalCopies - inventory.availableCopies}
                     </div>
-                    <div className="text-sm text-gray-600">Borrowed</div>
+                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.borrowed')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-600">
-                      {inventory.availableCopies > 0 ? 'Yes' : 'No'}
+                      {inventory.availableCopies > 0 ? t('common.yes') : t('common.no')}
                     </div>
-                    <div className="text-sm text-gray-600">Available</div>
+                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
                   </div>
                 </div>
               </CardBody>
@@ -356,7 +356,7 @@ export default function BookDetailPage() {
                 ) : (
                   <div className="text-gray-400 text-center">
                     <div className="text-6xl mb-2">📚</div>
-                    <div className="text-sm">No Cover Available</div>
+                    <div className="text-sm">{t('bookDetail.cover.notAvailable')}</div>
                   </div>
                 )}
               </div>
@@ -366,7 +366,7 @@ export default function BookDetailPage() {
           {/* Quick Actions */}
           {canManage && (
             <Card>
-              <CardHeader title="Quick Actions" />
+              <CardHeader title={t('bookDetail.actions.title')} />
               <CardBody>
                 <div className="space-y-3">
                   <Button
@@ -374,7 +374,7 @@ export default function BookDetailPage() {
                     leftIcon={<PlusIcon className="w-5 h-5" />}
                     onClick={handleAddCopy}
                   >
-                    Add Copy
+                    {t('bookDetail.actions.addCopy')}
                   </Button>
                   <Button
                     fullWidth
@@ -382,7 +382,7 @@ export default function BookDetailPage() {
                     leftIcon={<PrinterIcon className="w-5 h-5" />}
                     onClick={() => {/* TODO: Print all barcodes */}}
                   >
-                    Print All Barcodes
+                    {t('bookDetail.actions.printBarcodes')}
                   </Button>
                 </div>
               </CardBody>
@@ -394,21 +394,21 @@ export default function BookDetailPage() {
       {/* Copies List */}
       <Card>
         <CardHeader 
-          title="Individual Copies" 
-          subtitle={`${copies.length} copies in total`}
+          title={t('bookDetail.copies.title')} 
+          subtitle={t('bookDetail.copies.subtitle', { count: copies.length })}
         />
         <CardBody>
           {copies.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-gray-400 text-4xl mb-2">📖</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No copies available</h3>
-              <p className="text-gray-600 mb-4">Add copies to make this book available for borrowing.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('bookDetail.copies.empty.title')}</h3>
+              <p className="text-gray-600 mb-4">{t('bookDetail.copies.empty.description')}</p>
               {canManage && (
                 <Button
                   leftIcon={<PlusIcon className="w-5 h-5" />}
                   onClick={handleAddCopy}
                 >
-                  Add First Copy
+                  {t('bookDetail.copies.empty.addFirst')}
                 </Button>
               )}
             </div>
@@ -418,23 +418,23 @@ export default function BookDetailPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Barcode
+                      {t('bookDetail.copies.table.barcode')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
+                      {t('bookDetail.copies.table.status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Condition
+                      {t('bookDetail.copies.table.condition')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Shelf Location
+                      {t('bookDetail.copies.table.shelfLocation')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acquired
+                      {t('bookDetail.copies.table.acquired')}
                     </th>
                     {canManage && (
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+                        {t('bookDetail.copies.table.actions')}
                       </th>
                     )}
                   </tr>
@@ -472,7 +472,7 @@ export default function BookDetailPage() {
                               onClick={() => handlePrintBarcode(copy)}
                               leftIcon={<PrinterIcon className="w-4 h-4" />}
                             >
-                              Print
+                              {t('bookDetail.copies.actions.print')}
                             </Button>
                             <Button
                               size="sm"
@@ -488,7 +488,7 @@ export default function BookDetailPage() {
                               onClick={() => handleEditCopy(copy)}
                               leftIcon={<EyeIcon className="w-4 h-4" />}
                             >
-                              Edit
+                              {t('bookDetail.copies.actions.edit')}
                             </Button>
                             <Button
                               size="sm"
@@ -497,7 +497,7 @@ export default function BookDetailPage() {
                               leftIcon={<TrashIcon className="w-4 h-4" />}
                               className="text-error-600 hover:text-error-700"
                             >
-                              Delete
+                              {t('bookDetail.copies.actions.delete')}
                             </Button>
                           </div>
                         </td>

@@ -186,14 +186,45 @@ export default function LibrariesPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('libraries.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{t('libraries.subtitle')}</p>
         </div>
-        {canManage && (
-          <Button
-            leftIcon={<PlusIcon className="w-5 h-5" />}
-            onClick={handleAddLibrary}
-          >
-            {t('libraries.add')}
-          </Button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* View Mode Toggle */}
+          <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              title="Grid view"
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              title="List view"
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+          {canManage && (
+            <Button
+              leftIcon={<PlusIcon className="w-5 h-5" />}
+              onClick={handleAddLibrary}
+            >
+              {t('libraries.add')}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -209,26 +240,6 @@ export default function LibrariesPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              {/* View Mode Toggle */}
-              <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-                <Button
-                  variant={viewMode === 'grid' ? 'primary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="h-8 w-8 p-0"
-                >
-                  <Squares2X2Icon className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'primary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="h-8 w-8 p-0"
-                >
-                  <ListBulletIcon className="w-4 h-4" />
-                </Button>
-              </div>
-              
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
