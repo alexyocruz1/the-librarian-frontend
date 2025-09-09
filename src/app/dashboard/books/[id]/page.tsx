@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { 
@@ -63,8 +64,8 @@ export default function BookDetailPage() {
       // Fetch title first to detect 404 without noisy toasts
       const titleResponse = await api.get(`/titles/${bookId}`);
       if (!titleResponse.success || !titleResponse.data?.title) {
-        setTitle(null);
-        setLoading(false);
+        // If the book doesn't exist, show 404 page
+        notFound();
         return;
       }
       setTitle(titleResponse.data.title || titleResponse.data.data);

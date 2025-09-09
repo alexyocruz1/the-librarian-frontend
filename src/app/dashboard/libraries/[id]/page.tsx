@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeftIcon, 
@@ -42,10 +43,21 @@ export default function LibraryDetailPage() {
         api.get(`/libraries/${libraryId}/admins`)
       ]);
 
+      // Check if library exists
+      if (!libraryResponse.data.success || !libraryResponse.data.data) {
+        notFound();
+        return;
+      }
+
       setLibrary(libraryResponse.data.data);
       setAdmins(adminsResponse.data.data || []);
     } catch (error) {
       console.error('Error fetching library details:', error);
+      // If it's a 404 error, show not found page
+      if ((error as any)?.response?.status === 404) {
+        notFound();
+        return;
+      }
       toast.error('Failed to fetch library details');
     } finally {
       setLoading(false);
