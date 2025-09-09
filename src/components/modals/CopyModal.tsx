@@ -103,8 +103,8 @@ export default function CopyModal({
         const inventoryData = {
           libraryId,
           titleId,
-          totalCopies: 1,
-          availableCopies: 1,
+          totalCopies: 0,  // Start with 0 copies - the copy will be created separately
+          availableCopies: 0,  // Start with 0 available copies
           shelfLocation: data.shelfLocation || undefined,
         };
         

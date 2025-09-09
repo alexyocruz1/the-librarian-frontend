@@ -651,7 +651,7 @@ export default function BookDetailPage() {
           copy={editingCopy}
           mode={editingCopy ? 'edit' : 'create'}
           titleId={title._id}
-          libraryId={inventory?.libraryId || userLibraryId}
+          libraryId={typeof inventory?.libraryId === 'string' ? inventory.libraryId : (inventory?.libraryId as any)?._id || userLibraryId}
           inventoryId={inventory?._id}
         />
       )}
@@ -675,7 +675,7 @@ export default function BookDetailPage() {
           onSuccess={handleAssignToLibraryModalSuccess}
           titleId={title._id}
           titleName={title.title}
-          existingLibraries={allInventories.map(inv => inv.libraryId)}
+          existingLibraries={allInventories.map(inv => typeof inv.libraryId === 'string' ? inv.libraryId : (inv.libraryId as any)?._id)}
         />
       )}
     </div>

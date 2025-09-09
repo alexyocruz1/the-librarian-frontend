@@ -241,6 +241,8 @@
   "books.empty.cta": "Agregar libro",
   "common.retry": "Reintentar",
   "common.cancel": "Cancelar",
+  "common.yes": "Sí",
+  "common.no": "No",
   "bookDetail.errors.fetch": "No se pudieron obtener los detalles del libro",
   "bookDetail.notFound.title": "Libro no encontrado",
   "bookDetail.notFound.description": "El libro que buscas no existe.",

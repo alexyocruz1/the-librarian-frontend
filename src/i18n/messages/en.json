@@ -241,6 +241,8 @@
   "books.empty.cta": "Add Book",
   "common.retry": "Retry",
   "common.cancel": "Cancel",
+  "common.yes": "Yes",
+  "common.no": "No",
   "bookDetail.errors.fetch": "Failed to fetch book details",
   "bookDetail.notFound.title": "Book not found",
   "bookDetail.notFound.description": "The book you're looking for doesn't exist.",
