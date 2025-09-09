@@ -33,6 +33,7 @@ interface CopyModalProps {
   titleId: string;
   libraryId: string;
   inventoryId?: string;
+  inventoryShelfLocation?: string; // Shelf location from inventory level
 }
 
 const getStatusOptions = (t: (key: string) => string): { value: CopyStatus; label: string }[] => [
@@ -59,7 +60,8 @@ export default function CopyModal({
   mode, 
   titleId, 
   libraryId,
-  inventoryId
+  inventoryId,
+  inventoryShelfLocation
 }: CopyModalProps) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
@@ -118,7 +120,7 @@ export default function CopyModal({
         titleId,
         libraryId,
         acquiredAt: new Date(data.acquiredAt),
-        shelfLocation: data.shelfLocation || undefined,
+        shelfLocation: data.shelfLocation || inventoryShelfLocation || undefined,
       };
 
       if (mode === 'create') {
@@ -218,8 +220,11 @@ export default function CopyModal({
                       label={t('copyModal.fields.shelfLocation')}
                       {...register('shelfLocation')}
                       error={errors.shelfLocation?.message}
-                      placeholder={t('copyModal.placeholders.shelfLocation')}
-                      help={t('copyModal.help.shelfLocation')}
+                      placeholder={inventoryShelfLocation || t('copyModal.placeholders.shelfLocation')}
+                      help={inventoryShelfLocation 
+                        ? t('copyModal.help.shelfLocationOverride', { default: `Leave empty to use inventory location: ${inventoryShelfLocation}` })
+                        : t('copyModal.help.shelfLocation')
+                      }
                     />
 
                     <Input

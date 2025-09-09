@@ -197,6 +197,19 @@ export default function BookDetailPage() {
     fetchBookDetails();
   };
 
+  // Helper functions to calculate totals across all libraries
+  const getTotalCopiesAcrossLibraries = () => {
+    return allInventories.reduce((total, inv) => total + (inv.totalCopies || 0), 0);
+  };
+
+  const getAvailableCopiesAcrossLibraries = () => {
+    return allInventories.reduce((total, inv) => total + (inv.availableCopies || 0), 0);
+  };
+
+  const getBorrowedCopiesAcrossLibraries = () => {
+    return getTotalCopiesAcrossLibraries() - getAvailableCopiesAcrossLibraries();
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -374,32 +387,32 @@ export default function BookDetailPage() {
           </Card>
 
           {/* Inventory Summary */}
-          {inventory && (
+          {allInventories.length > 0 && (
             <Card>
               <CardHeader title={t('bookDetail.inventory.title')} />
               <CardBody>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary-600">
-                      {inventory.totalCopies}
+                      {getTotalCopiesAcrossLibraries()}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.totalCopies')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-success-600">
-                      {inventory.availableCopies}
+                      {getAvailableCopiesAcrossLibraries()}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-warning-600">
-                      {inventory.totalCopies - inventory.availableCopies}
+                      {getBorrowedCopiesAcrossLibraries()}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.borrowed')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-600">
-                      {inventory.availableCopies > 0 ? t('common.yes') : t('common.no')}
+                      {getAvailableCopiesAcrossLibraries() > 0 ? t('common.yes') : t('common.no')}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
                   </div>

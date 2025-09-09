@@ -78,13 +78,20 @@ export default function BooksPage() {
     try {
       setLoadingInventories(true);
       setInventoriesError(null);
+      console.log('Fetching inventories...');
       const response = await api.get('/inventories');
       console.log('Fetched inventories response:', response.data);
-      setInventories(response.data.data || []);
-    } catch (error) {
+      // The API response structure is {inventories: Array(1)}, not {data: {inventories: Array(1)}}
+      const inventoriesData = response.data.inventories || [];
+      console.log('Setting inventories to:', inventoriesData);
+      setInventories(inventoriesData);
+    } catch (error: any) {
       console.error('Error fetching inventories:', error);
+      console.error('Error details:', error.response?.data);
       const msg = getErrorMessage(error);
       setInventoriesError(msg);
+      // Set empty array on error to prevent undefined issues
+      setInventories([]);
     } finally {
       setLoadingInventories(false);
     }
@@ -96,18 +103,26 @@ export default function BooksPage() {
     return matchesSearch;
   });
 
-  const getInventoryForTitle = (titleId: string) => {
-    return inventories.find(inv => inv.titleId === titleId);
+  const getInventoriesForTitle = (titleId: string) => {
+    const titleInventories = inventories.filter(inv => {
+      // Handle both string and populated object cases
+      const invTitleId = typeof inv.titleId === 'string' ? inv.titleId : (inv.titleId as any)?._id;
+      return invTitleId === titleId;
+    });
+    console.log(`Looking for inventories for titleId: ${titleId}`);
+    console.log('Available inventories:', inventories);
+    console.log('Found inventories:', titleInventories);
+    return titleInventories;
   };
 
   const getTotalCopies = (titleId: string) => {
-    const inventory = getInventoryForTitle(titleId);
-    return inventory?.totalCopies || 0;
+    const titleInventories = getInventoriesForTitle(titleId);
+    return titleInventories.reduce((total, inv) => total + (inv.totalCopies || 0), 0);
   };
 
   const getAvailableCopies = (titleId: string) => {
-    const inventory = getInventoryForTitle(titleId);
-    return inventory?.availableCopies || 0;
+    const titleInventories = getInventoriesForTitle(titleId);
+    return titleInventories.reduce((total, inv) => total + (inv.availableCopies || 0), 0);
   };
 
   const handleAddBook = () => {
@@ -302,10 +317,10 @@ export default function BooksPage() {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
           {filteredTitles.map((title) => {
-            const inventory = getInventoryForTitle(title._id);
             const totalCopies = getTotalCopies(title._id);
             const availableCopies = getAvailableCopies(title._id);
             const availabilityRate = totalCopies > 0 ? (availableCopies / totalCopies) * 100 : 0;
+            console.log(`Title: ${title.title}, Total: ${totalCopies}, Available: ${availableCopies}, Rate: ${availabilityRate}%`);
 
             return (
               <motion.div
@@ -454,7 +469,6 @@ export default function BooksPage() {
         /* List View */
         <div className="space-y-4">
           {filteredTitles.map((title) => {
-            const inventory = getInventoryForTitle(title._id);
             const totalCopies = getTotalCopies(title._id);
             const availableCopies = getAvailableCopies(title._id);
             const availabilityRate = totalCopies > 0 ? (availableCopies / totalCopies) * 100 : 0;

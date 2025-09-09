@@ -94,27 +94,71 @@ export default function AssignToLibraryModal({
   const onSubmit = async (data: AssignToLibraryFormData) => {
     setLoading(true);
     try {
+      // Check if book is already assigned to this library
+      if (existingLibraries.includes(data.libraryId)) {
+        toast.error(t('assignToLibrary.errors.alreadyAssigned', { 
+          default: 'This book is already assigned to the selected library' 
+        }));
+        setLoading(false);
+        return;
+      }
+
+      // Create inventory with 0 copies initially
       const inventoryData = {
         libraryId: data.libraryId,
         titleId,
-        totalCopies: data.totalCopies,
+        totalCopies: 0, // Start with 0 - we'll create actual copies
+        availableCopies: 0,
         shelfLocation: data.shelfLocation || undefined,
         notes: data.notes || undefined,
       };
       
-      await api.post('/inventories', inventoryData);
-      toast.success(getSuccessMessage('inventory_created'));
+      const inventoryResponse = await api.post('/inventories', inventoryData);
+      const inventoryId = inventoryResponse.data.inventory._id;
+      
+      // Create the actual physical copies
+      const copyPromises = [];
+      for (let i = 0; i < data.totalCopies; i++) {
+        const copyData = {
+          inventoryId,
+          libraryId: data.libraryId,
+          titleId,
+          status: 'available',
+          condition: 'good',
+          shelfLocation: data.shelfLocation || undefined,
+        };
+        copyPromises.push(api.post('/copies', copyData));
+      }
+      
+      await Promise.all(copyPromises);
+      
+      // Update inventory with correct copy counts
+      await api.patch(`/inventories/${inventoryId}/copy-counts`);
+      
+      toast.success(t('assignToLibrary.success.created', { 
+        count: data.totalCopies,
+        default: `Successfully assigned ${data.totalCopies} copies to library` 
+      }));
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error assigning book to library:', error);
-      toast.error(getErrorMessage(error));
+      if (error.response?.status === 409) {
+        toast.error(t('assignToLibrary.errors.alreadyExists', { 
+          default: 'This book is already assigned to the selected library' 
+        }));
+      } else {
+        toast.error(getErrorMessage(error));
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const selectedLibrary = libraries.find(lib => lib._id === selectedLibraryId);
+  
+  // Filter out libraries where this book is already assigned
+  const availableLibraries = libraries.filter(lib => !existingLibraries.includes(lib._id));
 
   return (
     <AnimatePresence>
@@ -164,7 +208,7 @@ export default function AssignToLibraryModal({
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                         >
                           <option value="">{t('assignToLibrary.placeholders.selectLibrary')}</option>
-                          {libraries.map((library) => (
+                          {availableLibraries.map((library) => (
                             <option key={library._id} value={library._id}>
                               {library.name} ({library.code})
                             </option>
@@ -174,9 +218,12 @@ export default function AssignToLibraryModal({
                       {errors.libraryId && (
                         <p className="mt-1 text-sm text-error-600">{errors.libraryId.message}</p>
                       )}
-                      {libraries.length === 0 && !loadingLibraries && (
+                      {availableLibraries.length === 0 && !loadingLibraries && (
                         <p className="mt-1 text-sm text-warning-600">
-                          {t('assignToLibrary.noAvailableLibraries')}
+                          {existingLibraries.length > 0 
+                            ? t('assignToLibrary.allLibrariesAssigned', { default: 'This book is already assigned to all available libraries' })
+                            : t('assignToLibrary.noAvailableLibraries', { default: 'No libraries available' })
+                          }
                         </p>
                       )}
                     </div>
