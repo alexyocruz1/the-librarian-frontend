@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { api } from '@/lib/api';
 import { User } from '@/types';
+import { useI18n } from '@/context/I18nContext';
 import toast from 'react-hot-toast';
 
 interface AssignAdminModalProps {
@@ -26,6 +27,7 @@ export default function AssignAdminModal({
   libraryId, 
   libraryName 
 }: AssignAdminModalProps) {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [availableAdmins, setAvailableAdmins] = useState<User[]>([]);
@@ -43,13 +45,13 @@ export default function AssignAdminModal({
       setAvailableAdmins(response.data.data || []);
     } catch (error) {
       console.error('Error fetching admins:', error);
-      toast.error('Failed to fetch available administrators');
+      toast.error(t('assignAdmin.errors.fetchAdmins', { default: 'Failed to fetch available administrators' }));
     }
   };
 
   const handleAssignAdmins = async () => {
     if (selectedAdmins.length === 0) {
-      toast.error('Please select at least one administrator');
+      toast.error(t('assignAdmin.errors.selectAdmin', { default: 'Please select at least one administrator' }));
       return;
     }
 
@@ -61,12 +63,15 @@ export default function AssignAdminModal({
         )
       );
       
-      toast.success(`Successfully assigned ${selectedAdmins.length} administrator${selectedAdmins.length > 1 ? 's' : ''}`);
+      toast.success(selectedAdmins.length === 1
+        ? t('assignAdmin.success.assignedOne', { default: 'Successfully assigned 1 administrator' })
+        : t('assignAdmin.success.assignedMultiple', { count: selectedAdmins.length, default: `Successfully assigned ${selectedAdmins.length} administrators` })
+      );
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error('Error assigning admins:', error);
-      toast.error('Failed to assign administrators');
+      toast.error(t('assignAdmin.errors.assignFailed', { default: 'Failed to assign administrators' }));
     } finally {
       setLoading(false);
     }
@@ -106,8 +111,8 @@ export default function AssignAdminModal({
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
-                  title="Assign Administrators"
-                  subtitle={`Assign administrators to ${libraryName}`}
+                  title={t('assignAdmin.title', { default: 'Assign Administrators' })}
+                  subtitle={t('assignAdmin.subtitle', { libraryName, default: `Assign administrators to ${libraryName}` })}
                   action={
                     <Button
                       variant="ghost"
@@ -122,7 +127,7 @@ export default function AssignAdminModal({
                   <div className="space-y-6">
                     {/* Search */}
                     <Input
-                      placeholder="Search administrators..."
+                      placeholder={t('assignAdmin.search.placeholder', { default: 'Search administrators...' })}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -131,7 +136,10 @@ export default function AssignAdminModal({
                     {selectedAdmins.length > 0 && (
                       <div className="p-3 bg-primary-50 rounded-lg">
                         <p className="text-sm text-primary-700">
-                          {selectedAdmins.length} administrator{selectedAdmins.length > 1 ? 's' : ''} selected
+                          {selectedAdmins.length === 1
+                            ? t('assignAdmin.selectedOne', { default: '1 administrator selected' })
+                            : t('assignAdmin.selectedMultiple', { count: selectedAdmins.length, default: `${selectedAdmins.length} administrators selected` })
+                          }
                         </p>
                       </div>
                     )}
@@ -141,9 +149,14 @@ export default function AssignAdminModal({
                       {filteredAdmins.length === 0 ? (
                         <div className="text-center py-8">
                           <div className="text-gray-400 text-4xl mb-2">👥</div>
-                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No administrators found</h3>
+                          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                            {t('assignAdmin.empty.title', { default: 'No administrators found' })}
+                          </h3>
                           <p className="text-gray-600 dark:text-gray-400">
-                            {searchTerm ? 'Try adjusting your search terms' : 'No administrators available to assign'}
+                            {searchTerm 
+                              ? t('assignAdmin.empty.searchHint', { default: 'Try adjusting your search terms' })
+                              : t('assignAdmin.empty.noAdmins', { default: 'No administrators available to assign' })
+                            }
                           </p>
                         </div>
                       ) : (
@@ -195,7 +208,7 @@ export default function AssignAdminModal({
                         onClick={onClose}
                         disabled={loading}
                       >
-                        Cancel
+                        {t('common.cancel', { default: 'Cancel' })}
                       </Button>
                       <Button
                         onClick={handleAssignAdmins}
@@ -203,7 +216,10 @@ export default function AssignAdminModal({
                         disabled={selectedAdmins.length === 0}
                         leftIcon={<UserPlusIcon className="w-4 h-4" />}
                       >
-                        Assign {selectedAdmins.length > 0 ? `(${selectedAdmins.length})` : ''}
+                        {selectedAdmins.length > 0 
+                          ? t('assignAdmin.assignWithCount', { count: selectedAdmins.length, default: `Assign (${selectedAdmins.length})` })
+                          : t('assignAdmin.assign', { default: 'Assign' })
+                        }
                       </Button>
                     </div>
                   </div>

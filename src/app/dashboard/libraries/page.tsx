@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import LibraryModal from '@/components/modals/LibraryModal';
+import AssignAdminModal from '@/components/modals/AssignAdminModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { Library } from '@/types';
@@ -44,6 +45,8 @@ export default function LibrariesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [libraryToDelete, setLibraryToDelete] = useState<Library | null>(null);
+  const [showAssignAdminModal, setShowAssignAdminModal] = useState(false);
+  const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(null);
 
   useEffect(() => {
     fetchLibraries();
@@ -86,6 +89,23 @@ export default function LibrariesPage() {
   const cancelDeleteLibrary = () => {
     setShowDeleteModal(false);
     setLibraryToDelete(null);
+  };
+
+  const handleManageAdmins = (library: Library) => {
+    setSelectedLibrary(library);
+    setShowAssignAdminModal(true);
+  };
+
+  const handleAssignAdminModalSuccess = () => {
+    setShowAssignAdminModal(false);
+    setSelectedLibrary(null);
+    // Optionally refresh libraries data if needed
+    fetchLibraries();
+  };
+
+  const handleAssignAdminModalClose = () => {
+    setShowAssignAdminModal(false);
+    setSelectedLibrary(null);
   };
 
   const handleAddLibrary = () => {
@@ -358,7 +378,7 @@ export default function LibrariesPage() {
                         variant="outline"
                         size="sm"
                         leftIcon={<UserPlusIcon className="w-4 h-4" />}
-                        onClick={() => {/* TODO: Open assign admin modal */}}
+                        onClick={() => handleManageAdmins(library)}
                         className="hover:bg-primary-50 hover:border-primary-300 hover:text-primary-700 transition-colors"
                       >
                         {t('libraries.manageAdmins')}
@@ -457,7 +477,7 @@ export default function LibrariesPage() {
                             size="sm"
                             variant="outline"
                             leftIcon={<UserPlusIcon className="w-4 h-4" />}
-                            onClick={() => {/* TODO: Open assign admin modal */}}
+                            onClick={() => handleManageAdmins(library)}
                           >
                             {t('libraries.manageAdmins')}
                           </Button>
@@ -589,6 +609,17 @@ export default function LibrariesPage() {
         </div>
         )}
       </AnimatePresence>
+
+      {/* Assign Admin Modal */}
+      {showAssignAdminModal && selectedLibrary && (
+        <AssignAdminModal
+          isOpen={showAssignAdminModal}
+          onClose={handleAssignAdminModalClose}
+          onSuccess={handleAssignAdminModalSuccess}
+          libraryId={selectedLibrary._id}
+          libraryName={selectedLibrary.name}
+        />
+      )}
     </div>
   );
 }
