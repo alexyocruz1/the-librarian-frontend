@@ -1,6 +1,6 @@
 'use client';
  
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookmarkIcon,
@@ -105,13 +105,7 @@ export default function MyRequestsPage() {
 
   const hasFetched = useRef(false);
 
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    fetchRequests();
-  }, []);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -155,7 +149,14 @@ export default function MyRequestsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchRequests();
+  }, [fetchRequests]);
+
 
   const handleCancelRequest = async (requestId: string) => {
     try {

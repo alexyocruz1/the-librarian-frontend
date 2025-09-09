@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { PlusIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -319,10 +320,11 @@ export default function BooksPage() {
                       {/* Book Cover */}
                       <div className="relative h-48 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 overflow-hidden">
                         {title.coverUrl ? (
-                          <img
+                          <Image
                             src={title.coverUrl}
                             alt={title.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
@@ -469,12 +471,13 @@ export default function BooksPage() {
                     <div className="flex items-start space-x-4">
                       {/* Book Cover Thumbnail */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden shadow-sm">
+                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden shadow-sm relative">
                           {title.coverUrl ? (
-                            <img
+                            <Image
                               src={title.coverUrl}
                               alt={title.title}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           ) : (
                             <div className="flex items-center justify-center h-full">

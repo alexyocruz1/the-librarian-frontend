@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
@@ -35,13 +35,7 @@ export default function LibraryDetailPage() {
 
   const libraryId = params.id as string;
 
-  useEffect(() => {
-    if (libraryId) {
-      fetchLibraryDetails();
-    }
-  }, [libraryId]);
-
-  const fetchLibraryDetails = async () => {
+  const fetchLibraryDetails = useCallback(async () => {
     try {
       const [libraryResponse, adminsResponse] = await Promise.all([
         api.get(`/libraries/${libraryId}`),
@@ -56,7 +50,14 @@ export default function LibraryDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [libraryId]);
+
+  useEffect(() => {
+    if (libraryId) {
+      fetchLibraryDetails();
+    }
+  }, [libraryId, fetchLibraryDetails]);
+
 
   const handleRemoveAdmin = async (userId: string) => {
     if (!confirm('Are you sure you want to remove this admin from the library?')) return;

@@ -70,6 +70,14 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
       };
     }, [value, onSearch, debounceMs]);
 
+    const handleSelectSuggestion = useCallback((suggestion: SearchSuggestion) => {
+      onChange(suggestion.title);
+      onSelect?.(suggestion);
+      setIsOpen(false);
+      setHighlightedIndex(-1);
+      inputRef.current?.blur();
+    }, [onChange, onSelect]);
+
     // Handle keyboard navigation
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
       if (!showSuggestions || suggestions.length === 0) return;
@@ -101,15 +109,7 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           inputRef.current?.blur();
           break;
       }
-    }, [suggestions, highlightedIndex, value, onSearch, showSuggestions]);
-
-    const handleSelectSuggestion = useCallback((suggestion: SearchSuggestion) => {
-      onChange(suggestion.title);
-      onSelect?.(suggestion);
-      setIsOpen(false);
-      setHighlightedIndex(-1);
-      inputRef.current?.blur();
-    }, [onChange, onSelect]);
+    }, [suggestions, highlightedIndex, value, onSearch, showSuggestions, handleSelectSuggestion]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;

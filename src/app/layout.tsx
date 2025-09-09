@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
@@ -14,8 +14,6 @@ export const metadata: Metadata = {
   description: 'A modern, comprehensive library management system for managing books, users, and borrowing workflows.',
   keywords: ['library', 'management', 'books', 'borrowing', 'catalog'],
   authors: [{ name: 'Alexy Cruz' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#3b82f6',
   openGraph: {
     title: 'The Librarian - Library Management System',
     description: 'A modern, comprehensive library management system',
@@ -31,6 +29,12 @@ export const metadata: Metadata = {
     index: false,
     follow: false,
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#3b82f6',
 };
 
 export default function RootLayout({

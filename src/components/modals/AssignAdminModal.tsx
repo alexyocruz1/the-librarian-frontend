@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
@@ -33,13 +33,7 @@ export default function AssignAdminModal({
   const [availableAdmins, setAvailableAdmins] = useState<User[]>([]);
   const [selectedAdmins, setSelectedAdmins] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchAvailableAdmins();
-    }
-  }, [isOpen, libraryId]);
-
-  const fetchAvailableAdmins = async () => {
+  const fetchAvailableAdmins = useCallback(async () => {
     try {
       const response = await api.get('/users?role=admin');
       setAvailableAdmins(response.data.data || []);
@@ -47,7 +41,14 @@ export default function AssignAdminModal({
       console.error('Error fetching admins:', error);
       toast.error(t('assignAdmin.errors.fetchAdmins', { default: 'Failed to fetch available administrators' }));
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchAvailableAdmins();
+    }
+  }, [isOpen, libraryId, fetchAvailableAdmins]);
+
 
   const handleAssignAdmins = async () => {
     if (selectedAdmins.length === 0) {

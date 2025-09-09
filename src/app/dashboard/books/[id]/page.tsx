@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { 
   ArrowLeftIcon, 
   PencilIcon, 
@@ -411,12 +412,13 @@ export default function BookDetailPage() {
         <div className="space-y-6">
           <Card>
             <CardBody className="p-4">
-              <div className="aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center relative">
                 {title.coverUrl ? (
-                  <img
+                  <Image
                     src={title.coverUrl}
                     alt={title.title}
-                    className="w-full h-full object-cover rounded-lg"
+                    fill
+                    className="object-cover rounded-lg"
                   />
                 ) : (
                   <div className="text-gray-400 text-center">

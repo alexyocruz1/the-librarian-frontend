@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '@/lib/api';
 import { SearchSuggestion } from '@/components/ui/SearchInput';
 import { debounce } from '@/lib/utils';
@@ -56,52 +56,55 @@ export const useSearch = (options: UseSearchOptions = {}) => {
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SearchFilters>({});
 
+  // Search function
+  const performSearch = useCallback(async (searchQuery: string, searchFilters: SearchFilters) => {
+    if (!searchQuery.trim() || searchQuery.length < minQueryLength) {
+      setSuggestions([]);
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams();
+      params.append('q', searchQuery.trim());
+      
+      // Add non-empty filter values
+      Object.entries(searchFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value));
+        }
+      });
+
+      // Get suggestions
+      if (enableSuggestions) {
+        const suggestionsResponse = await api.get(`/titles/search/suggestions?${params}`);
+        if (suggestionsResponse.data.success) {
+          setSuggestions(suggestionsResponse.data.data.suggestions || []);
+        }
+      }
+
+      // Get full search results
+      const resultsResponse = await api.get(`/titles/search?${params}`);
+      if (resultsResponse.data.success) {
+        setResults(resultsResponse.data.data.results || []);
+      }
+    } catch (err: any) {
+      console.error('Search error:', err);
+      setError(err.response?.data?.error || 'Search failed');
+      setSuggestions([]);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [minQueryLength, enableSuggestions]);
+
   // Debounced search function
-  const debouncedSearch = useCallback(
-    debounce(async (searchQuery: string, searchFilters: SearchFilters) => {
-      if (!searchQuery.trim() || searchQuery.length < minQueryLength) {
-        setSuggestions([]);
-        setResults([]);
-        return;
-      }
-
-      setLoading(true);
-      setError(null);
-
-      try {
-        const params = new URLSearchParams();
-        params.append('q', searchQuery.trim());
-        
-        // Add non-empty filter values
-        Object.entries(searchFilters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            params.append(key, String(value));
-          }
-        });
-
-        // Get suggestions
-        if (enableSuggestions) {
-          const suggestionsResponse = await api.get(`/titles/search/suggestions?${params}`);
-          if (suggestionsResponse.data.success) {
-            setSuggestions(suggestionsResponse.data.data.suggestions || []);
-          }
-        }
-
-        // Get full search results
-        const resultsResponse = await api.get(`/titles/search?${params}`);
-        if (resultsResponse.data.success) {
-          setResults(resultsResponse.data.data.results || []);
-        }
-      } catch (err: any) {
-        console.error('Search error:', err);
-        setError(err.response?.data?.error || 'Search failed');
-        setSuggestions([]);
-        setResults([]);
-      } finally {
-        setLoading(false);
-      }
-    }, debounceMs),
-    [debounceMs, minQueryLength, enableSuggestions]
+  const debouncedSearch = useMemo(
+    () => debounce(performSearch, debounceMs),
+    [performSearch, debounceMs]
   );
 
   // Search function

@@ -1,6 +1,6 @@
 'use client';
  
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   BookOpenIcon,
@@ -113,13 +113,7 @@ export default function MyHistoryPage() {
 
   const hasFetched = useRef(false);
 
-  useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-    fetchHistory();
-  }, []);
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -163,7 +157,14 @@ export default function MyHistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchHistory();
+  }, [fetchHistory]);
+
 
   const filteredRecords = records.filter(record => {
     if (filter === 'all') return true;
