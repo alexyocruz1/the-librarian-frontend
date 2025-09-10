@@ -74,12 +74,22 @@ export default function ImportExportPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await api.get('/csv/export', {
-        responseType: 'blob',
+      // Use axios directly for blob responses to avoid API client wrapper
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/csv/export`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+      
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `library-catalog-${new Date().toISOString().split('T')[0]}.csv`);
@@ -100,15 +110,25 @@ export default function ImportExportPage() {
   const handleDownloadTemplate = async () => {
     setDownloadTemplate(true);
     try {
-      const response = await api.get('/csv/template', {
-        responseType: 'blob',
+      // Use fetch directly for blob responses
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/csv/template`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        },
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'book-import-template.csv');
+      link.setAttribute('download', 'copies-import-template.csv');
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -303,6 +323,11 @@ export default function ImportExportPage() {
               <li>{t('books.importExport.instructions.required.publishedYear')}</li>
               <li>{t('books.importExport.instructions.required.language')}</li>
               <li>{t('books.importExport.instructions.required.categories')}</li>
+              <li>{t('books.importExport.instructions.required.libraryCode')}</li>
+              <li>{t('books.importExport.instructions.required.barcode')}</li>
+              <li>{t('books.importExport.instructions.required.status')}</li>
+              <li>{t('books.importExport.instructions.required.condition')}</li>
+              <li>{t('books.importExport.instructions.required.totalCopies')}</li>
             </ul>
             
             <h3>{t('books.importExport.instructions.optional.title')}</h3>
@@ -311,8 +336,9 @@ export default function ImportExportPage() {
               <li>{t('books.importExport.instructions.optional.subtitle')}</li>
               <li>{t('books.importExport.instructions.optional.description')}</li>
               <li>{t('books.importExport.instructions.optional.coverUrl')}</li>
-              <li>{t('books.importExport.instructions.optional.totalCopies')}</li>
               <li>{t('books.importExport.instructions.optional.shelfLocation')}</li>
+              <li>{t('books.importExport.instructions.optional.acquiredAt')}</li>
+              <li>{t('books.importExport.instructions.optional.inventoryNotes')}</li>
             </ul>
 
             <h3>{t('books.importExport.instructions.notes.title')}</h3>
@@ -322,6 +348,10 @@ export default function ImportExportPage() {
               <li>{t('books.importExport.instructions.notes.separators')}</li>
               <li>{t('books.importExport.instructions.notes.year')}</li>
               <li>{t('books.importExport.instructions.notes.copies')}</li>
+              <li>{t('books.importExport.instructions.notes.barcodeUnique')}</li>
+              <li>{t('books.importExport.instructions.notes.libraryCode')}</li>
+              <li>{t('books.importExport.instructions.notes.statusValues')}</li>
+              <li>{t('books.importExport.instructions.notes.conditionValues')}</li>
             </ul>
           </div>
         </CardBody>
