@@ -46,6 +46,8 @@ export default function BookDetailPage() {
   const [showAssignToLibraryModal, setShowAssignToLibraryModal] = useState(false);
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [copyToDelete, setCopyToDelete] = useState<{ id: string; barcode: string } | null>(null);
   const [selectedCopy, setSelectedCopy] = useState<Copy | null>(null);
   const [editingCopy, setEditingCopy] = useState<Copy | null>(null);
   const [userLibraryId, setUserLibraryId] = useState<string>('');
@@ -489,17 +491,29 @@ export default function BookDetailPage() {
     }));
   };
 
-  const handleDeleteCopy = async (copyId: string) => {
-    if (!confirm(t('bookDetail.copies.deleteConfirm'))) return;
+  const handleDeleteCopy = (copyId: string, barcode: string) => {
+    setCopyToDelete({ id: copyId, barcode });
+    setShowDeleteConfirmModal(true);
+  };
+
+  const confirmDeleteCopy = async () => {
+    if (!copyToDelete) return;
 
     try {
-      await api.delete(`/copies/${copyId}`);
+      await api.delete(`/copies/${copyToDelete.id}`);
       toast.success(t('bookDetail.copies.deleteSuccess'));
       fetchBookDetails();
+      setShowDeleteConfirmModal(false);
+      setCopyToDelete(null);
     } catch (error) {
       console.error('Error deleting copy:', error);
       toast.error(t('bookDetail.copies.deleteError'));
     }
+  };
+
+  const cancelDeleteCopy = () => {
+    setShowDeleteConfirmModal(false);
+    setCopyToDelete(null);
   };
 
   const handleAddCopy = () => {
@@ -545,17 +559,59 @@ export default function BookDetailPage() {
     fetchBookDetails();
   };
 
-  // Helper functions to calculate totals across all libraries
-  const getTotalCopiesAcrossLibraries = () => {
-    return allInventories.reduce((total, inv) => total + (inv.totalCopies || 0), 0);
+  // Helper functions to calculate totals from local copies state (reactive to changes)
+  const getTotalCopies = () => {
+    return copies.length;
   };
 
-  const getAvailableCopiesAcrossLibraries = () => {
-    return allInventories.reduce((total, inv) => total + (inv.availableCopies || 0), 0);
+  const getCopiesByStatus = (status: string) => {
+    return copies.filter(copy => copy.status === status).length;
   };
 
-  const getBorrowedCopiesAcrossLibraries = () => {
-    return getTotalCopiesAcrossLibraries() - getAvailableCopiesAcrossLibraries();
+  const getAvailableCopies = () => {
+    return getCopiesByStatus('available');
+  };
+
+  const getBorrowedCopies = () => {
+    return getCopiesByStatus('borrowed');
+  };
+
+  const getReservedCopies = () => {
+    return getCopiesByStatus('reserved');
+  };
+
+  const getLostCopies = () => {
+    return getCopiesByStatus('lost');
+  };
+
+  const getMaintenanceCopies = () => {
+    return getCopiesByStatus('maintenance');
+  };
+
+  const isAvailable = () => {
+    return getAvailableCopies() > 0;
+  };
+
+  // Helper functions for library-specific statistics
+  const getCopiesByLibrary = (libraryId: string) => {
+    return copies.filter(copy => {
+      const copyLibraryId = typeof copy.libraryId === 'string' 
+        ? copy.libraryId 
+        : (copy.libraryId as any)?._id;
+      return copyLibraryId === libraryId;
+    });
+  };
+
+  const getLibraryStats = (libraryId: string) => {
+    const libraryCopies = getCopiesByLibrary(libraryId);
+    return {
+      total: libraryCopies.length,
+      available: libraryCopies.filter(copy => copy.status === 'available').length,
+      borrowed: libraryCopies.filter(copy => copy.status === 'borrowed').length,
+      reserved: libraryCopies.filter(copy => copy.status === 'reserved').length,
+      lost: libraryCopies.filter(copy => copy.status === 'lost').length,
+      maintenance: libraryCopies.filter(copy => copy.status === 'maintenance').length,
+    };
   };
 
   if (loading) {
@@ -735,32 +791,52 @@ export default function BookDetailPage() {
           </Card>
 
           {/* Inventory Summary */}
-          {allInventories.length > 0 && (
+          {copies.length > 0 && (
             <Card>
               <CardHeader title={t('bookDetail.inventory.title')} />
               <CardBody>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-primary-600">
-                      {getTotalCopiesAcrossLibraries()}
+                      {getTotalCopies()}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.totalCopies')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-success-600">
-                      {getAvailableCopiesAcrossLibraries()}
+                      {getAvailableCopies()}
                     </div>
-                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
+                    <div className="text-sm text-gray-600">{t('copyModal.status.available')}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-info-600">
+                      {getBorrowedCopies()}
+                    </div>
+                    <div className="text-sm text-gray-600">{t('copyModal.status.borrowed')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-warning-600">
-                      {getBorrowedCopiesAcrossLibraries()}
+                      {getReservedCopies()}
                     </div>
-                    <div className="text-sm text-gray-600">{t('bookDetail.inventory.borrowed')}</div>
+                    <div className="text-sm text-gray-600">{t('copyModal.status.reserved')}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-error-600">
+                      {getLostCopies()}
+                    </div>
+                    <div className="text-sm text-gray-600">{t('copyModal.status.lost')}</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-gray-600">
-                      {getAvailableCopiesAcrossLibraries() > 0 ? t('common.yes') : t('common.no')}
+                      {getMaintenanceCopies()}
+                    </div>
+                    <div className="text-sm text-gray-600">{t('copyModal.status.maintenance')}</div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                      {isAvailable() ? t('common.yes') : t('common.no')}
                     </div>
                     <div className="text-sm text-gray-600">{t('bookDetail.inventory.available')}</div>
                   </div>
@@ -850,34 +926,61 @@ export default function BookDetailPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allInventories.map((inventory) => (
-                <div key={inventory._id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                      {(inventory.libraryId as any)?.name || 'Unknown Library'}
-                    </h4>
-                    <Badge variant="secondary">
-                      {(inventory.libraryId as any)?.code || 'N/A'}
-                    </Badge>
-                  </div>
-                  <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                    <div className="flex justify-between">
-                      <span>{t('bookDetail.libraryAssignments.totalCopies')}:</span>
-                      <span className="font-medium">{inventory.totalCopies}</span>
+              {allInventories.map((inventory) => {
+                const libraryId = typeof inventory.libraryId === 'string' 
+                  ? inventory.libraryId 
+                  : (inventory.libraryId as any)?._id;
+                const stats = getLibraryStats(libraryId);
+                
+                return (
+                  <div key={inventory._id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div className="flex items-start justify-between mb-2">
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                        {(inventory.libraryId as any)?.name || 'Unknown Library'}
+                      </h4>
+                      <Badge variant="secondary">
+                        {(inventory.libraryId as any)?.code || 'N/A'}
+                      </Badge>
                     </div>
-                    <div className="flex justify-between">
-                      <span>{t('bookDetail.libraryAssignments.availableCopies')}:</span>
-                      <span className="font-medium text-success-600">{inventory.availableCopies}</span>
-                    </div>
-                    {inventory.shelfLocation && (
+                    <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                       <div className="flex justify-between">
-                        <span>{t('bookDetail.libraryAssignments.shelfLocation')}:</span>
-                        <span className="font-medium">{inventory.shelfLocation}</span>
+                        <span>{t('bookDetail.libraryAssignments.totalCopies')}:</span>
+                        <span className="font-medium">{stats.total}</span>
                       </div>
-                    )}
+                      <div className="flex justify-between">
+                        <span>{t('copyModal.status.available')}:</span>
+                        <span className="font-medium text-success-600">{stats.available}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>{t('copyModal.status.borrowed')}:</span>
+                        <span className="font-medium text-info-600">{stats.borrowed}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>{t('copyModal.status.reserved')}:</span>
+                        <span className="font-medium text-warning-600">{stats.reserved}</span>
+                      </div>
+                      {stats.lost > 0 && (
+                        <div className="flex justify-between">
+                          <span>{t('copyModal.status.lost')}:</span>
+                          <span className="font-medium text-error-600">{stats.lost}</span>
+                        </div>
+                      )}
+                      {stats.maintenance > 0 && (
+                        <div className="flex justify-between">
+                          <span>{t('copyModal.status.maintenance')}:</span>
+                          <span className="font-medium text-gray-600">{stats.maintenance}</span>
+                        </div>
+                      )}
+                      {inventory.shelfLocation && (
+                        <div className="flex justify-between">
+                          <span>{t('bookDetail.libraryAssignments.shelfLocation')}:</span>
+                          <span className="font-medium">{inventory.shelfLocation}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardBody>
@@ -913,6 +1016,9 @@ export default function BookDetailPage() {
                       {t('bookDetail.copies.table.barcode')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('bookDetail.copies.table.library')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('bookDetail.copies.table.status')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -940,7 +1046,30 @@ export default function BookDetailPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <Badge variant={copy.status === 'available' ? 'success' : 'warning'}>
+                        <div className="text-sm text-gray-900">
+                          {(copy.libraryId as any)?.name || 'Unknown Library'}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {(copy.libraryId as any)?.code || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge variant={(() => {
+                          switch (copy.status) {
+                            case 'available':
+                              return 'success'; // Green
+                            case 'borrowed':
+                              return 'info'; // Blue
+                            case 'reserved':
+                              return 'warning'; // Yellow
+                            case 'lost':
+                              return 'error'; // Red
+                            case 'maintenance':
+                              return 'secondary'; // Gray
+                            default:
+                              return 'secondary';
+                          }
+                        })()}>
                           {t(`copyModal.status.${copy.status}`)}
                         </Badge>
                       </td>
@@ -995,7 +1124,7 @@ export default function BookDetailPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              onClick={() => handleDeleteCopy(copy._id)}
+                              onClick={() => handleDeleteCopy(copy._id, copy.barcode || 'Unknown')}
                               leftIcon={<TrashIcon className="w-4 h-4" />}
                               className="text-error-600 hover:text-error-700"
                             >
@@ -1152,6 +1281,47 @@ export default function BookDetailPage() {
                 >
                   {t('common.cancel', { default: 'Cancel' })}
                 </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmModal && copyToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0 w-10 h-10 mx-auto bg-error-100 dark:bg-error-900 rounded-full flex items-center justify-center">
+                  <TrashIcon className="w-6 h-6 text-error-600 dark:text-error-400" />
+                </div>
+              </div>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {t('bookDetail.copies.deleteConfirmTitle', { default: 'Delete Copy' })}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  {t('bookDetail.copies.deleteConfirmMessage', { 
+                    barcode: copyToDelete.barcode,
+                    default: `Are you sure you want to delete copy with barcode "${copyToDelete.barcode}"? This action cannot be undone.`
+                  })}
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={cancelDeleteCopy}
+                  >
+                    {t('common.cancel', { default: 'Cancel' })}
+                  </Button>
+                  <Button
+                    variant="error"
+                    onClick={confirmDeleteCopy}
+                    leftIcon={<TrashIcon className="w-4 h-4" />}
+                  >
+                    {t('common.delete', { default: 'Delete' })}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
