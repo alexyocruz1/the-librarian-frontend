@@ -27,8 +27,30 @@ export default function ImportExportPage() {
   const [importing, setImporting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [downloadTemplate, setDownloadTemplate] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   const canManage = user?.role === 'admin' || user?.role === 'superadmin';
+
+  // Show loading state during hydration to prevent mismatch
+  if (!user) {
+    return (
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <Skeleton className="h-48 w-full" />
+          </div>
+          <div className="space-y-4">
+            <Skeleton className="h-48 w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -50,7 +72,7 @@ export default function ImportExportPage() {
     setImporting(true);
     try {
       const formData = new FormData();
-      formData.append('file', importFile);
+      formData.append('csvFile', importFile);
 
       const response = await api.post('/csv/import', formData, {
         headers: {
@@ -58,14 +80,41 @@ export default function ImportExportPage() {
         },
       });
 
-      toast.success(t('books.import.success', { count: response.data?.data?.imported ?? 0 }));
+      const results = response.data?.data;
+      if (results) {
+        const message = `Import completed: ${results.copiesCreated} copies created, ${results.titlesCreated} titles created`;
+        toast.success(message);
+        
+        // Show errors if any (as warnings, not errors)
+        if (results.errors && results.errors.length > 0) {
+          console.warn('Import warnings:', results.errors);
+          // Show warnings as info instead of error to not override success message
+          setTimeout(() => {
+            toast(`${results.errors.length} warnings during import`, {
+              icon: '⚠️',
+              duration: 5000
+            });
+          }, 1000); // Delay the warning message
+        }
+      } else {
+        toast.success(t('books.import.success', { count: 0 }));
+      }
+      
       setImportFile(null);
       // Reset file input
       const fileInput = document.getElementById('csv-file') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     } catch (error: any) {
       console.error('Error importing CSV:', error);
-      toast.error(getErrorMessage(error));
+      
+      // Check if it's a CSV validation error with details
+      if (error.response?.data?.error?.includes('CSV validation failed') && error.response?.data?.details) {
+        const details = error.response.data.details;
+        setValidationErrors(details);
+        setShowValidationModal(true);
+      } else {
+        toast.error(getErrorMessage(error));
+      }
     } finally {
       setImporting(false);
     }
@@ -288,10 +337,6 @@ export default function ImportExportPage() {
                     <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
                     {t('books.export.includes.item.inventoryCopies')}
                   </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-primary-500 rounded-full"></div>
-                    {t('books.export.includes.item.barcodesShelves')}
-                  </li>
                 </ul>
               </div>
 
@@ -356,6 +401,61 @@ export default function ImportExportPage() {
           </div>
         </CardBody>
       </Card>
+
+      {/* Validation Error Modal */}
+      {showValidationModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-strong max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                CSV Validation Errors
+              </h3>
+              <button
+                onClick={() => setShowValidationModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                title="Close validation errors"
+                aria-label="Close validation errors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="px-6 py-4">
+              <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="flex items-start gap-3">
+                  <ExclamationTriangleIcon className="w-6 h-6 text-red-600 dark:text-red-400 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-red-900 dark:text-red-100 mb-2">
+                      CSV Import Failed
+                    </h4>
+                    <p className="text-sm text-red-700 dark:text-red-300">
+                      Please fix the following errors in your CSV file and try again:
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {validationErrors.map((error, index) => (
+                  <div key={index} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-mono">
+                      {error}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+              <Button
+                onClick={() => setShowValidationModal(false)}
+                variant="primary"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

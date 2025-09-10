@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,7 @@ import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { api } from '@/lib/api';
-import { Title } from '@/types';
+import { Title, Library } from '@/types';
 import { useI18n } from '@/context/I18nContext';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
@@ -27,6 +27,10 @@ type BookFormData = {
   publishedYear: number;
   description?: string;
   coverUrl?: string;
+  libraryId?: string;
+  totalCopies?: number;
+  shelfLocation?: string;
+  notes?: string;
 };
 
 interface BookModalProps {
@@ -40,6 +44,22 @@ interface BookModalProps {
 export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: BookModalProps) {
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
+  const [libraries, setLibraries] = useState<Library[]>([]);
+  const [loadingLibraries, setLoadingLibraries] = useState(false);
+
+  const fetchLibraries = useCallback(async () => {
+    try {
+      setLoadingLibraries(true);
+      const response = await api.get('/libraries');
+      const allLibraries = response.data.libraries || response.data.data || [];
+      setLibraries(allLibraries);
+    } catch (error) {
+      console.error('Error fetching libraries:', error);
+      toast.error(getErrorMessage(error));
+    } finally {
+      setLoadingLibraries(false);
+    }
+  }, []);
 
   const bookSchema = z.object({
     isbn13: z.string()
@@ -101,6 +121,29 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
       .refine((val) => !val || val === '' || /^https?:\/\/.+/.test(val), {
         message: t('bookModal.validation.coverUrlFormat', { default: 'Cover URL must be a valid HTTP/HTTPS URL' })
       }),
+    // New fields for library assignment (only required when creating and libraries are available)
+    libraryId: z.string()
+      .optional()
+      .refine((val) => {
+        // Only require library if we're creating and libraries are available
+        return true; // We'll handle this validation in the submit handler
+      }),
+    totalCopies: z.number()
+      .optional()
+      .refine((val) => {
+        // Only require totalCopies if we're creating and libraries are available
+        return true; // We'll handle this validation in the submit handler
+      }),
+    shelfLocation: z.string()
+      .optional()
+      .refine((val) => !val || val.length <= 100, {
+        message: t('bookModal.validation.shelfLocationMaxLength', { default: 'Shelf location cannot exceed 100 characters' })
+      }),
+    notes: z.string()
+      .optional()
+      .refine((val) => !val || val.length <= 500, {
+        message: t('bookModal.validation.notesMaxLength', { default: 'Notes cannot exceed 500 characters' })
+      }),
   });
 
   const {
@@ -123,11 +166,18 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
       publishedYear: new Date().getFullYear(),
       description: '',
       coverUrl: '',
+      libraryId: '',
+      totalCopies: 1,
+      shelfLocation: '',
+      notes: '',
     }
   });
 
   useEffect(() => {
     if (isOpen) {
+      // Fetch libraries when modal opens
+      fetchLibraries();
+      
       if (mode === 'edit' && book) {
         setValue('isbn13', book.isbn13 || '');
         setValue('isbn10', book.isbn10 || '');
@@ -140,15 +190,41 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
         setValue('publishedYear', book.publishedYear || 0);
         setValue('description', book.description || '');
         setValue('coverUrl', book.coverUrl || '');
+        // Clear library fields for edit mode (they're not part of the title)
+        setValue('libraryId', '');
+        setValue('totalCopies', 1);
+        setValue('shelfLocation', '');
+        setValue('notes', '');
       } else {
         reset();
       }
     }
-  }, [isOpen, mode, book, setValue, reset]);
+  }, [isOpen, mode, book, setValue, reset, fetchLibraries]);
 
   const onSubmit = async (data: BookFormData) => {
     setLoading(true);
     try {
+      // Validate library fields when creating and libraries are available
+      if (mode === 'create' && libraries.length > 0) {
+        if (!data.libraryId) {
+          toast.error(t('bookModal.validation.libraryRequired', { default: 'Please select a library' }));
+          setLoading(false);
+          return;
+        }
+        if (!data.totalCopies || data.totalCopies < 1) {
+          toast.error(t('bookModal.validation.totalCopiesMin', { default: 'Total copies must be at least 1' }));
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If creating but no libraries available, just create the title without inventory
+      if (mode === 'create' && libraries.length === 0) {
+        toast.warning(t('bookModal.noLibraries.warning', { 
+          default: 'Book created but not assigned to any library. Please create a library first and then assign this book to it.' 
+        }));
+      }
+
       const bookData = {
         ...data,
         authors: data.authors.split(',').map(author => author.trim()).filter(Boolean),
@@ -160,7 +236,25 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
       };
 
       if (mode === 'create') {
-        await api.post('/titles', bookData);
+        // Create the title first
+        const titleResponse = await api.post('/titles', bookData);
+        const createdTitle = titleResponse.data.title || titleResponse.data.data;
+        
+        // If library is selected, create an inventory record
+        if (data.libraryId && data.totalCopies && libraries.length > 0) {
+          const inventoryData = {
+            libraryId: data.libraryId,
+            titleId: createdTitle._id,
+            totalCopies: data.totalCopies,
+            availableCopies: data.totalCopies, // Initially all copies are available
+            shelfLocation: data.shelfLocation || undefined,
+            notes: data.notes || undefined,
+          };
+          
+          await api.post('/inventories', inventoryData);
+          console.log('Inventory created successfully');
+        }
+        
         toast.success(getSuccessMessage('book_created'));
         console.log('Book created successfully, calling onSuccess...');
         // Small delay to ensure backend processing is complete
@@ -218,6 +312,7 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
                 
                 <CardBody>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {/* Basic and Technical Information - Two Column Layout */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Basic Information */}
                       <div className="space-y-4">
@@ -306,6 +401,141 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
                         />
                       </div>
                     </div>
+
+                    {/* Library Assignment - Full Width Section (Only show when creating) */}
+                    {mode === 'create' && (
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex-shrink-0">
+                            <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                              <svg className="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                              {t('bookModal.sections.libraryAssignment', { default: 'Library Assignment' })}
+                            </h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Assign this book to a library and specify inventory details
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {libraries.length === 0 && !loadingLibraries ? (
+                          <div className="p-6 bg-gradient-to-r from-warning-50 to-orange-50 dark:from-warning-900/20 dark:to-orange-900/20 border border-warning-200 dark:border-warning-800 rounded-xl">
+                            <div className="flex items-start space-x-4">
+                              <div className="flex-shrink-0">
+                                <div className="w-10 h-10 bg-warning-100 dark:bg-warning-900/50 rounded-full flex items-center justify-center">
+                                  <svg className="w-5 h-5 text-warning-600 dark:text-warning-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div className="flex-1">
+                                <h4 className="text-lg font-semibold text-warning-800 dark:text-warning-200 mb-2">
+                                  {t('bookModal.noLibraries.title', { default: 'No Libraries Available' })}
+                                </h4>
+                                <p className="text-warning-700 dark:text-warning-300 mb-4">
+                                  {t('bookModal.noLibraries.message', { 
+                                    default: 'You need to create at least one library before adding books. Please go to the Libraries page to create a library first.' 
+                                  })}
+                                </p>
+                                <div className="flex items-center space-x-2 text-sm text-warning-600 dark:text-warning-400">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span>You can still create the book title and assign it to a library later.</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-5">
+                            {/* Library Selection */}
+                            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                                {t('bookModal.fields.library', { default: 'Library *' })}
+                              </label>
+                              <select
+                                {...register('libraryId')}
+                                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                                disabled={libraries.length === 0}
+                              >
+                                <option value="">
+                                  {loadingLibraries 
+                                    ? t('bookModal.placeholders.loadingLibraries', { default: 'Loading libraries...' })
+                                    : t('bookModal.placeholders.selectLibrary', { default: 'Select a library' })
+                                  }
+                                </option>
+                                {libraries.map((library) => (
+                                  <option key={library._id} value={library._id}>
+                                    {library.name} ({library.code})
+                                  </option>
+                                ))}
+                              </select>
+                              {errors.libraryId && (
+                                <p className="mt-2 text-sm text-error-600 flex items-center">
+                                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                  {errors.libraryId.message}
+                                </p>
+                              )}
+                            </div>
+                            
+                            {/* Inventory Details - Full width layout */}
+                            {libraries.length > 0 && (
+                              <div className="space-y-4">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                                    <Input
+                                      label={t('bookModal.fields.totalCopies', { default: 'Total Copies *' })}
+                                      type="number"
+                                      {...register('totalCopies', { valueAsNumber: true })}
+                                      error={errors.totalCopies?.message}
+                                      placeholder={t('bookModal.placeholders.totalCopies', { default: 'Enter number of copies' })}
+                                      help={t('bookModal.help.totalCopies', { default: 'Number of physical copies to add to the library' })}
+                                    />
+                                  </div>
+                                  
+                                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                                    <Input
+                                      label={t('bookModal.fields.shelfLocation', { default: 'Shelf Location' })}
+                                      {...register('shelfLocation')}
+                                      error={errors.shelfLocation?.message}
+                                      placeholder={t('bookModal.placeholders.shelfLocation', { default: 'Enter shelf location (optional)' })}
+                                      help={t('bookModal.help.shelfLocation', { default: 'e.g., Aisle 2, Rack 4' })}
+                                    />
+                                  </div>
+                                  
+                                  <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+                                    <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                                      {t('bookModal.fields.notes', { default: 'Notes' })}
+                                    </label>
+                                    <textarea
+                                      {...register('notes')}
+                                      rows={3}
+                                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none transition-colors"
+                                      placeholder={t('bookModal.placeholders.notes', { default: 'Enter any additional notes (optional)' })}
+                                    />
+                                    {errors.notes && (
+                                      <p className="mt-2 text-sm text-error-600 flex items-center">
+                                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                        </svg>
+                                        {errors.notes.message}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {/* Description */}
                     <div>

@@ -97,12 +97,7 @@ export default function BooksPage() {
     }
   };
 
-  const filteredTitles = titles.filter(title => {
-    const matchesSearch = title.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         title.authors.some(author => author.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesSearch;
-  });
-
+  // Define helper functions before they're used
   const getInventoriesForTitle = (titleId: string) => {
     const titleInventories = inventories.filter(inv => {
       // Handle both string and populated object cases
@@ -114,6 +109,16 @@ export default function BooksPage() {
     console.log('Found inventories:', titleInventories);
     return titleInventories;
   };
+
+  const filteredTitles = titles.filter(title => {
+    const matchesSearch = title.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         title.authors.some(author => author.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Only show titles that have inventories in accessible libraries
+    const hasInventories = getInventoriesForTitle(title._id).length > 0;
+    
+    return matchesSearch && hasInventories;
+  });
 
   const getTotalCopies = (titleId: string) => {
     const titleInventories = getInventoriesForTitle(titleId);

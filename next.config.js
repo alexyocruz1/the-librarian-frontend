@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'images.unsplash.com', 'via.placeholder.com'],
+    domains: ['localhost', 'images.unsplash.com', 'via.placeholder.com', 'example.com'],
   },
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',

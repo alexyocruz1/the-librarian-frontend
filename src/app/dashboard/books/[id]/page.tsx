@@ -48,6 +48,8 @@ export default function BookDetailPage() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
   const [copyToDelete, setCopyToDelete] = useState<{ id: string; barcode: string } | null>(null);
+  const [showDeleteBookModal, setShowDeleteBookModal] = useState(false);
+  const [deletingBook, setDeletingBook] = useState(false);
   const [selectedCopy, setSelectedCopy] = useState<Copy | null>(null);
   const [editingCopy, setEditingCopy] = useState<Copy | null>(null);
   const [userLibraryId, setUserLibraryId] = useState<string>('');
@@ -559,6 +561,31 @@ export default function BookDetailPage() {
     fetchBookDetails();
   };
 
+  const handleDeleteBook = () => {
+    setShowDeleteBookModal(true);
+  };
+
+  const handleDeleteBookModalClose = () => {
+    setShowDeleteBookModal(false);
+  };
+
+  const confirmDeleteBook = async () => {
+    if (!title) return;
+    
+    setDeletingBook(true);
+    try {
+      await api.delete(`/titles/${title._id}`);
+      toast.success(t('bookDetail.actions.deleteBookSuccess'));
+      router.push('/dashboard/books');
+    } catch (error: any) {
+      console.error('Error deleting book:', error);
+      toast.error(t('bookDetail.actions.deleteBookError'));
+    } finally {
+      setDeletingBook(false);
+      setShowDeleteBookModal(false);
+    }
+  };
+
   // Helper functions to calculate totals from local copies state (reactive to changes)
   const getTotalCopies = () => {
     return copies.length;
@@ -701,12 +728,22 @@ export default function BookDetailPage() {
           )}
         </div>
         {canManage && (
-          <Button
-            leftIcon={<PencilIcon className="w-5 h-5" />}
-            onClick={handleEditBook}
-          >
-            {t('bookDetail.actions.editBook')}
-          </Button>
+          <>
+            <Button
+              leftIcon={<PencilIcon className="w-5 h-5" />}
+              onClick={handleEditBook}
+            >
+              {t('bookDetail.actions.editBook')}
+            </Button>
+            <Button
+              variant="outline"
+              leftIcon={<TrashIcon className="w-5 h-5" />}
+              onClick={handleDeleteBook}
+              className="text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+            >
+              {t('bookDetail.actions.deleteBook')}
+            </Button>
+          </>
         )}
       </div>
 
@@ -1326,6 +1363,72 @@ export default function BookDetailPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Delete Book Confirmation Modal */}
+      {title && showDeleteBookModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          onClick={handleDeleteBookModalClose}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-strong max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 dark:bg-red-900 rounded-full">
+              <TrashIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+            </div>
+            
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 text-center mb-2">
+              {t('bookDetail.actions.deleteBookConfirm.title')}
+            </h3>
+            
+            <p className="text-gray-600 dark:text-gray-400 text-center mb-6">
+              {t('bookDetail.actions.deleteBookConfirm.message', { title: title.title })}
+            </p>
+            
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+              <div className="flex items-start">
+                <XCircleIcon className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+                <div className="text-sm text-red-800 dark:text-red-200">
+                  <p className="font-medium mb-1">{t('bookDetail.actions.deleteBookConfirm.warning.title')}</p>
+                  <ul className="list-disc list-inside space-y-1 text-xs">
+                    <li>{t('bookDetail.actions.deleteBookConfirm.warning.copies')}</li>
+                    <li>{t('bookDetail.actions.deleteBookConfirm.warning.inventories')}</li>
+                    <li>{t('bookDetail.actions.deleteBookConfirm.warning.borrowRecords')}</li>
+                    <li>{t('bookDetail.actions.deleteBookConfirm.warning.irreversible')}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                onClick={handleDeleteBookModalClose}
+                className="flex-1"
+                disabled={deletingBook}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                variant="error"
+                onClick={confirmDeleteBook}
+                loading={deletingBook}
+                className="flex-1"
+                leftIcon={<TrashIcon className="w-4 h-4" />}
+              >
+                {t('bookDetail.actions.deleteBookConfirm.confirm')}
+              </Button>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
     </div>
   );
