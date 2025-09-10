@@ -398,7 +398,7 @@ export default function BookDetailPage() {
             <div><strong>${title?.title || 'Unknown Book'}</strong></div>
             <div>${title?.authors?.join(', ') || 'Unknown Author'}</div>
             <div>Copy ID: ${copy._id}</div>
-            <div>Status: ${copy.status}</div>
+            <div>Status: ${t(`copyModal.status.${copy.status}`)}</div>
           </div>
         </div>
       </div>
@@ -941,19 +941,29 @@ export default function BookDetailPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge variant={copy.status === 'available' ? 'success' : 'warning'}>
-                          {copy.status}
+                          {t(`copyModal.status.${copy.status}`)}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge variant="secondary">
-                          {copy.condition}
+                          {t(`copyModal.condition.${copy.condition}`)}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {copy.shelfLocation || 'Not specified'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {copy.acquiredAt ? new Date(copy.acquiredAt).toLocaleDateString() : 'Not specified'}
+                        {copy.acquiredAt ? (() => {
+                          // Extract date parts from ISO string to avoid timezone conversion
+                          const isoString = copy.acquiredAt;
+                          if (isoString.includes('T')) {
+                            // If it's an ISO string, extract just the date part
+                            return isoString.split('T')[0];
+                          } else {
+                            // If it's already a date string, use it as-is
+                            return isoString;
+                          }
+                        })() : 'Not specified'}
                       </td>
                       {canManage && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

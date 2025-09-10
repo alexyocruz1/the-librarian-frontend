@@ -17,10 +17,20 @@ import toast from 'react-hot-toast';
 
 const createCopySchema = (t: (key: string) => string) => z.object({
   libraryId: z.string().min(1, t('copyModal.validation.libraryRequired')),
+  barcode: z.string().optional(),
   status: z.enum(['available', 'borrowed', 'reserved', 'lost', 'maintenance']),
   condition: z.enum(['new', 'good', 'used', 'worn', 'damaged']),
   shelfLocation: z.string().optional(),
   acquiredAt: z.string().min(1, t('copyModal.validation.acquiredAtRequired')),
+});
+
+const updateCopySchema = (t: (key: string) => string) => z.object({
+  libraryId: z.string().optional(), // Make libraryId optional for updates since it's not sent to backend
+  barcode: z.string().optional(),
+  status: z.enum(['available', 'borrowed', 'reserved', 'lost', 'maintenance']),
+  condition: z.enum(['new', 'good', 'used', 'worn', 'damaged']),
+  shelfLocation: z.string().optional(),
+  acquiredAt: z.string().min(1, t('copyModal.validation.acquiredAtRequired')), // Make acquiredAt required for updates
 });
 
 type CopyFormData = z.infer<ReturnType<typeof createCopySchema>>;
@@ -77,13 +87,14 @@ export default function CopyModal({
     setValue,
     watch
   } = useForm<CopyFormData>({
-    resolver: zodResolver(createCopySchema(t)),
+    resolver: zodResolver(mode === 'create' ? createCopySchema(t) : updateCopySchema(t)),
     defaultValues: {
       libraryId: libraryId,
+      barcode: '',
       status: 'available',
       condition: 'good',
       shelfLocation: '',
-      acquiredAt: new Date().toISOString().split('T')[0],
+      acquiredAt: '',
     }
   });
 
@@ -92,14 +103,29 @@ export default function CopyModal({
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && copy) {
-        setValue('libraryId', copy.libraryId);
+        // Handle libraryId - it might be an object (populated) or string
+        const libraryIdValue = typeof copy.libraryId === 'string' 
+          ? copy.libraryId 
+          : (copy.libraryId as any)?._id || (copy.libraryId as any)?.id || copy.libraryId;
+        setValue('libraryId', libraryIdValue);
+        setValue('barcode', copy.barcode || '');
         setValue('status', copy.status);
         setValue('condition', copy.condition);
         setValue('shelfLocation', copy.shelfLocation || '');
-        setValue('acquiredAt', copy.acquiredAt ? new Date(copy.acquiredAt).toISOString().split('T')[0] : '');
+        const acquiredAtValue = copy.acquiredAt ? (() => {
+          // Extract date without timezone conversion
+          const isoString = copy.acquiredAt;
+          if (isoString.includes('T')) {
+            return isoString.split('T')[0];
+          } else {
+            return isoString;
+          }
+        })() : '';
+        setValue('acquiredAt', acquiredAtValue);
       } else {
         reset({
           libraryId: libraryId,
+          barcode: '',
           status: 'available',
           condition: 'good',
           shelfLocation: '',
@@ -128,20 +154,28 @@ export default function CopyModal({
         currentInventoryId = inventoryResponse.data.inventory._id;
       }
 
-      const copyData = {
-        ...data,
-        inventoryId: currentInventoryId,
-        titleId,
-        libraryId: data.libraryId,
-        acquiredAt: new Date(data.acquiredAt),
-        shelfLocation: data.shelfLocation || inventoryShelfLocation || undefined,
-      };
-
       if (mode === 'create') {
+        const copyData = {
+          ...data,
+          inventoryId: currentInventoryId,
+          titleId,
+          libraryId: data.libraryId,
+          barcode: data.barcode || undefined,
+          acquiredAt: new Date(data.acquiredAt),
+          shelfLocation: data.shelfLocation || inventoryShelfLocation || undefined,
+        };
         await api.post('/copies', copyData);
         toast.success(getSuccessMessage('copy_created'));
       } else {
-        await api.put(`/copies/${copy?._id}`, copyData);
+        // For updates, only send the fields that are allowed to be updated
+        const updateData = {
+          barcode: data.barcode || undefined,
+          status: data.status,
+          condition: data.condition,
+          shelfLocation: data.shelfLocation || inventoryShelfLocation || undefined,
+          acquiredAt: data.acquiredAt || undefined,
+        };
+        await api.put(`/copies/${copy?._id}`, updateData);
         toast.success(getSuccessMessage('copy_updated'));
       }
 
@@ -211,6 +245,15 @@ export default function CopyModal({
                         )}
                       </div>
                     )}
+
+                    {/* Barcode Field */}
+                    <Input
+                      label={t('copyModal.fields.barcode')}
+                      {...register('barcode')}
+                      error={errors.barcode?.message}
+                      placeholder={t('copyModal.placeholders.barcode')}
+                      help={t('copyModal.help.barcode')}
+                    />
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
