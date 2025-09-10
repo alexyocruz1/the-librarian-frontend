@@ -80,9 +80,17 @@ export default function ImportExportPage() {
         },
       });
 
-      const results = response.data?.data;
+      const results = response.data;
+      
       if (results) {
-        const message = `Import completed: ${results.copiesCreated} copies created, ${results.titlesCreated} titles created`;
+        const totalTitlesCreated = results.titlesCreated || 0;
+        const totalCopiesCreated = results.copiesCreated || 0;
+        
+        let message = `Import completed: ${totalCopiesCreated} copies created`;
+        if (totalTitlesCreated > 0) {
+          message += `, ${totalTitlesCreated} titles created`;
+        }
+        
         toast.success(message);
         
         // Show errors if any (as warnings, not errors)
