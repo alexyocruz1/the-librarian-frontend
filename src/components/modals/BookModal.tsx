@@ -220,9 +220,11 @@ export default function BookModal({ isOpen, onClose, onSuccess, book, mode }: Bo
 
       // If creating but no libraries available, just create the title without inventory
       if (mode === 'create' && libraries.length === 0) {
-        toast.warning(t('bookModal.noLibraries.warning', { 
+        toast(t('bookModal.noLibraries.warning', { 
           default: 'Book created but not assigned to any library. Please create a library first and then assign this book to it.' 
-        }));
+        }), {
+          icon: '⚠️'
+        });
       }
 
       const bookData = {
