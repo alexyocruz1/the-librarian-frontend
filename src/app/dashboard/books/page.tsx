@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import BookImage from '@/components/ui/BookImage';
 import { PlusIcon, MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -338,22 +338,15 @@ export default function BooksPage() {
                   <CardBody className="p-0">
                     <div className="flex flex-col h-full">
                       {/* Book Cover */}
-                      <div className="relative h-48 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 overflow-hidden">
-                        {title.coverUrl ? (
-                          <Image
-                            src={title.coverUrl}
-                            alt={title.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center h-full">
-                            <div className="text-center">
-                              <div className="text-6xl mb-2">📚</div>
-                              <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">No Cover</p>
-                            </div>
-                          </div>
-                        )}
+                      <div className="relative h-48 overflow-hidden">
+                        <BookImage
+                          src={title.coverUrl}
+                          alt={title.title}
+                          width={300}
+                          height={192}
+                          className="h-48 w-full group-hover:scale-105 transition-transform duration-300"
+                          fallbackText="No Cover"
+                        />
                         
                         {/* Availability Badge */}
                         <div className="absolute top-3 right-3">
@@ -436,7 +429,7 @@ export default function BooksPage() {
                                 availabilityRate >= 50 ? 'bg-green-500' : 
                                 availabilityRate >= 25 ? 'bg-yellow-500' : 'bg-red-500'
                               }`}
-                              style={{ width: `${availabilityRate}%` }}
+                              style={{ width: `${availabilityRate}%` }} // eslint-disable-line
                             />
                           </div>
                         </div>
@@ -490,23 +483,14 @@ export default function BooksPage() {
                     <div className="flex items-start space-x-4">
                       {/* Book Cover Thumbnail */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-20 bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg overflow-hidden shadow-sm relative">
-                          {title.coverUrl ? (
-                            <Image
-                              src={title.coverUrl}
-                              alt={title.title}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center h-full">
-                              <div className="text-center">
-                                <div className="text-2xl mb-1">📚</div>
-                                <div className="text-xs text-primary-600 dark:text-primary-400 font-medium">No Cover</div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        <BookImage
+                          src={title.coverUrl}
+                          alt={title.title}
+                          width={64}
+                          height={80}
+                          className="w-16 h-20 shadow-sm"
+                          fallbackText="No Cover"
+                        />
                       </div>
 
                       {/* Book Details */}
@@ -579,7 +563,7 @@ export default function BooksPage() {
                                     availabilityRate >= 50 ? 'bg-green-500' : 
                                     availabilityRate >= 25 ? 'bg-yellow-500' : 'bg-red-500'
                                   }`}
-                                  style={{ width: `${availabilityRate}%` }}
+                                  style={{ width: `${availabilityRate}%` }} // eslint-disable-line
                                 />
                               </div>
                             </div>

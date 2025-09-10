@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import BookImage from '@/components/ui/BookImage';
 import { 
   ArrowLeftIcon, 
   PencilIcon, 
@@ -887,21 +887,14 @@ export default function BookDetailPage() {
         <div className="space-y-6">
           <Card>
             <CardBody className="p-4">
-              <div className="aspect-[3/4] bg-gray-100 rounded-lg flex items-center justify-center relative">
-                {title.coverUrl ? (
-                  <Image
-                    src={title.coverUrl}
-                    alt={title.title}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="text-gray-400 text-center">
-                    <div className="text-6xl mb-2">📚</div>
-                    <div className="text-sm">{t('bookDetail.cover.notAvailable')}</div>
-                  </div>
-                )}
-              </div>
+              <BookImage
+                src={title.coverUrl}
+                alt={title.title}
+                width={300}
+                height={400}
+                className="aspect-[3/4] w-full"
+                fallbackText={t('bookDetail.cover.notAvailable')}
+              />
             </CardBody>
           </Card>
 
