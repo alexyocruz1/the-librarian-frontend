@@ -83,7 +83,7 @@ export default function BookDetailPage() {
       // Fetch related data, tolerate partial failures
       const results = await Promise.allSettled([
         api.get(`/inventories?titleId=${bookId}`),
-        api.get(`/copies?titleId=${bookId}`)
+        api.get(`/copies?titleId=${bookId}&limit=1000`) // Get all copies for this title
       ]);
 
       const invRes = results[0];
