@@ -143,7 +143,7 @@ export default function UsersPage() {
     }
   };
 
-  const canManage = currentUser?.role === 'admin' || currentUser?.role === 'superadmin';
+  const canManage = currentUser?.role === 'superadmin';
   const isSuperAdmin = currentUser?.role === 'superadmin';
 
   if (loading) {
@@ -180,7 +180,7 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('users.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">{t('users.subtitle')}</p>
         </div>
-        {canManage && (
+        {isSuperAdmin && (
           <Button
             leftIcon={<PlusIcon className="w-5 h-5" />}
             onClick={handleAddUser}
@@ -299,7 +299,7 @@ export default function UsersPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                       {t('users.table.joined')}
                     </th>
-                    {canManage && (
+                    {isSuperAdmin && (
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {t('users.table.actions')}
                       </th>
@@ -352,7 +352,7 @@ export default function UsersPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
-                      {canManage && (
+                      {isSuperAdmin && (
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
                             {user.status === 'pending' && (

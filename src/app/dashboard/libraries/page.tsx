@@ -186,7 +186,7 @@ export default function LibrariesPage() {
   console.log('Search term:', searchTerm);
   console.log('Filtered libraries:', filteredLibraries);
 
-  const canManage = user?.role === 'admin' || user?.role === 'superadmin';
+  const canManage = user?.role === 'superadmin';
 
   if (loading) {
     return (

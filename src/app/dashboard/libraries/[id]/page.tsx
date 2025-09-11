@@ -88,7 +88,7 @@ export default function LibraryDetailPage() {
     fetchLibraryDetails();
   };
 
-  const canManage = user?.role === 'admin' || user?.role === 'superadmin';
+  const canManage = user?.role === 'superadmin';
 
   if (loading) {
     return (

@@ -61,9 +61,9 @@ const navigation: NavItem[] = [
     icon: UsersIcon,
     roles: ['admin', 'superadmin'],
     children: [
-      { name: 'dashboard.menu.allUsers', href: '/dashboard/users', icon: UsersIcon },
+      { name: 'dashboard.menu.allUsers', href: '/dashboard/users', icon: UsersIcon, roles: ['superadmin'] },
       { name: 'dashboard.menu.pendingStudents', href: '/dashboard/users/pending', icon: ClipboardDocumentListIcon },
-      { name: 'dashboard.menu.pendingAdmins', href: '/dashboard/users/pending-admins', icon: ClipboardDocumentListIcon },
+      { name: 'dashboard.menu.pendingAdmins', href: '/dashboard/users/pending-admins', icon: ClipboardDocumentListIcon, roles: ['superadmin'] },
     ],
   },
   {
