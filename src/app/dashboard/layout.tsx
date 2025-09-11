@@ -299,14 +299,6 @@ export default function DashboardLayout({
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user?.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
                 </div>
-                <div className="relative">
-                  <button 
-                    className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                    aria-label="User profile menu"
-                  >
-                    <UserCircleIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                  </button>
-                </div>
                 <Button
                   variant="ghost"
                   size="sm"
