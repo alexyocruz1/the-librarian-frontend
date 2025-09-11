@@ -107,7 +107,8 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
   const fetchLibraries = async () => {
     try {
       const response = await api.get('/libraries');
-      setLibraries(response.data.data || []);
+      // ApiResponse shape: { success, data: { libraries }, pagination }
+      setLibraries((response.data && (response.data as any).libraries) || []);
     } catch (error) {
       console.error('Error fetching libraries:', error);
       toast.error(getErrorMessage(error));

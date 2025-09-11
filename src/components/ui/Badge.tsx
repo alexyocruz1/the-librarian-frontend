@@ -70,12 +70,12 @@ Badge.displayName = 'Badge';
 
 // Status Badge Component
 export interface StatusBadgeProps extends Omit<BadgeProps, 'variant'> {
-  status: string;
+  status?: string;
 }
 
 const StatusBadge = React.forwardRef<HTMLSpanElement, StatusBadgeProps>(
   ({ status, className, ...props }, ref) => {
-    const getStatusVariant = (status: string): VariantProps<typeof badgeVariants>['variant'] => {
+    const getStatusVariant = (s: string): VariantProps<typeof badgeVariants>['variant'] => {
       const statusMap: Record<string, VariantProps<typeof badgeVariants>['variant']> = {
         // User statuses
         active: 'success',
@@ -108,17 +108,17 @@ const StatusBadge = React.forwardRef<HTMLSpanElement, StatusBadgeProps>(
         guest: 'secondary',
       };
       
-      return statusMap[status] || 'secondary';
+      return statusMap[s] || 'secondary';
     };
 
     return (
       <Badge
         ref={ref}
-        variant={getStatusVariant(status)}
+        variant={getStatusVariant((status || 'unknown').toLowerCase())}
         className={className}
         {...props}
       >
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {(status || 'Unknown').charAt(0).toUpperCase() + (status || 'Unknown').slice(1)}
       </Badge>
     );
   }
