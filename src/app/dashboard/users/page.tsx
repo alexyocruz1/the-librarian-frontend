@@ -45,7 +45,8 @@ export default function UsersPage() {
   const fetchUsers = async () => {
     try {
       const response = await api.get('/users');
-      setUsers(response.data.data || []);
+      // API client returns ApiResponse: { success, data: { users }, pagination }
+      setUsers((response.data?.users) || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error(getErrorMessage(error));
@@ -56,7 +57,7 @@ export default function UsersPage() {
 
   const handleApproveUser = async (userId: string) => {
     try {
-      await api.put(`/users/${userId}/approve`);
+      await api.approveStudent(userId);
       toast.success(getSuccessMessage('user_approved'));
       fetchUsers();
     } catch (error: any) {
@@ -69,7 +70,7 @@ export default function UsersPage() {
     if (!confirm(t('users.confirm.reject'))) return;
 
     try {
-      await api.put(`/users/${userId}/reject`);
+      await api.rejectStudent(userId);
       toast.success(getSuccessMessage('user_rejected'));
       fetchUsers();
     } catch (error: any) {
@@ -111,6 +112,8 @@ export default function UsersPage() {
   };
 
   const filteredUsers = users.filter(user => {
+    // Hide current user from list
+    if (currentUser?.id && user._id === currentUser.id) return false;
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (user.studentId && user.studentId.toLowerCase().includes(searchTerm.toLowerCase()));

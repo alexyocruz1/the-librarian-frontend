@@ -129,7 +129,7 @@ export default function PendingStudentsPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{t('pendingStudents.title')}</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">{t('pendingStudents.subtitle')}</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">Pending student and admin registrations awaiting approval</p>
       </div>
 
       {/* Stats */}
@@ -191,8 +191,8 @@ export default function PendingStudentsPage() {
           {pendingUsers.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">✅</div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{t('pendingStudents.empty.title')}</h3>
-              <p className="text-gray-600 dark:text-gray-400">{t('pendingStudents.empty.description')}</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No pending approvals</h3>
+              <p className="text-gray-600 dark:text-gray-400">New student or admin registrations awaiting your review will appear here.</p>
             </div>
           ) : (
             <div className="space-y-4">

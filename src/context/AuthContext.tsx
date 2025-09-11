@@ -129,20 +129,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await apiClient.register(data);
       
       if (response.success && response.data) {
-        // Store token in localStorage
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('accessToken', response.data.accessToken);
+        const token = (response.data as any).accessToken as string | undefined;
+        const user = response.data.user as AuthUser;
+
+        if (token && user.status === 'active') {
+          // Only auto-login when user is active (guests)
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('accessToken', token);
+          }
+          setAuthState({
+            user,
+            accessToken: token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+          toast.success(getSuccessMessage('register'));
+          return true;
         }
-        
-        setAuthState({
-          user: response.data.user,
-          accessToken: response.data.accessToken,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-        
-        toast.success(getSuccessMessage('register'));
-        return true;
+
+        // For pending students: don't authenticate; show info
+        setAuthState(prev => ({ ...prev, isLoading: false }));
+        toast.success('Account created. Please wait for admin approval.');
+        return false;
       } else {
         setAuthState(prev => ({ ...prev, isLoading: false }));
         toast.error(getErrorMessage({ response: { data: { error: response.error } } }));

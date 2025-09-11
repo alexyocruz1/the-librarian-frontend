@@ -65,7 +65,11 @@ export default function RegisterPage() {
       const { confirmPassword, ...registerData } = data;
       const success = await registerUser(registerData);
       if (success) {
+        // Guest: logged in → go to dashboard
         router.push('/dashboard');
+      } else {
+        // Student pending: go to login with info banner
+        router.push('/auth/login');
       }
     } catch (error) {
       console.error('Registration error:', error);

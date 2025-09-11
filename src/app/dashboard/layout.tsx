@@ -63,6 +63,7 @@ const navigation: NavItem[] = [
     children: [
       { name: 'dashboard.menu.allUsers', href: '/dashboard/users', icon: UsersIcon },
       { name: 'dashboard.menu.pendingStudents', href: '/dashboard/users/pending', icon: ClipboardDocumentListIcon },
+      { name: 'dashboard.menu.pendingAdmins', href: '/dashboard/users/pending-admins', icon: ClipboardDocumentListIcon },
     ],
   },
   {

@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import { User, UserRole, UserStatus } from '@/types';
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
+import { useI18n } from '@/context/I18nContext';
 
 const userSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -55,6 +56,7 @@ const statusOptions: { value: UserStatus; label: string }[] = [
 export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: UserModalProps) {
   const [loading, setLoading] = useState(false);
   const [libraries, setLibraries] = useState<any[]>([]);
+  const { t } = useI18n();
 
   const {
     register,
@@ -70,7 +72,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
       email: '',
       password: '',
       role: 'guest',
-      status: 'active',
+      status: 'pending',
       studentId: '',
       libraries: [],
       profile: {
@@ -164,8 +166,8 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
             >
               <Card className="border-0 shadow-none">
                 <CardHeader
-                  title={mode === 'create' ? 'Add New User' : 'Edit User'}
-                  subtitle={mode === 'create' ? 'Create a new user account' : 'Update user information'}
+                  title={mode === 'create' ? t('userModal.title.create') : t('userModal.title.edit')}
+                  subtitle={mode === 'create' ? t('userModal.subtitle.create') : t('userModal.subtitle.edit')}
                   action={
                     <Button
                       variant="ghost"
@@ -181,33 +183,33 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Basic Information */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Basic Information</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{t('userModal.sections.basic')}</h3>
                         
                         <Input
-                          label="Full Name *"
+                          label={t('userModal.fields.name')}
                           {...register('name')}
                           error={errors.name?.message}
-                          placeholder="Enter full name"
+                          placeholder={t('userModal.placeholders.name')}
                           autoComplete="name"
                           name="name"
                         />
                         
                         <Input
-                          label="Email Address *"
+                          label={t('userModal.fields.email')}
                           type="email"
                           {...register('email')}
                           error={errors.email?.message}
-                          placeholder="Enter email address"
+                          placeholder={t('userModal.placeholders.email')}
                           autoComplete="email"
                           name="email"
                         />
                         
                         <Input
-                          label={mode === 'create' ? 'Password *' : 'New Password (leave blank to keep current)'}
+                          label={mode === 'create' ? t('userModal.fields.password') : t('userModal.fields.newPassword')}
                           type="password"
                           {...register('password')}
                           error={errors.password?.message}
-                          placeholder="Enter password"
+                          placeholder={t('userModal.placeholders.password')}
                           autoComplete={mode === 'create' ? 'new-password' : 'new-password'}
                           name="password"
                         />
@@ -215,11 +217,11 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
 
                       {/* Role and Status */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Role & Status</h3>
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">{t('userModal.sections.roleStatus')}</h3>
                         
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Role *
+                            {t('userModal.fields.role')}
                           </label>
                           <select
                             {...register('role')}
@@ -227,7 +229,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                           >
                             {roleOptions.map((option) => (
                               <option key={option.value} value={option.value}>
-                                {option.label}
+                                {t(`users.roles.${option.value}`)}
                               </option>
                             ))}
                           </select>
@@ -238,7 +240,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            Status *
+                            {t('userModal.fields.status')}
                           </label>
                           <select
                             {...register('status')}
@@ -246,7 +248,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                           >
                             {statusOptions.map((option) => (
                               <option key={option.value} value={option.value}>
-                                {option.label}
+                                {t(`users.status.${option.value}`)}
                               </option>
                             ))}
                           </select>
@@ -257,10 +259,10 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
 
                         {selectedRole === 'student' && (
                           <Input
-                            label="Student ID"
+                            label={t('userModal.fields.studentId')}
                             {...register('studentId')}
                             error={errors.studentId?.message}
-                            placeholder="Enter student ID"
+                            placeholder={t('userModal.placeholders.studentId')}
                           />
                         )}
                       </div>
@@ -270,7 +272,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                     {selectedRole === 'admin' && libraries.length > 0 && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Assigned Libraries
+                          {t('userModal.fields.assignedLibraries')}
                         </label>
                         <div className="space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-lg p-3">
                           {libraries.map((library) => (
@@ -292,32 +294,32 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
 
                     {/* Profile Information */}
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Profile Information</h3>
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{t('userModal.sections.profile')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
-                          label="Department"
+                          label={t('userModal.fields.department')}
                           {...register('profile.department')}
                           error={errors.profile?.department?.message}
-                          placeholder="Enter department"
+                          placeholder={t('userModal.placeholders.department')}
                         />
                         
                         <Input
-                          label="Phone Number"
+                          label={t('userModal.fields.phone')}
                           {...register('profile.phone')}
                           error={errors.profile?.phone?.message}
-                          placeholder="Enter phone number"
+                          placeholder={t('userModal.placeholders.phone')}
                         />
                       </div>
                       
                       <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Address
+                          {t('userModal.fields.address')}
                         </label>
                         <textarea
                           {...register('profile.address')}
                           rows={3}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
-                          placeholder="Enter address"
+                          placeholder={t('userModal.placeholders.address')}
                         />
                         {errors.profile?.address && (
                           <p className="mt-1 text-sm text-error-600">{errors.profile.address.message}</p>
@@ -333,13 +335,13 @@ export default function UserModal({ isOpen, onClose, onSuccess, user, mode }: Us
                         onClick={onClose}
                         disabled={loading}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </Button>
                       <Button
                         type="submit"
                         loading={loading}
                       >
-                        {mode === 'create' ? 'Create User' : 'Update User'}
+                        {mode === 'create' ? t('userModal.actions.create') : t('userModal.actions.update')}
                       </Button>
                     </div>
                   </form>
