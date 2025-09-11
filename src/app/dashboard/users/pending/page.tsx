@@ -30,7 +30,9 @@ export default function PendingStudentsPage() {
   const fetchPendingUsers = useCallback(async () => {
     try {
       const response = await api.get('/users/pending');
-      setPendingUsers(response.data.data || []);
+      // Filter to show only students, not admins
+      const allPending = response.data.students || [];
+      setPendingUsers(allPending.filter((user: User) => user.role === 'student'));
     } catch (error) {
       console.error('Error fetching pending users:', error);
       toast.error(t('pendingStudents.toast.fetchError'));
@@ -246,19 +248,20 @@ export default function PendingStudentsPage() {
 
                     <div className="flex items-center gap-3">
                       <Button
-                        variant="outline"
                         size="sm"
+                        variant="ghost"
                         onClick={() => handleRejectUser(user._id)}
                         leftIcon={<XCircleIcon className="w-4 h-4" />}
-                        className="text-error-600 border-error-300 hover:bg-error-50"
+                        className="text-error-600 hover:text-error-700"
                       >
                         {t('users.actions.reject')}
                       </Button>
                       <Button
                         size="sm"
+                        variant="ghost"
                         onClick={() => handleApproveUser(user._id)}
                         leftIcon={<CheckCircleIcon className="w-4 h-4" />}
-                        className="bg-success-600 hover:bg-success-700"
+                        className="text-success-600 hover:text-success-700"
                       >
                         {t('users.actions.approve')}
                       </Button>
