@@ -37,9 +37,11 @@ export default function LibrariesPage() {
   const { user } = useAuth();
   const { t } = useI18n();
   const [libraries, setLibraries] = useState<Library[]>([]);
+  const [statsByLibrary, setStatsByLibrary] = useState<Record<string, { adminCount: number; titleCount: number; copyCount: number }>>({});
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<{ hasAdmins?: '' | 'yes' | 'no'; withTitles?: '' | 'yes' | 'no'; withCopies?: '' | 'yes' | 'no' }>({ hasAdmins: '', withTitles: '', withCopies: '' });
   const [showLibraryModal, setShowLibraryModal] = useState(false);
   const [editingLibrary, setEditingLibrary] = useState<Library | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -57,12 +59,40 @@ export default function LibrariesPage() {
       setLoading(true);
       const response = await api.get('/libraries');
       console.log('Libraries response:', response);
-      setLibraries(response.data.libraries || []);
+      const libs = (response.data && (response.data as any).libraries) || [];
+      setLibraries(libs);
+      // Fetch counts for admins and books per library
+      fetchLibraryStats(libs);
     } catch (error) {
       console.error('Error fetching libraries:', error);
       toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLibraryStats = async (libs: Library[]) => {
+    try {
+      const entries = await Promise.all(
+        libs.map(async (lib) => {
+          try {
+            const [adminsRes, inventoriesRes, copiesRes] = await Promise.all([
+              api.getLibraryAdmins(lib._id),
+              api.get('/inventories', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
+              api.get('/copies', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
+            ]);
+            const admins = (adminsRes.data && (adminsRes.data as any).admins) || [];
+            const titleTotal = (inventoriesRes.pagination && (inventoriesRes.pagination as any).total) || (inventoriesRes.data && (inventoriesRes.data as any).inventories ? (inventoriesRes.data as any).inventories.length : 0);
+            const copyTotal = (copiesRes.pagination && (copiesRes.pagination as any).total) || (copiesRes.data && (copiesRes.data as any).copies ? (copiesRes.data as any).copies.length : 0);
+            return [lib._id, { adminCount: admins.length, titleCount: titleTotal, copyCount: copyTotal }] as const;
+          } catch (e) {
+            return [lib._id, { adminCount: 0, titleCount: 0, copyCount: 0 }] as const;
+          }
+        })
+      );
+      setStatsByLibrary(Object.fromEntries(entries));
+    } catch (e) {
+      // ignore per-card failures
     }
   };
 
@@ -138,7 +168,17 @@ export default function LibrariesPage() {
                            library.location.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            library.location.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            library.location.country?.toLowerCase().includes(searchTerm.toLowerCase())));
-    return matchesSearch;
+    if (!matchesSearch) return false;
+
+    // Apply filters that depend on computed stats
+    const stats = statsByLibrary[library._id] || { adminCount: 0, titleCount: 0, copyCount: 0 };
+    if (filters.hasAdmins === 'yes' && stats.adminCount <= 0) return false;
+    if (filters.hasAdmins === 'no' && stats.adminCount > 0) return false;
+    if (filters.withTitles === 'yes' && stats.titleCount <= 0) return false;
+    if (filters.withTitles === 'no' && stats.titleCount > 0) return false;
+    if (filters.withCopies === 'yes' && stats.copyCount <= 0) return false;
+    if (filters.withCopies === 'no' && stats.copyCount > 0) return false;
+    return true;
   });
 
   // Debug logging
@@ -249,6 +289,72 @@ export default function LibrariesPage() {
               </Button>
             </div>
           </div>
+
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('libraries.filters.hasAdmins')}
+                  </label>
+                  <select
+                    value={filters.hasAdmins || ''}
+                    onChange={(e) => setFilters(prev => ({ ...prev, hasAdmins: (e.target.value as any) }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    aria-label={t('libraries.filters.hasAdmins')}
+                  >
+                    <option value="">{t('common.all') || 'All'}</option>
+                    <option value="yes">{t('common.yes') || 'Yes'}</option>
+                    <option value="no">{t('common.no') || 'No'}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('libraries.filters.withTitles')}
+                  </label>
+                  <select
+                    value={filters.withTitles || ''}
+                    onChange={(e) => setFilters(prev => ({ ...prev, withTitles: (e.target.value as any) }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    aria-label={t('libraries.filters.withTitles')}
+                  >
+                    <option value="">{t('common.all') || 'All'}</option>
+                    <option value="yes">{t('common.yes') || 'Yes'}</option>
+                    <option value="no">{t('common.no') || 'No'}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('libraries.filters.withCopies')}
+                  </label>
+                  <select
+                    value={filters.withCopies || ''}
+                    onChange={(e) => setFilters(prev => ({ ...prev, withCopies: (e.target.value as any) }))}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                    aria-label={t('libraries.filters.withCopies')}
+                  >
+                    <option value="">{t('common.all') || 'All'}</option>
+                    <option value="yes">{t('common.yes') || 'Yes'}</option>
+                    <option value="no">{t('common.no') || 'No'}</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFilters({ hasAdmins: '', withTitles: '', withCopies: '' })}
+                >
+                  {t('libraries.filters.clear')}
+                </Button>
+              </div>
+            </motion.div>
+          )}
         </CardBody>
       </Card>
 
@@ -360,23 +466,34 @@ export default function LibrariesPage() {
                   )}
 
                   {/* Stats - Enhanced Design */}
-                  <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100 dark:border-gray-700">
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <UsersIcon className="w-5 h-5 text-primary-600" />
-                        <span className="text-xl font-bold text-gray-900 dark:text-gray-100">0</span>
+                  <div className="grid grid-cols-3 gap-3 pt-6 border-t border-gray-100 dark:border-gray-700">
+                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <UsersIcon className="w-4 h-4 text-primary-600" />
+                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.adminCount ?? 0}</span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                         {t('libraries.stats.admins')}
                       </p>
                     </div>
-                    <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <BookOpenIcon className="w-5 h-5 text-success-600" />
-                        <span className="text-xl font-bold text-gray-900 dark:text-gray-100">0</span>
+                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <BookOpenIcon className="w-4 h-4 text-success-600" />
+                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.titleCount ?? 0}</span>
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                        {t('libraries.stats.books')}
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        {t('libraries.stats.titles')}
+                      </p>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <svg className="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.copyCount ?? 0}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                        {t('libraries.stats.copies')}
                       </p>
                     </div>
                   </div>
@@ -468,16 +585,25 @@ export default function LibrariesPage() {
                         <div className="text-center">
                           <div className="flex items-center gap-1">
                             <UsersIcon className="w-4 h-4 text-primary-600" />
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">0</span>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.adminCount ?? 0}</span>
                           </div>
                           <p className="text-xs text-gray-500">{t('libraries.stats.admins')}</p>
                         </div>
                         <div className="text-center">
                           <div className="flex items-center gap-1">
                             <BookOpenIcon className="w-4 h-4 text-success-600" />
-                            <span className="font-semibold text-gray-900 dark:text-gray-100">0</span>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.titleCount ?? 0}</span>
                           </div>
-                          <p className="text-xs text-gray-500">{t('libraries.stats.books')}</p>
+                          <p className="text-xs text-gray-500">{t('libraries.stats.titles')}</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.copyCount ?? 0}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">{t('libraries.stats.copies')}</p>
                         </div>
                       </div>
                       

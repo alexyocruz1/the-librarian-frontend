@@ -27,7 +27,7 @@ export default function PendingAdminsPage() {
   const fetchPendingAdmins = useCallback(async () => {
     try {
       const response = await api.get('/users/pending');
-      const all = (response.data.data || []) as User[];
+      const all = ((response.data && (response.data as any).students) || []) as User[];
       setPendingAdmins(all.filter(u => u.role === 'admin'));
     } catch (error) {
       console.error('Error fetching pending admins:', error);
@@ -164,21 +164,22 @@ export default function PendingAdminsPage() {
                     </div>
                     <div className="flex items-center gap-3">
                       <Button
-                        variant="outline"
                         size="sm"
-                        onClick={() => handleReject(u._id)}
-                        leftIcon={<XCircleIcon className="w-4 h-4" />}
-                        className="text-error-600 border-error-300 hover:bg-error-50"
+                        variant="ghost"
+                        onClick={() => handleApprove(u._id)}
+                        leftIcon={<CheckCircleIcon className="w-4 h-4" />}
+                        className="text-success-600 hover:text-success-700"
                       >
-                        {t('users.actions.reject')}
+                        {t('users.actions.approve')}
                       </Button>
                       <Button
                         size="sm"
-                        onClick={() => handleApprove(u._id)}
-                        leftIcon={<CheckCircleIcon className="w-4 h-4" />}
-                        className="bg-success-600 hover:bg-success-700"
+                        variant="ghost"
+                        onClick={() => handleReject(u._id)}
+                        leftIcon={<XCircleIcon className="w-4 h-4" />}
+                        className="text-error-600 hover:text-error-700"
                       >
-                        {t('users.actions.approve')}
+                        {t('users.actions.reject')}
                       </Button>
                     </div>
                   </div>
