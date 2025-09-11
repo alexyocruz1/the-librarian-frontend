@@ -50,10 +50,6 @@ export default function LibrariesPage() {
   const [showAssignAdminModal, setShowAssignAdminModal] = useState(false);
   const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(null);
 
-  useEffect(() => {
-    fetchLibraries();
-  }, []);
-
   const fetchLibraries = async () => {
     try {
       setLoading(true);
@@ -70,6 +66,10 @@ export default function LibrariesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLibraries();
+  }, [fetchLibraries]);
 
   const fetchLibraryStats = async (libs: Library[]) => {
     try {

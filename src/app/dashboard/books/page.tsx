@@ -21,10 +21,14 @@ import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useI18n } from '@/context/I18nContext';
+import { useLibrary } from '@/context/LibraryContext';
+import LibrarySelector from '@/components/LibrarySelector';
+import BorrowRequestModal from '@/components/modals/BorrowRequestModal';
 
 export default function BooksPage() {
   const { t } = useI18n();
   const { user } = useAuth();
+  const { selectedLibrary } = useLibrary();
   const router = useRouter();
   const [titles, setTitles] = useState<Title[]>([]);
   const [inventories, setInventories] = useState<Inventory[]>([]);
@@ -34,12 +38,13 @@ export default function BooksPage() {
   const [titlesError, setTitlesError] = useState<string | null>(null);
   const [inventoriesError, setInventoriesError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedLibrary, setSelectedLibrary] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
   const [showBookModal, setShowBookModal] = useState(false);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [editingBook, setEditingBook] = useState<Title | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showBorrowRequestModal, setShowBorrowRequestModal] = useState(false);
+  const [selectedTitle, setSelectedTitle] = useState<Title | null>(null);
   
   const {
     suggestions,
@@ -52,11 +57,6 @@ export default function BooksPage() {
     minQueryLength: 2,
     maxSuggestions: 8,
   });
-
-  useEffect(() => {
-    fetchTitles();
-    fetchInventories();
-  }, []);
 
   const fetchTitles = async () => {
     try {
@@ -79,7 +79,14 @@ export default function BooksPage() {
       setLoadingInventories(true);
       setInventoriesError(null);
       console.log('Fetching inventories...');
-      const response = await api.get('/inventories');
+      
+      // For students/guests, filter by selected library
+      let url = '/inventories';
+      if ((user?.role === 'student' || user?.role === 'guest') && selectedLibrary) {
+        url += `?libraryId=${selectedLibrary._id}`;
+      }
+      
+      const response = await api.get(url);
       console.log('Fetched inventories response:', response.data);
       // The API response structure is {inventories: Array(1)}, not {data: {inventories: Array(1)}}
       const inventoriesData = response.data.inventories || [];
@@ -96,6 +103,18 @@ export default function BooksPage() {
       setLoadingInventories(false);
     }
   };
+
+  useEffect(() => {
+    fetchTitles();
+    fetchInventories();
+  }, [fetchTitles, fetchInventories]);
+
+  // Refetch inventories when selected library changes for students
+  useEffect(() => {
+    if (user?.role === 'student' || user?.role === 'guest') {
+      fetchInventories();
+    }
+  }, [selectedLibrary, user?.role, fetchInventories]);
 
   // Define helper functions before they're used
   const getInventoriesForTitle = (titleId: string) => {
@@ -153,6 +172,25 @@ export default function BooksPage() {
   const handleBookModalClose = () => {
     setShowBookModal(false);
     setEditingBook(null);
+  };
+
+  const handleRequestBorrow = (title: Title) => {
+    if (!selectedLibrary && (user?.role === 'student' || user?.role === 'guest')) {
+      toast.error(t('books.errors.selectLibraryFirst', { default: 'Please select a library first' }));
+      return;
+    }
+    setSelectedTitle(title);
+    setShowBorrowRequestModal(true);
+  };
+
+  const handleBorrowRequestSuccess = () => {
+    // Refresh inventories to update availability
+    fetchInventories();
+  };
+
+  const handleBorrowRequestClose = () => {
+    setShowBorrowRequestModal(false);
+    setSelectedTitle(null);
   };
 
   const handleSearchChange = (value: string) => {
@@ -262,6 +300,15 @@ export default function BooksPage() {
           ) : null}
         </div>
       </div>
+
+      {/* Library Selection for Students/Guests */}
+      {(user?.role === 'student' || user?.role === 'guest') && (
+        <Card>
+          <CardBody>
+            <LibrarySelector />
+          </CardBody>
+        </Card>
+      )}
 
       {/* Search and Filters */}
       <Card>
@@ -454,6 +501,16 @@ export default function BooksPage() {
                               {t('common.edit')}
                             </Button>
                           )}
+                          {(user?.role === 'student' || user?.role === 'guest') && availableCopies > 0 && (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="text-sm font-medium"
+                              onClick={() => handleRequestBorrow(title)}
+                            >
+                              {t('books.requestBorrow', { default: 'Request' })}
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -589,6 +646,16 @@ export default function BooksPage() {
                                 {t('common.edit')}
                               </Button>
                             )}
+                            {(user?.role === 'student' || user?.role === 'guest') && availableCopies > 0 && (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                className="text-sm font-medium w-24"
+                                onClick={() => handleRequestBorrow(title)}
+                              >
+                                {t('books.requestBorrow', { default: 'Request' })}
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -630,6 +697,17 @@ export default function BooksPage() {
         book={editingBook}
         mode={editingBook ? 'edit' : 'create'}
       />
+
+      {/* Borrow Request Modal */}
+      {selectedTitle && (
+        <BorrowRequestModal
+          isOpen={showBorrowRequestModal}
+          onClose={handleBorrowRequestClose}
+          onSuccess={handleBorrowRequestSuccess}
+          title={selectedTitle}
+          library={selectedLibrary || undefined}
+        />
+      )}
     </div>
   );
 }

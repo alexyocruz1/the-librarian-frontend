@@ -24,6 +24,7 @@ import NotificationCenter from '@/components/notifications/NotificationCenter';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/context/I18nContext';
+import { LibraryProvider } from '@/context/LibraryContext';
 
 interface NavItem {
   name: string;
@@ -321,7 +322,9 @@ export default function DashboardLayout({
             transition={{ duration: 0.3 }}
             className="p-6"
           >
-            {children}
+            <LibraryProvider>
+              {children}
+            </LibraryProvider>
           </motion.div>
         </main>
       </div>
