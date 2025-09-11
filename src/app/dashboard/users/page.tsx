@@ -111,9 +111,10 @@ export default function UsersPage() {
     setEditingUser(null);
   };
 
+  const currentUserId = (currentUser as any)?.id || (currentUser as any)?._id;
   const filteredUsers = users.filter(user => {
-    // Hide current user from list
-    if (currentUser?.id && user._id === currentUser.id) return false;
+    // Hide current user from list (handle id vs _id shapes)
+    if (currentUserId && user._id === currentUserId) return false;
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (user.studentId && user.studentId.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -384,7 +385,7 @@ export default function UsersPage() {
                             >
                               {t('common.edit')}
                             </Button>
-                            {isSuperAdmin && user._id !== currentUser?.id && (
+                            {isSuperAdmin && user._id !== currentUserId && (
                               <Button
                                 size="sm"
                                 variant="ghost"
