@@ -49,12 +49,26 @@ const navigation: NavItem[] = [
     name: 'dashboard.menu.books',
     href: '/dashboard/books',
     icon: BookOpenIcon,
+    roles: ['admin', 'superadmin'], // Hide entire books section for students
     children: [
       { name: 'dashboard.menu.allBooks', href: '/dashboard/books', icon: BookOpenIcon },
       { name: 'dashboard.menu.importExport', href: '/dashboard/books/import-export', icon: ClipboardDocumentListIcon, roles: ['admin', 'superadmin'] },
       { name: 'dashboard.menu.myRequests', href: '/dashboard/books/requests', icon: BookmarkIcon },
       { name: 'dashboard.menu.myHistory', href: '/dashboard/books/history', icon: ClipboardDocumentListIcon },
     ],
+  },
+  // Student-specific navigation items
+  {
+    name: 'dashboard.menu.myRequests',
+    href: '/dashboard/books/requests',
+    icon: BookmarkIcon,
+    roles: ['student', 'guest'],
+  },
+  {
+    name: 'dashboard.menu.myHistory',
+    href: '/dashboard/books/history',
+    icon: ClipboardDocumentListIcon,
+    roles: ['student', 'guest'],
   },
   {
     name: 'dashboard.menu.users',

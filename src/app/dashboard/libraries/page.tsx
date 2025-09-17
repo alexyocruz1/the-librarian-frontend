@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   PlusIcon, 
@@ -16,7 +16,10 @@ import {
   UserPlusIcon,
   Squares2X2Icon,
   ListBulletIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ArrowRightIcon,
+  XMarkIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,12 +27,23 @@ import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import LibraryModal from '@/components/modals/LibraryModal';
 import AssignAdminModal from '@/components/modals/AssignAdminModal';
+import BorrowRequestModal from '@/components/modals/BorrowRequestModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
-import { Library } from '@/types';
+import { Library, Title } from '@/types';
+
+// Extended title interface for library browsing with availability info
+interface TitleWithAvailability extends Title {
+  libraryId?: string;
+  libraryName?: string;
+  availableCopies?: number;
+  totalCopies?: number;
+}
 import { getErrorMessage, getSuccessMessage } from '@/lib/errorMessages';
 import toast from 'react-hot-toast';
 import AppLoader from '@/components/ui/AppLoader';
+import BookImage from '@/components/ui/BookImage';
+import SearchInput from '@/components/ui/SearchInput';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useI18n } from '@/context/I18nContext';
 
@@ -49,52 +63,146 @@ export default function LibrariesPage() {
   const [libraryToDelete, setLibraryToDelete] = useState<Library | null>(null);
   const [showAssignAdminModal, setShowAssignAdminModal] = useState(false);
   const [selectedLibrary, setSelectedLibrary] = useState<Library | null>(null);
+  
+  // Book browsing state for students
+  const [showBookBrowsing, setShowBookBrowsing] = useState(false);
+  const [books, setBooks] = useState<TitleWithAvailability[]>([]);
+  const [booksLoading, setBooksLoading] = useState(false);
+  const [bookSearchQuery, setBookSearchQuery] = useState('');
+  const [showBorrowRequestModal, setShowBorrowRequestModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Title | null>(null);
 
-  const fetchLibraries = async () => {
+
+  // Fetch books for selected library (students only)
+  const fetchBooksForLibrary = useCallback(async (libraryId: string, searchQuery: string = '') => {
+    try {
+      setBooksLoading(true);
+      
+      console.log('Fetching available books for library:', libraryId);
+      const response = await api.get(`/inventories/available/${libraryId}`);
+      if (response.success) {
+        const inventories = response.data.inventories || [];
+        console.log('Available inventories:', inventories);
+        
+        // Extract unique titles from inventories
+        const titleMap = new Map();
+        inventories.forEach((inventory: any) => {
+          if (inventory.titleId && !titleMap.has(inventory.titleId._id)) {
+            // Add library-specific info to the title
+            const titleWithLibrary: TitleWithAvailability = {
+              ...inventory.titleId,
+              libraryId: inventory.libraryId._id,
+              libraryName: inventory.libraryId.name,
+              availableCopies: inventory.availableCopies,
+              totalCopies: inventory.totalCopies
+            };
+            titleMap.set(inventory.titleId._id, titleWithLibrary);
+          }
+        });
+        
+        let books = Array.from(titleMap.values());
+        console.log('Books after processing:', books);
+        
+        // Apply search filter if provided
+        if (searchQuery) {
+          const searchLower = searchQuery.toLowerCase();
+          books = books.filter((book: TitleWithAvailability) => 
+            book.title.toLowerCase().includes(searchLower) ||
+            book.authors.some((author: string) => author.toLowerCase().includes(searchLower)) ||
+            (book.isbn13 && book.isbn13.includes(searchQuery)) ||
+            (book.isbn10 && book.isbn10.includes(searchQuery))
+          );
+        }
+        
+        setBooks(books);
+      } else {
+        setBooks([]);
+      }
+    } catch (error) {
+      console.error('Error fetching books:', error);
+      toast.error('Failed to load books');
+      setBooks([]);
+    } finally {
+      setBooksLoading(false);
+    }
+  }, []);
+
+  const fetchLibraries = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/libraries');
-      console.log('Libraries response:', response);
       const libs = (response.data && (response.data as any).libraries) || [];
       setLibraries(libs);
+      
       // Fetch counts for admins and books per library
-      fetchLibraryStats(libs);
+      try {
+        // For students and guests, we can't fetch detailed stats due to API restrictions
+        // They can only see basic library information
+        if (user?.role === 'student' || user?.role === 'guest') {
+          const entries = libs.map((lib: Library) => [
+            lib._id, 
+            { adminCount: 0, titleCount: 0, copyCount: 0 }
+          ] as const);
+          setStatsByLibrary(Object.fromEntries(entries));
+          return;
+        }
+
+        const entries = await Promise.all(
+          libs.map(async (lib: Library) => {
+            try {
+              const promises = [
+                api.get('/inventories', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
+                api.get('/copies', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
+              ];
+              
+
+              // Only fetch admin stats for admins and superadmins
+              if (user?.role === 'admin' || user?.role === 'superadmin') {
+                promises.unshift(api.getLibraryAdmins(lib._id));
+              }
+
+              const results = await Promise.all(promises);
+              
+              let adminCount = 0;
+              let inventoriesRes, copiesRes;
+
+              if (user?.role === 'admin' || user?.role === 'superadmin') {
+                const [adminsRes, invRes, copRes] = results;
+                adminCount = (adminsRes.data && (adminsRes.data as any).admins) || [];
+                adminCount = Array.isArray(adminCount) ? adminCount.length : 0;
+                inventoriesRes = invRes;
+                copiesRes = copRes;
+              } else {
+                [inventoriesRes, copiesRes] = results;
+              }
+
+              // Extract total counts from pagination metadata
+              const titleTotal = inventoriesRes.pagination?.total || 0;
+              const copyTotal = copiesRes.pagination?.total || 0;
+              
+              
+              return [lib._id, { adminCount, titleCount: titleTotal, copyCount: copyTotal }] as const;
+            } catch (e) {
+              console.error(`Error fetching stats for library ${lib.name}:`, e);
+              return [lib._id, { adminCount: 0, titleCount: 0, copyCount: 0 }] as const;
+            }
+          })
+        );
+        setStatsByLibrary(Object.fromEntries(entries));
+      } catch (e) {
+        // ignore per-card failures
+      }
     } catch (error) {
       console.error('Error fetching libraries:', error);
       toast.error(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.role]);
 
   useEffect(() => {
     fetchLibraries();
   }, [fetchLibraries]);
-
-  const fetchLibraryStats = async (libs: Library[]) => {
-    try {
-      const entries = await Promise.all(
-        libs.map(async (lib) => {
-          try {
-            const [adminsRes, inventoriesRes, copiesRes] = await Promise.all([
-              api.getLibraryAdmins(lib._id),
-              api.get('/inventories', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
-              api.get('/copies', { params: { libraryId: lib._id, page: 1, limit: 1 } }),
-            ]);
-            const admins = (adminsRes.data && (adminsRes.data as any).admins) || [];
-            const titleTotal = (inventoriesRes.pagination && (inventoriesRes.pagination as any).total) || (inventoriesRes.data && (inventoriesRes.data as any).inventories ? (inventoriesRes.data as any).inventories.length : 0);
-            const copyTotal = (copiesRes.pagination && (copiesRes.pagination as any).total) || (copiesRes.data && (copiesRes.data as any).copies ? (copiesRes.data as any).copies.length : 0);
-            return [lib._id, { adminCount: admins.length, titleCount: titleTotal, copyCount: copyTotal }] as const;
-          } catch (e) {
-            return [lib._id, { adminCount: 0, titleCount: 0, copyCount: 0 }] as const;
-          }
-        })
-      );
-      setStatsByLibrary(Object.fromEntries(entries));
-    } catch (e) {
-      // ignore per-card failures
-    }
-  };
 
   const handleDeleteLibrary = (library: Library) => {
     setLibraryToDelete(library);
@@ -136,6 +244,44 @@ export default function LibrariesPage() {
   const handleAssignAdminModalClose = () => {
     setShowAssignAdminModal(false);
     setSelectedLibrary(null);
+  };
+
+  // Student book browsing handlers
+  const handleSelectLibrary = (library: Library) => {
+    setSelectedLibrary(library);
+    setShowBookBrowsing(true);
+    setBookSearchQuery('');
+    fetchBooksForLibrary(library._id, '');
+  };
+
+  const handleCloseBookBrowsing = () => {
+    setShowBookBrowsing(false);
+    setSelectedLibrary(null);
+    setBooks([]);
+    setBookSearchQuery('');
+  };
+
+  const handleBookSearch = (query: string) => {
+    setBookSearchQuery(query);
+    if (selectedLibrary) {
+      fetchBooksForLibrary(selectedLibrary._id, query);
+    }
+  };
+
+  const handleRequestBook = (book: Title) => {
+    setSelectedBook(book);
+    setShowBorrowRequestModal(true);
+  };
+
+  const handleBorrowRequestSuccess = () => {
+    setShowBorrowRequestModal(false);
+    setSelectedBook(null);
+    toast.success('Book request submitted successfully!');
+  };
+
+  const handleBorrowRequestClose = () => {
+    setShowBorrowRequestModal(false);
+    setSelectedBook(null);
   };
 
   const handleAddLibrary = () => {
@@ -181,10 +327,6 @@ export default function LibrariesPage() {
     return true;
   });
 
-  // Debug logging
-  console.log('Libraries state:', libraries);
-  console.log('Search term:', searchTerm);
-  console.log('Filtered libraries:', filteredLibraries);
 
   const canManage = user?.role === 'superadmin';
 
@@ -423,7 +565,7 @@ export default function LibrariesPage() {
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                         {t('libraries.location')}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                         {library.location ? (
                           <>
                             {library.location.address && <div className="mb-1">{library.location.address}</div>}
@@ -435,7 +577,7 @@ export default function LibrariesPage() {
                         ) : (
                           <span className="text-gray-400 italic">{t('libraries.location.none')}</span>
                         )}
-                      </p>
+                      </div>
                     </div>
                   </div>
 
@@ -466,41 +608,63 @@ export default function LibrariesPage() {
                   )}
 
                   {/* Stats - Enhanced Design */}
-                  <div className="grid grid-cols-3 gap-3 pt-6 border-t border-gray-100 dark:border-gray-700">
-                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <UsersIcon className="w-4 h-4 text-primary-600" />
-                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.adminCount ?? 0}</span>
+                  <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+                    {(user?.role === 'admin' || user?.role === 'superadmin') ? (
+                      <div className="grid gap-3 grid-cols-3">
+                        {/* Admin Count - Only for admins and superadmins */}
+                        <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <UsersIcon className="w-4 h-4 text-primary-600" />
+                            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.adminCount ?? 0}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            {t('libraries.stats.admins')}
+                          </p>
+                        </div>
+                        
+                        {/* Titles Count - Visible to all users */}
+                        <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <BookOpenIcon className="w-4 h-4 text-success-600" />
+                            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.titleCount ?? 0}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            {t('libraries.stats.titles')}
+                          </p>
+                        </div>
+                        
+                        {/* Copies Count - Visible to all users */}
+                        <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                          <div className="flex items-center justify-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                            <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.copyCount ?? 0}</span>
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            {t('libraries.stats.copies')}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                        {t('libraries.stats.admins')}
-                      </p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <BookOpenIcon className="w-4 h-4 text-success-600" />
-                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.titleCount ?? 0}</span>
+                    ) : (
+                      /* Student/Guest View - Show browsing message */
+                      <div className="text-center p-4 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-200 dark:border-primary-800">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <BookOpenIcon className="w-5 h-5 text-primary-600" />
+                          <span className="text-sm font-semibold text-primary-800 dark:text-primary-200">
+                            {t('libraries.browseBooks')}
+                          </span>
+                        </div>
+                        <p className="text-xs text-primary-600 dark:text-primary-400">
+                          {t('libraries.browseBooksDescription')}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                        {t('libraries.stats.titles')}
-                      </p>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <svg className="w-4 h-4 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        <span className="text-lg font-bold text-gray-900 dark:text-gray-100">{statsByLibrary[library._id]?.copyCount ?? 0}</span>
-                      </div>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                        {t('libraries.stats.copies')}
-                      </p>
-                    </div>
+                    )}
                   </div>
 
                   {/* Actions - Improved Design */}
-                  {canManage && (
-                    <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+                  <div className="pt-6 border-t border-gray-100 dark:border-gray-700">
+                    {canManage ? (
                       <Button
                         fullWidth
                         variant="outline"
@@ -511,8 +675,21 @@ export default function LibrariesPage() {
                       >
                         {t('libraries.manageAdmins')}
                       </Button>
-                    </div>
-                  )}
+                    ) : (
+                      /* Student/Guest View - Browse Books Button */
+                      <Button
+                        fullWidth
+                        variant="primary"
+                        size="sm"
+                        leftIcon={<BookOpenIcon className="w-4 h-4" />}
+                        rightIcon={<ArrowRightIcon className="w-4 h-4" />}
+                        onClick={() => handleSelectLibrary(library)}
+                        className="bg-primary-600 hover:bg-primary-700 text-white transition-colors"
+                      >
+                        {t('libraries.browseBooks')}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardBody>
             </Card>
@@ -657,6 +834,237 @@ export default function LibrariesPage() {
         </Card>
       )}
 
+      {/* Book Browsing Interface for Students */}
+      {showBookBrowsing && selectedLibrary && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="space-y-6"
+        >
+          {/* Book Browsing Header */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                leftIcon={<XMarkIcon className="w-4 h-4" />}
+                onClick={handleCloseBookBrowsing}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                {t('common.back', { default: 'Back' })}
+              </Button>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  {t('libraries.browsingBooks', { library: selectedLibrary.name })}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {t('libraries.browsingBooksDescription', { library: selectedLibrary.name })}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="max-w-md">
+            <SearchInput
+              value={bookSearchQuery}
+              onChange={handleBookSearch}
+              placeholder={t('books.search.placeholder', { default: 'Search books by title, author, or ISBN...' })}
+              loading={booksLoading}
+            />
+          </div>
+
+          {/* Books Grid */}
+          {booksLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <CardBody className="p-0">
+                    <div className="flex flex-col h-full">
+                      <div className="h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                      <div className="p-4 flex-1 flex flex-col space-y-3">
+                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        </div>
+                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="pt-3 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          ) : books.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6">
+              {books.map((book, index) => (
+                <motion.div
+                  key={book._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card className="h-full hover:shadow-lg transition-all duration-200 group overflow-hidden">
+                    <CardBody className="p-0">
+                      <div className="flex flex-col h-full">
+                        {/* Book Cover */}
+                        <div className="relative h-48 overflow-hidden">
+                          <BookImage
+                            src={book.coverUrl}
+                            alt={book.title}
+                            width={300}
+                            height={192}
+                            className="h-48 w-full group-hover:scale-105 transition-transform duration-300"
+                            fallbackText="No Cover"
+                          />
+                          
+                          {/* Availability Badge */}
+                          <div className="absolute top-3 right-3">
+                            <Badge 
+                              variant={(book.availableCopies || 0) > 0 ? "success" : "error"}
+                              size="sm"
+                              className="shadow-md"
+                            >
+                              {(book.availableCopies || 0) > 0 ? `${book.availableCopies}/${book.totalCopies}` : '0/' + (book.totalCopies || 0)}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Book Info */}
+                        <div className="p-4 flex-1 flex flex-col">
+                          {/* Title and Author */}
+                          <div className="mb-3">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                              {book.title}
+                            </h3>
+                            {book.subtitle && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
+                                {book.subtitle}
+                              </p>
+                            )}
+                            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                              {t('books.by', { default: 'by' })} {book.authors.join(', ')}
+                            </p>
+                          </div>
+                          
+                          {/* Key Info Grid */}
+                          <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+                            {book.publishedYear && (
+                              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                                <div className="text-gray-500 dark:text-gray-400 font-medium">{t('books.year', { default: 'Year' })}</div>
+                                <div className="text-gray-900 dark:text-gray-100 font-bold">{book.publishedYear}</div>
+                              </div>
+                            )}
+                            {book.publisher && (
+                              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-2">
+                                <div className="text-gray-500 dark:text-gray-400 font-medium">{t('books.publisher', { default: 'Publisher' })}</div>
+                                <div className="text-gray-900 dark:text-gray-100 font-bold truncate" title={book.publisher}>
+                                  {book.publisher}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Categories */}
+                          {book.categories && book.categories.length > 0 && (
+                            <div className="mb-3">
+                              <div className="flex flex-wrap gap-1">
+                                {book.categories.slice(0, 2).map((category) => (
+                                  <Badge key={category} variant="secondary" size="sm" className="text-xs">
+                                    {category}
+                                  </Badge>
+                                ))}
+                                {book.categories.length > 2 && (
+                                  <Badge variant="secondary" size="sm" className="text-xs">
+                                    +{book.categories.length - 2}
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Availability Status */}
+                          <div className="mb-4">
+                            <div className="flex items-center justify-between text-sm mb-2">
+                              <span className="text-gray-600 dark:text-gray-400 font-medium">
+                                {t('books.availability', { default: 'Availability' })}
+                              </span>
+                              <span className={`font-bold ${(book.availableCopies || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {book.availableCopies || 0} {t('books.of', { default: 'of' })} {book.totalCopies || 0}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div 
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                  ((book.availableCopies || 0) / (book.totalCopies || 1)) * 100 >= 50 ? 'bg-green-500' : 
+                                  ((book.availableCopies || 0) / (book.totalCopies || 1)) * 100 >= 25 ? 'bg-yellow-500' : 'bg-red-500'
+                                }`}
+                                style={{ 
+                                  width: `${Math.min(((book.availableCopies || 0) / (book.totalCopies || 1)) * 100, 100)}%`,
+                                  transform: 'translateX(0)'
+                                }}
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Request Button */}
+                          <div className="pt-3 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                            <Button
+                              fullWidth
+                              variant="primary"
+                              size="sm"
+                              leftIcon={<HeartIcon className="w-4 h-4" />}
+                              onClick={() => handleRequestBook(book)}
+                              disabled={!(book.availableCopies && book.availableCopies > 0)}
+                            >
+                              {(book.availableCopies || 0) > 0 
+                                ? t('books.requestBorrow', { default: 'Request' })
+                                : t('books.notAvailable', { default: 'Not Available' })
+                              }
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <CardBody className="text-center py-12">
+                <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">📚</div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {bookSearchQuery ? t('books.noResults', { default: 'No books found' }) : t('books.empty', { default: 'No books available' })}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400">
+                  {bookSearchQuery 
+                    ? t('books.noResultsDescription', { default: 'Try adjusting your search terms or browse all books.' })
+                    : t('books.emptyDescription', { default: 'This library doesn\'t have any books yet.' })
+                  }
+                </p>
+                {bookSearchQuery && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBookSearch('')}
+                    className="mt-4"
+                  >
+                    {t('books.clearSearch', { default: 'Clear Search' })}
+                  </Button>
+                )}
+              </CardBody>
+            </Card>
+          )}
+        </motion.div>
+      )}
+
       {/* Library Modal */}
       <LibraryModal
         isOpen={showLibraryModal}
@@ -755,6 +1163,17 @@ export default function LibrariesPage() {
           onSuccess={handleAssignAdminModalSuccess}
           libraryId={selectedLibrary._id}
           libraryName={selectedLibrary.name}
+        />
+      )}
+
+      {/* Borrow Request Modal */}
+      {showBorrowRequestModal && selectedBook && selectedLibrary && (
+        <BorrowRequestModal
+          isOpen={showBorrowRequestModal}
+          onClose={handleBorrowRequestClose}
+          onSuccess={handleBorrowRequestSuccess}
+          title={selectedBook}
+          library={selectedLibrary}
         />
       )}
     </div>
