@@ -39,8 +39,8 @@ export default function AdvancedSearchModal({
   const fetchLibraries = async () => {
     try {
       const response = await api.get('/libraries');
-      if (response.data.success) {
-        setLibraries(response.data.data || []);
+      if (response.success) {
+        setLibraries(response.data || []);
       }
     } catch (error) {
       console.error('Error fetching libraries:', error);
@@ -50,8 +50,8 @@ export default function AdvancedSearchModal({
   const fetchCategories = async () => {
     try {
       const response = await api.get('/titles/categories');
-      if (response.data.success) {
-        setCategories(response.data.data || []);
+      if (response.success) {
+        setCategories(response.data || []);
       }
     } catch (error) {
       console.error('Error fetching categories:', error);

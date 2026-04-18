@@ -90,8 +90,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['"Avenir Next"', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['"Avenir Next"', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Georgia', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

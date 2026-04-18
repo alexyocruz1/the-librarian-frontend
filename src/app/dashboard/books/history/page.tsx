@@ -127,8 +127,8 @@ export default function MyHistoryPage() {
 
       const response = await api.get('/borrow-records/user/' + user.id);
       
-      if (response.data.success) {
-        const records = response.data.data?.history || [];
+      if (response.success) {
+        const records = response.data?.history || [];
         setRecords(records);
         setError(null);
         // If we get an empty array, that's not an error - it's just no history

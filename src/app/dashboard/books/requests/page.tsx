@@ -117,10 +117,13 @@ export default function MyRequestsPage() {
         return;
       }
 
+      console.log('🔍 Fetching requests for user ID:', user.id);
       const response = await api.get('/borrow-requests/user/' + user.id);
+      console.log('🔍 API response:', response);
       
-      if (response.data.success) {
-        const requests = response.data.data?.requests || [];
+      if (response.success) {
+        const requests = response.data?.requests || [];
+        console.log('🔍 Found requests:', requests);
         setRequests(requests);
         setError(null);
         // If we get an empty array, that's not an error - it's just no requests
@@ -162,7 +165,7 @@ export default function MyRequestsPage() {
     try {
       const response = await api.patch(`/borrow-requests/${requestId}/cancel`);
       
-      if (response.data.success) {
+      if (response.success) {
         toast.success('Request cancelled successfully');
         fetchRequests(); // Refresh the list
       } else {

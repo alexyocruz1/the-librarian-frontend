@@ -1,86 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import type { ReactNode } from 'react';
 import './globals.css';
-import { AuthProvider } from '@/context/AuthContext';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { PreferencesProvider } from '@/context/PreferencesContext';
-import { I18nProvider } from '@/context/I18nContext';
-import { Toaster } from 'react-hot-toast';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'The Librarian - Library Management System',
-  description: 'A modern, comprehensive library management system for managing books, users, and borrowing workflows.',
-  keywords: ['library', 'management', 'books', 'borrowing', 'catalog'],
-  authors: [{ name: 'Alexy Cruz' }],
-  openGraph: {
-    title: 'The Librarian - Library Management System',
-    description: 'A modern, comprehensive library management system',
-    type: 'website',
-    locale: 'en_US',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'The Librarian - Library Management System',
-    description: 'A modern, comprehensive library management system',
-  },
-  robots: {
-    index: false,
-    follow: false,
-  },
+  title: 'The Librarian',
+  description: 'Multi-tenant library management for public browsing and librarian-led loan handling.',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#3b82f6',
+  themeColor: '#0f172a',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
-      <body className={`${inter.className} h-full`}>
-        <ThemeProvider>
-          <AuthProvider>
-            <PreferencesProvider>
-              <I18nProvider>
-                {children}
-                <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: 'var(--toast-bg, #fff)',
-                  color: 'var(--toast-color, #374151)',
-                  boxShadow: '0 10px 40px -10px rgba(0, 0, 0, 0.15)',
-                  border: '1px solid var(--toast-border, #e5e7eb)',
-                  borderRadius: '12px',
-                  padding: '16px',
-                },
-                success: {
-                  iconTheme: {
-                    primary: '#10b981',
-                    secondary: '#fff',
-                  },
-                },
-                error: {
-                  iconTheme: {
-                    primary: '#ef4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-              </I18nProvider>
-            </PreferencesProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }

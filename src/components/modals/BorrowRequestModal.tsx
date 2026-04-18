@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -59,16 +59,18 @@ export default function BorrowRequestModal({
 
   const currentLibrary = library || selectedLibrary;
 
-  const checkAvailability = async () => {
+  const checkAvailability = useCallback(async () => {
     if (!currentLibrary || !title) return;
 
     try {
       setCheckingAvailability(true);
-      const response = await api.get(`/inventories?libraryId=${currentLibrary._id}&titleId=${title._id}`);
+      // Use the public endpoint to get all available inventories for the library
+      const response = await api.get(`/inventories/available/${currentLibrary._id}`);
       
-      if (response.data.success) {
-        const inventories = response.data.data?.inventories || response.data.inventories || [];
-        const inventory = inventories.find((inv: any) => inv.titleId === title._id);
+      if (response.success) {
+        const inventories = response.data.inventories || [];
+        // Find the inventory for this specific title
+        const inventory = inventories.find((inv: any) => inv.titleId._id === title._id);
         setAvailableCopies(inventory?.availableCopies || 0);
       }
     } catch (error) {
@@ -77,7 +79,7 @@ export default function BorrowRequestModal({
     } finally {
       setCheckingAvailability(false);
     }
-  };
+  }, [currentLibrary, title]);
 
   // Check availability when modal opens
   useEffect(() => {
@@ -108,13 +110,13 @@ export default function BorrowRequestModal({
 
       const response = await api.post('/borrow-requests', requestData);
 
-      if (response.data.success) {
+      if (response.success) {
         toast.success(t('borrowRequest.success.created', { default: 'Borrow request submitted successfully' }));
         onSuccess();
         onClose();
         reset();
       } else {
-        toast.error(response.data.error || t('borrowRequest.errors.createFailed', { default: 'Failed to create borrow request' }));
+        toast.error(response.error || t('borrowRequest.errors.createFailed', { default: 'Failed to create borrow request' }));
       }
     } catch (error) {
       console.error('Error creating borrow request:', error);

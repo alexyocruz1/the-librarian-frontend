@@ -146,8 +146,8 @@ export const useSearch = (options: UseSearchOptions = {}) => {
       });
 
       const response = await api.get(`/titles/search/suggestions?${params}`);
-      if (response.data.success) {
-        setSuggestions(response.data.data.suggestions || []);
+      if (response.success) {
+        setSuggestions(response.data.suggestions || []);
       }
     } catch (err: any) {
       console.error('Suggestions error:', err);
@@ -169,8 +169,8 @@ export const useSearch = (options: UseSearchOptions = {}) => {
       });
 
       const response = await api.get(`/titles/search/advanced?${params}`);
-      if (response.data.success) {
-        setResults(response.data.data.results || []);
+      if (response.success) {
+        setResults(response.data.results || []);
         setQuery(searchFilters.query || '');
         setFilters(searchFilters);
       }
@@ -187,8 +187,8 @@ export const useSearch = (options: UseSearchOptions = {}) => {
   const getPopularSearches = useCallback(async () => {
     try {
       const response = await api.get('/titles/search/popular');
-      if (response.data.success) {
-        return response.data.data.popularSearches || [];
+      if (response.success) {
+        return response.data.popularSearches || [];
       }
     } catch (err: any) {
       console.error('Popular searches error:', err);

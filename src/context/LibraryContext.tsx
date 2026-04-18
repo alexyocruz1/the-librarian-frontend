@@ -34,8 +34,8 @@ export function LibraryProvider({ children }: LibraryProviderProps) {
       
       const response = await api.get('/libraries');
       
-      if (response.data.success) {
-        const librariesData = response.data.data?.libraries || response.data.libraries || [];
+      if (response.success) {
+        const librariesData = response.data?.libraries || [];
         setLibraries(librariesData);
         
         // Auto-select first library if none selected and user is student/guest
