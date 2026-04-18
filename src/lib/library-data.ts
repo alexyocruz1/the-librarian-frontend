@@ -98,15 +98,17 @@ export async function listAvailableBooks(libraryId: string, query?: string): Pro
   }
 
   const filters = [
-    'select=id,library_id,title,author,category,total_copies,available_copies,archived_at',
+    'select=id,library_id,title,author,categories,total_copies,available_copies,library_codes,book_code,editorial,edition,cover_type,shelf_location,cost,acquired_at,image_url,archived_at',
     `library_id=eq.${libraryId}`,
     'available_copies=gt.0',
     'archived_at=is.null',
   ];
 
+
   if (query) {
     const escaped = encodeURIComponent(`*${query}*`);
-    filters.push(`or=(title.ilike.${escaped},author.ilike.${escaped},category.ilike.${escaped})`);
+    filters.push(`or=(title.ilike.*${escaped}*,author.ilike.*${escaped}*)`);
+
   }
 
   return supabaseRest<TenantBook[]>(`/rest/v1/books?${filters.join('&')}`);
@@ -131,7 +133,8 @@ export async function lookupLoans(libraryId: string, identifier: string): Promis
   );
 
   const books = await supabaseRest<TenantBook[]>(
-    `/rest/v1/books?select=id,title,author,category&library_id=eq.${libraryId}`,
+    `/rest/v1/books?select=id,title,author,categories&library_id=eq.${libraryId}`,
+
     { method: 'GET' },
     { service: true }
   );
@@ -332,7 +335,8 @@ export async function listDashboardLoans(session: LibrarianSession, activeLibrar
     { service: true }
   );
   const books = await supabaseRest<TenantBook[]>(
-    `/rest/v1/books?select=id,title,author,category&library_id=in.(${idClause})`,
+    `/rest/v1/books?select=id,title,author,categories&library_id=in.(${idClause})`,
+
     { method: 'GET' },
     { service: true }
   );
@@ -357,10 +361,11 @@ export async function listDashboardBooks(session: LibrarianSession, activeLibrar
 
   const idClause = libraryIds.join(',');
   return supabaseRest<TenantBook[]>(
-    `/rest/v1/books?select=id,library_id,title,author,category,total_copies,available_copies,archived_at&library_id=in.(${idClause})&archived_at=is.null&order=title.asc`,
+    `/rest/v1/books?select=id,library_id,title,author,categories,total_copies,available_copies,library_codes,book_code,editorial,edition,cover_type,shelf_location,cost,acquired_at,image_url,archived_at&library_id=in.(${idClause})&archived_at=is.null&order=title.asc`,
     { method: 'GET' },
     { service: true }
   );
+
 }
 
 export async function createDashboardBook(session: LibrarianSession, payload: BookMutationPayload) {
@@ -695,7 +700,8 @@ export async function updateLoanStatus(session: LibrarianSession, loanId: string
 
   const loan = result[0];
   const books = await supabaseRest<TenantBook[]>(
-    `/rest/v1/books?select=id,title,author,category&library_id=eq.${loan.library_id}&id=eq.${loan.book_id}`,
+    `/rest/v1/books?select=id,title,author,categories&library_id=eq.${loan.library_id}&id=eq.${loan.book_id}`,
+
     { method: 'GET' },
     { service: true }
   );
