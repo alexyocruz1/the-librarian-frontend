@@ -110,10 +110,15 @@ export async function lookupLoans(libraryId: string, identifier: string): Promis
 
   const loans = await supabaseRest<TenantLoan[]>(
     `/rest/v1/loans?select=id,library_id,book_id,full_name,identifier,requested_copies,status,created_at,updated_at,handled_at,returned_at&library_id=eq.${libraryId}&identifier=eq.${encodeURIComponent(identifier)}&order=created_at.desc`
+  ,
+    { method: 'GET' },
+    { service: true }
   );
 
   const books = await supabaseRest<TenantBook[]>(
-    `/rest/v1/books?select=id,title,author,category&library_id=eq.${libraryId}`
+    `/rest/v1/books?select=id,title,author,category&library_id=eq.${libraryId}`,
+    { method: 'GET' },
+    { service: true }
   );
   const bookMap = new Map(books.map((book) => [book.id, book]));
 
