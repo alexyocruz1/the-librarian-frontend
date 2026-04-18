@@ -242,8 +242,13 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <span className="mb-2 block text-sm font-medium text-slate-500">Códigos de Biblioteca (Auto)</span>
                 <div className="w-full rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm font-mono text-slate-400">
                   {editingBookId 
-                    ? books.find(b => b.id === editingBookId)?.library_codes.join(', ')
-                    : `${(selectedLibrary?.subdomain || 'lib').toLowerCase()}####`}
+                    ? (() => {
+                        const codes = books.find(b => b.id === editingBookId)?.library_codes || [];
+                        return codes.length > 1 
+                          ? `${codes[0]} — ${codes[codes.length - 1]}`
+                          : codes[0] || 'N/A';
+                      })()
+                    : 'Será asignado al guardar'}
                 </div>
               </label>
             </div>
