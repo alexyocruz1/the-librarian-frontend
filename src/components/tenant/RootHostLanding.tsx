@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { useI18n } from '@/context/I18nContext';
