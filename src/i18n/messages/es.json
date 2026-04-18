@@ -629,7 +629,6 @@
   "borrowRequest.errors.createFailed": "Error al crear la solicitud de préstamo",
   "borrowRequest.success.created": "Pedido de préstamo enviado exitosamente",
   "borrowRequest.warnings.noCopies": "No hay copias disponibles actualmente para este libro. No puedes enviar una solicitud en este momento.",
-  "common.back": "Atrás",
   "copyModal.title.create": "Agregar Nueva Copia",
   "copyModal.title.edit": "Editar Copia",
   "copyModal.subtitle.create": "Agregar una nueva copia física de este libro",

@@ -25,6 +25,7 @@
   "dashboard.quickActions.viewReports": "View Reports",
   "dashboard.lastLogin": "Last login: {date}",
   "dashboard.firstLogin": "First login",
+  "common.changeLibrary": "Change Library",
   "requests.title": "My Requests",
   "requests.subtitle": "Track your book borrowing requests and their status",
   "requests.filters.all": "All Requests",
@@ -695,8 +696,7 @@
   "bookDetail.actions.deleteBookConfirm.warning.copies": "All copies of this book",
   "bookDetail.actions.deleteBookConfirm.warning.inventories": "All inventory records",
   "bookDetail.actions.deleteBookConfirm.warning.borrowRecords": "All related borrow records",
-  "bookDetail.actions.deleteBookConfirm.warning.irreversible": "This action cannot be undone"
-,
+  "bookDetail.actions.deleteBookConfirm.warning.irreversible": "This action cannot be undone",
   "userModal.title.create": "Add New User",
   "userModal.title.edit": "Edit User",
   "userModal.subtitle.create": "Create a new user account",
@@ -725,5 +725,3 @@
   "userModal.actions.create": "Create User",
   "userModal.actions.update": "Update User"
 }
-
-
