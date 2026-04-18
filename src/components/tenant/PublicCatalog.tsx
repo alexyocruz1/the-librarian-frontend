@@ -103,15 +103,15 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
   return (
     <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
       <header className="relative z-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 md:px-10">
-         <div className="flex flex-wrap gap-3">
-            <Link href="/" className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
-              &larr; Cambiar sede
-            </Link>
-            <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
-              {t('dashboard.quickActions.myRequests') || 'Consultar mis préstamos'}
-            </Link>
-          </div>
-          <LanguageSwitcher className="flex items-center shrink-0 z-50" />
+        <div className="flex flex-wrap gap-3">
+          <Link href={librarySlug ? `/l/${librarySlug}/libraries` : '/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
+            {t('common.changeLibrary') || '&larr; Cambiar sede'}
+          </Link>
+          <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
+            {t('dashboard.quickActions.myRequests') || 'Consultar mis préstamos'}
+          </Link>
+        </div>
+        <LanguageSwitcher className="flex items-center shrink-0 z-50" />
       </header>
 
 
@@ -157,8 +157,8 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">{book.categories.join(', ')}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <h2 className="text-xl font-semibold text-slate-900 leading-tight">{book.title}</h2>
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 onClick={() => setPreviewImage(book.image_url || 'https://via.placeholder.com/400x600?text=Sin+Imagen')}
                                 className="text-slate-400 hover:text-slate-900 transition shrink-0"
                               >
@@ -246,29 +246,29 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
 
       {previewImage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-              <button 
-                onClick={() => setPreviewImage(null)}
-                className="absolute top-6 right-6 z-10 rounded-full bg-white/80 p-2 text-slate-900 shadow-md hover:bg-white transition"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
-                <Image 
-                  src={previewImage} 
-                  alt="Vista previa" 
-                  fill
-                  className="object-cover"
-                  unoptimized
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
-                  }}
-                />
-              </div>
+          <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-6 right-6 z-10 rounded-full bg-white/80 p-2 text-slate-900 shadow-md hover:bg-white transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
+              <Image
+                src={previewImage}
+                alt="Vista previa"
+                fill
+                className="object-cover"
+                unoptimized
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
+                }}
+              />
+            </div>
 
-           </div>
+          </div>
         </div>
       )}
     </main>
