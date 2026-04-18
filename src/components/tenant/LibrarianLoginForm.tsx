@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function LibrarianLoginForm() {
   const router = useRouter();
@@ -36,27 +37,29 @@ export default function LibrarianLoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_25px_70px_-40px_rgba(15,23,42,0.35)]">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Librarian sign in</p>
-        <h1 className="mt-2 font-serif text-4xl text-slate-900">Manage only the libraries assigned to you.</h1>
-      </div>
+    <div className="w-full relative">
+      <LanguageSwitcher />
+      <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_25px_70px_-40px_rgba(15,23,42,0.35)]">
+        <div>
+          <h1 className="font-serif text-3xl font-bold text-slate-900 text-center">Login</h1>
+        </div>
 
-      <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">Email</span>
-        <input value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
-      </label>
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-slate-700">Email</span>
+          <input value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+        </label>
 
-      <label className="block">
-        <span className="mb-2 block text-sm font-medium text-slate-700">Password</span>
-        <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
-      </label>
+        <label className="block">
+          <span className="mb-2 block text-sm font-medium text-slate-700">Password</span>
+          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+        </label>
 
-      {error && <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
+        {error && <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
-      <button className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
-        {loading ? 'Signing in...' : 'Enter dashboard'}
-      </button>
-    </form>
+        <button className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+          {loading ? 'Signing in...' : 'Enter dashboard'}
+        </button>
+      </form>
+    </div>
   );
 }

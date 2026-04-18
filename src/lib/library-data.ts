@@ -68,6 +68,18 @@ export async function resolveLibrary(subdomain: string | null): Promise<LibraryT
   return result[0] || null;
 }
 
+export async function listPublicLibraries(): Promise<LibraryTenant[]> {
+  if (!isSupabaseConfigured()) {
+    return mockLibraries;
+  }
+
+  return supabaseRest<LibraryTenant[]>(
+    `/rest/v1/libraries?select=id,name,subdomain,city,accent,description&order=name.asc`,
+    { method: 'GET' },
+    { service: true }
+  );
+}
+
 export async function listAvailableBooks(libraryId: string, query?: string): Promise<TenantBook[]> {
   if (!isSupabaseConfigured()) {
     return mockBooks

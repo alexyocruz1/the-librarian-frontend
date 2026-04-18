@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { LibraryTenant, TenantBook } from '@/types/tenant';
 import { cn, formatDateTime } from '@/lib/utils';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import { useI18n } from '@/context/I18nContext';
 
 interface CatalogResponse {
   library: LibraryTenant;
@@ -25,6 +27,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
     identifier: '',
     requested_copies: 1,
   });
+  const { t } = useI18n();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -81,7 +84,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
       return;
     }
 
-    setStatusMessage(`Request sent for ${payload.loan.book?.title || 'the selected book'} at ${formatDateTime(payload.loan.created_at)}.`);
+    setStatusMessage(t('borrowRequest.success.created') || `Request sent for ${payload.loan.book?.title || 'the selected book'}`);
     setRequestingBookId(null);
     setRequestForm({
       full_name: '',
@@ -92,20 +95,27 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
-      <section className="mx-auto max-w-7xl px-6 py-10 md:px-10 md:py-14">
+    <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
+      <LanguageSwitcher />
+      <header className="absolute top-6 left-6 z-40">
+         <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="mt-0 inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
+            {t('dashboard.quickActions.myRequests') || 'Look up my loans'}
+          </Link>
+      </header>
+
+      <section className="mx-auto max-w-7xl pt-20 px-6 pb-10 md:px-10 md:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.7fr]">
           <div className="space-y-6">
             <div className="space-y-4">
               <span className="inline-flex rounded-full border border-amber-200 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-700 backdrop-blur">
-                Public library catalog
+                {t('common.publicLibraryCatalog') || 'Public library catalog'}
               </span>
               <div className="space-y-3">
                 <h1 className="font-serif text-5xl tracking-tight text-slate-900 md:text-6xl">
-                  {data?.library?.name || 'Your neighborhood library'}, organized around fast borrowing.
+                  {data?.library?.name || t('common.neighborhoodLibrary') || 'Your neighborhood library'}
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                  Browse only books that are currently available, request a loan without creating an account, and keep every action scoped to the current library.
+                  {t('common.publicDocs') || 'Browse only books that are currently available, request a loan without creating an account, and keep every action scoped to the current library.'}
                 </p>
               </div>
             </div>
@@ -113,13 +123,13 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
             <div className="rounded-[2rem] border border-slate-200 bg-white/90 p-5 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)] backdrop-blur">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Discover books</p>
-                  <p className="text-sm text-slate-500">Search by title, author, or category.</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t('dashboard.quickActions.browseBooks') || 'Discover books'}</p>
+                  <p className="text-sm text-slate-500">{t('common.searchDesc') || 'Search by title, author, or category.'}</p>
                 </div>
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search available books"
+                  placeholder={t('search.placeholder') || "Search available books"}
                   className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-amber-300 focus:bg-white md:max-w-md"
                 />
               </div>
@@ -136,19 +146,19 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                             <h2 className="mt-2 text-2xl font-semibold text-slate-900">{book.title}</h2>
                             <p className="mt-1 text-sm text-slate-600">{book.author}</p>
                           </div>
-                          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                            {book.available_copies} available
+                          <span className="whitespace-nowrap flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                            {book.available_copies} {t('books.table.available') || 'available'}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between text-sm text-slate-500">
-                          <span>Total copies: {book.total_copies}</span>
+                          <span>{t('books.table.total') || 'Total copies'}: {book.total_copies}</span>
                           <button
                             type="button"
                             onClick={() => setRequestingBookId(requestingBookId === book.id ? null : book.id)}
                             className="rounded-full bg-slate-900 px-4 py-2 font-medium text-white transition hover:bg-slate-700"
                           >
-                            Request loan
+                            {t('borrowRequest.actions.submit') || 'Request loan'}
                           </button>
                         </div>
 
@@ -180,7 +190,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                             />
                             <button className="w-full rounded-xl bg-amber-500 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-400">
-                              Submit request
+                              {t('borrowRequest.actions.submit') || 'Submit request'}
                             </button>
                           </form>
                         )}
@@ -193,21 +203,8 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
           </div>
 
           <aside className="space-y-5">
-            <div className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-[0_30px_70px_-45px_rgba(15,23,42,0.9)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-300">Current tenant</p>
-              <h2 className="mt-3 text-3xl font-semibold">
-                {librarySlug ? `/l/${librarySlug}` : data?.library?.subdomain || 'library'}
-              </h2>
-              <p className="mt-3 text-sm leading-7 text-slate-300">
-                {data?.library?.description || 'Each tenant keeps books, loans, and librarian access fully isolated.'}
-              </p>
-              <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="mt-6 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">
-                Look up my loans
-              </Link>
-            </div>
-
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Catalog mix</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t('dashboard.stats.desc.inCatalog') || 'Catalog mix'}</p>
               <div className="mt-4 space-y-3">
                 {groupedCategories.map(([category, count]) => (
                   <div key={category} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
@@ -218,14 +215,6 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Demo credentials</p>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                In local mock mode, sign in as <span className="font-semibold text-slate-900">ana@librarian.test</span> or{' '}
-                <span className="font-semibold text-slate-900">marcus@librarian.test</span> with password <span className="font-semibold text-slate-900">library123</span>.
-              </p>
             </div>
           </aside>
         </div>
