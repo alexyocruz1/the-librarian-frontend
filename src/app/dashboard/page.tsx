@@ -13,10 +13,10 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Librarian dashboard</p>
-        <h1 className="mt-2 text-4xl font-semibold text-slate-900">Handle requests without losing tenant boundaries.</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Panel de Control</p>
+        <h1 className="mt-2 text-4xl font-semibold text-slate-900">Administra los préstamos de cada sede fácilmente.</h1>
         <p className="mt-3 max-w-3xl text-base leading-8 text-slate-600">
-          Inventory moves only when books are physically handed out or returned, and every transition is expected to be enforced inside a database transaction.
+          El inventario solo se actualiza cuando los libros se entregan o se devuelven físicamente, garantizando un control preciso de la disponibilidad.
         </p>
       </div>
       <DashboardClient libraries={libraries} />

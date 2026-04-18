@@ -94,19 +94,19 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     <div className="space-y-8">
       <section className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Assigned libraries</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tus Bibliotecas</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{libraries.length}</p>
-          <p className="mt-2 text-sm text-slate-600">Librarians only see the tenants they are mapped to.</p>
+          <p className="mt-2 text-sm text-slate-600">Solo verás la información de las sedes que te han asignado.</p>
         </div>
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Open requests</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Préstamos activos</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{loans.filter((loan) => loan.status !== 'returned' && loan.status !== 'rejected').length}</p>
-          <p className="mt-2 text-sm text-slate-600">Pending, approved, and handled requests remain active here.</p>
+          <p className="mt-2 text-sm text-slate-600">Los préstamos pendientes, aprobados y en curso aparecerán aquí.</p>
         </div>
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Inventory at risk</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Inventario en riesgo</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{books.filter((book) => book.available_copies <= 1).length}</p>
-          <p className="mt-2 text-sm text-slate-600">Books with one or fewer copies left available.</p>
+          <p className="mt-2 text-sm text-slate-600">Libros con una o ninguna copia disponible.</p>
         </div>
       </section>
 
@@ -114,15 +114,15 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Loan queues</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Grouped by identifier and library</h2>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Fila de préstamos</p>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Organizado por lector y sede</h2>
             </div>
             <Link href="/dashboard/books" className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
-              View inventory
+              Ver inventario
             </Link>
           </div>
 
-          {loading && <p className="mt-6 text-sm text-slate-500">Loading dashboard data...</p>}
+          {loading && <p className="mt-6 text-sm text-slate-500">Cargando el panel...</p>}
           {error && <p className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
           <div className="mt-6 space-y-5">
@@ -141,33 +141,33 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                     <div key={loan.id} className="rounded-[1.25rem] border border-slate-200 bg-white p-4">
                       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                          <p className="font-semibold text-slate-900">{loan.book?.title || 'Unknown title'}</p>
+                          <p className="font-semibold text-slate-900">{loan.book?.title || 'Título desconocido'}</p>
                           <p className="text-sm text-slate-500">
-                            {loan.book?.author || 'Unknown author'} · {loan.requested_copies} copy · {formatDateTime(loan.created_at)}
+                            {loan.book?.author || 'Autor desconocido'} · {loan.requested_copies} {loan.requested_copies === 1 ? 'copia' : 'copias'} · {formatDateTime(loan.created_at)}
                           </p>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {loan.status === 'pending' && (
                             <>
                               <button onClick={() => updateStatus(loan.id, 'approved')} className="rounded-full bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700">
-                                Approve
+                                Aprobar
                               </button>
                               <button onClick={() => updateStatus(loan.id, 'rejected')} className="rounded-full bg-rose-100 px-3 py-2 text-xs font-semibold text-rose-700">
-                                Reject
+                                Rechazar
                               </button>
                             </>
                           )}
                           {loan.status === 'approved' && (
                             <button onClick={() => updateStatus(loan.id, 'handled')} className="rounded-full bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-800">
-                              Mark handled
+                              Marcar entregado
                             </button>
                           )}
                           {loan.status === 'handled' && (
                             <button onClick={() => updateStatus(loan.id, 'returned')} className="rounded-full bg-sky-100 px-3 py-2 text-xs font-semibold text-sky-700">
-                              Mark returned
+                              Marcar devuelto
                             </button>
                           )}
-                          <span className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700">{loan.status}</span>
+                          <span className="rounded-full bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700">{loan.status === 'pending' ? 'pendiente' : loan.status === 'approved' ? 'aprobado' : loan.status === 'handled' ? 'entregado' : loan.status === 'returned' ? 'devuelto' : loan.status === 'rejected' ? 'rechazado' : loan.status}</span>
                         </div>
                       </div>
                     </div>
@@ -179,8 +179,8 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
         </div>
 
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Inventory overview</p>
-          <h2 className="mt-2 text-2xl font-semibold text-slate-900">Book availability by tenant</h2>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Resumen de Inventario</p>
+          <h2 className="mt-2 text-2xl font-semibold text-slate-900">Disponibilidad en cada sede</h2>
           <div className="mt-6 space-y-3">
             {books.map((book) => (
               <div key={book.id} className="rounded-[1.4rem] border border-slate-200 bg-slate-50 px-4 py-4">

@@ -145,9 +145,9 @@ export default function BookManagementClient({ libraries }: BookManagementClient
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Book editor</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Editor de Libros</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900">
-              {editingBookId ? 'Update a catalog record' : 'Add a book to a library'}
+              {editingBookId ? 'Actualiza un libro en el catálogo' : 'Agrega un libro a la biblioteca'}
             </h2>
           </div>
           {editingBookId && (
@@ -156,14 +156,14 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               onClick={() => resetForm(selectedLibraryId)}
               className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
             >
-              Cancel edit
+              Cancelar edición
             </button>
           )}
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Library</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700">Biblioteca</span>
             <select
               value={form.library_id}
               onChange={(event) => {
@@ -181,7 +181,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Title</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700">Título</span>
             <input
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
@@ -190,7 +190,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Author</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700">Autor</span>
             <input
               value={form.author}
               onChange={(event) => setForm((current) => ({ ...current, author: event.target.value }))}
@@ -199,7 +199,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Category</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700">Categoría</span>
             <input
               value={form.category}
               onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
@@ -209,7 +209,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
 
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Total copies</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700">Total de copias</span>
               <input
                 type="number"
                 min={0}
@@ -225,7 +225,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Available copies</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700">Copias disponibles</span>
               <input
                 type="number"
                 min={0}
@@ -244,7 +244,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           {error && <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
           <button className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
-            {editingBookId ? 'Save changes' : 'Create book'}
+            {editingBookId ? 'Guardar cambios' : 'Guardar libro'}
           </button>
         </form>
       </section>
@@ -252,8 +252,8 @@ export default function BookManagementClient({ libraries }: BookManagementClient
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Catalog inventory</p>
-            <h2 className="mt-2 text-2xl font-semibold text-slate-900">{selectedLibrary?.name || 'Assigned library'} books</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Inventario completo</p>
+            <h2 className="mt-2 text-2xl font-semibold text-slate-900">Libros de {selectedLibrary?.name || 'la biblioteca'}</h2>
           </div>
           <select
             value={selectedLibraryId}
@@ -273,7 +273,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           </select>
         </div>
 
-        {loading && <p className="mt-6 text-sm text-slate-500">Loading books...</p>}
+        {loading && <p className="mt-6 text-sm text-slate-500">Cargando los libros...</p>}
 
         <div className="mt-6 space-y-3">
           {books.map((book) => (
@@ -283,7 +283,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   <p className="text-lg font-semibold text-slate-900">{book.title}</p>
                   <p className="text-sm text-slate-600">{book.author} · {book.category}</p>
                   <p className="mt-2 text-sm text-slate-500">
-                    Available {book.available_copies} of {book.total_copies}
+                    Disponibles {book.available_copies} de {book.total_copies}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -292,14 +292,14 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                     onClick={() => startEdit(book)}
                     className="rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-800"
                   >
-                    Edit
+                    Editar
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDelete(book)}
                     className="rounded-full bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-700"
                   >
-                    Delete
+                    Eliminar
                   </button>
                 </div>
               </div>
@@ -308,7 +308,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
 
           {!loading && !books.length && (
             <div className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-              No books exist for this library yet. Create the first one from the form.
+              Aún no hay libros en esta sede. Crea el primero completando el formulario.
             </div>
           )}
         </div>
