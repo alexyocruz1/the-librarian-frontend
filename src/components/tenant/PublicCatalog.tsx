@@ -104,7 +104,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
     <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
       <header className="relative z-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 md:px-10">
         <div className="flex flex-wrap gap-3">
-          <Link href={librarySlug ? `/l/${librarySlug}/libraries` : '/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
+          <Link href={'/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
             &larr; {t('common.changeLibrary') || 'Cambiar sede'}
           </Link>
           <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
