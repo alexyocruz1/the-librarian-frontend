@@ -96,14 +96,14 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
 
   return (
     <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
-      <LanguageSwitcher />
-      <header className="absolute top-6 left-6 z-40">
-         <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="mt-0 inline-flex rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
+      <header className="relative z-40 flex flex-wrap items-start justify-between gap-4 px-6 pt-6 md:px-10">
+         <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
             {t('dashboard.quickActions.myRequests') || 'Look up my loans'}
           </Link>
+          <LanguageSwitcher className="flex items-center shrink-0 z-50" />
       </header>
 
-      <section className="mx-auto max-w-7xl pt-20 px-6 pb-10 md:px-10 md:py-14">
+      <section className="mx-auto max-w-7xl pt-10 px-6 pb-10 md:px-10 md:py-10">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.7fr]">
           <div className="space-y-6">
             <div className="space-y-4">

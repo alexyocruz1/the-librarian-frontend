@@ -3,11 +3,11 @@
 import { useI18n } from '@/context/I18nContext';
 import { SupportedLocale } from '@/i18n';
 
-export default function LanguageSwitcher() {
+export default function LanguageSwitcher({ className }: { className?: string }) {
   const { locale, setLocale, t } = useI18n();
 
   return (
-    <div className="absolute right-6 top-6 flex items-center gap-2 z-50">
+    <div className={className ?? "absolute right-6 top-6 flex items-center gap-2 z-50"}>
       <select
         value={locale}
         onChange={(e) => setLocale(e.target.value as SupportedLocale)}

@@ -623,7 +623,7 @@
   "borrowRequest.fields.notes": "Notas (Opcional)",
   "borrowRequest.placeholders.notes": "Cualquier nota adicional para tu solicitud...",
   "borrowRequest.help.notes": "Notas opcionales para ayudar al bibliotecario a entender tu solicitud",
-  "borrowRequest.actions.submit": "Enviar Pedido",
+  "borrowRequest.actions.submit": "Solicitar Libro",
   "borrowRequest.errors.noLibrarySelected": "Por favor selecciona una biblioteca primero",
   "borrowRequest.errors.noCopiesAvailable": "No hay copias disponibles para este título",
   "borrowRequest.errors.createFailed": "Error al crear la solicitud de préstamo",
@@ -735,5 +735,3 @@
   "userModal.actions.create": "Crear Usuario",
   "userModal.actions.update": "Actualizar Usuario"
 }
-
-
