@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getLibrarianSession, listAccessibleLibraries } from '@/lib/library-data';
+import LogoutButton from '@/components/auth/LogoutButton';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getLibrarianSession();
@@ -39,6 +40,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                 </div>
               ))}
             </div>
+          </div>
+          <div className="mt-8">
+            <LogoutButton />
           </div>
         </aside>
 
