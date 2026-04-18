@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 import { useI18n } from '@/context/I18nContext';
 
@@ -41,6 +42,11 @@ export default function LibrarianLoginForm() {
   return (
     <div className="w-full relative">
       <LanguageSwitcher />
+      <div className="mx-auto w-full max-w-md mb-6">
+        <Link href="/" className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-slate-900 transition">
+          &larr; {t('common.backToHome') || 'Back to home'}
+        </Link>
+      </div>
       <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_25px_70px_-40px_rgba(15,23,42,0.35)]">
         <div>
           <h1 className="font-serif text-3xl font-bold text-slate-900 text-center">{t('auth.login.title') || 'Login'}</h1>
