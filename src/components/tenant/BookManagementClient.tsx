@@ -507,8 +507,11 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                       {book.author} · {book.categories.join(', ')}
                     </p>
                     <div className="mt-2 text-[10px] font-mono text-slate-400">
-                       ID: {book.library_codes.join(', ')}
+                       ID: {book.library_codes.length > 1 
+                         ? `${book.library_codes[0]} — ${book.library_codes[book.library_codes.length - 1]}`
+                         : book.library_codes[0] || 'N/A'}
                     </div>
+
                     <div className="mt-3 flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">Disponibilidad:</span>
                       <span className={cn(
