@@ -102,12 +102,18 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
 
   return (
     <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
-      <header className="relative z-0 flex flex-wrap items-start justify-between gap-4 px-6 pt-6 md:px-10">
-         <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
-            {t('dashboard.quickActions.myRequests') || 'Consultar mis préstamos'}
-          </Link>
+      <header className="relative z-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 md:px-10">
+         <div className="flex flex-wrap gap-3">
+            <Link href="/" className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
+              &larr; Cambiar sede
+            </Link>
+            <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
+              {t('dashboard.quickActions.myRequests') || 'Consultar mis préstamos'}
+            </Link>
+          </div>
           <LanguageSwitcher className="flex items-center shrink-0 z-50" />
       </header>
+
 
       <section className="mx-auto max-w-7xl pt-10 px-6 pb-10 md:px-10 md:py-10">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.7fr]">
