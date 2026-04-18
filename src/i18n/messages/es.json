@@ -650,6 +650,7 @@
   "copyModal.status.reserved": "Reservado",
   "copyModal.status.lost": "Perdido",
   "copyModal.status.maintenance": "Mantenimiento",
+  "common.changeLibrary": "Cambiar Librería",
   "copyModal.condition.new": "Nuevo",
   "copyModal.condition.good": "Bueno",
   "copyModal.condition.used": "Usado",
