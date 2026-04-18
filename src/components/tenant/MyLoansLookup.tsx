@@ -4,7 +4,11 @@ import { FormEvent, useState } from 'react';
 import { TenantLoan } from '@/types/tenant';
 import { formatDateTime } from '@/lib/utils';
 
-export default function MyLoansLookup() {
+interface MyLoansLookupProps {
+  librarySlug?: string;
+}
+
+export default function MyLoansLookup({ librarySlug }: MyLoansLookupProps) {
   const [identifier, setIdentifier] = useState('');
   const [loans, setLoans] = useState<TenantLoan[]>([]);
   const [message, setMessage] = useState<string | null>(null);
@@ -15,7 +19,10 @@ export default function MyLoansLookup() {
     setLoading(true);
     setMessage(null);
 
-    const response = await fetch(`/api/public/my-loans?identifier=${encodeURIComponent(identifier)}`);
+    const endpoint = librarySlug
+      ? `/api/public/my-loans/${encodeURIComponent(librarySlug)}?identifier=${encodeURIComponent(identifier)}`
+      : `/api/public/my-loans?identifier=${encodeURIComponent(identifier)}`;
+    const response = await fetch(endpoint);
     const payload = await response.json();
 
     if (!response.ok) {
@@ -37,7 +44,7 @@ export default function MyLoansLookup() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Loan lookup</p>
           <h1 className="font-serif text-5xl text-slate-900">Find every request tied to your identifier.</h1>
           <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-600">
-            Results stay scoped to the current library subdomain, so patrons only see their own local request history.
+            Results stay scoped to the current library, so patrons only see their own local request history.
           </p>
         </div>
 

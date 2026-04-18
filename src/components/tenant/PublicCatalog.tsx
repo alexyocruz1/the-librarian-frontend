@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { LibraryTenant, TenantBook } from '@/types/tenant';
 import { cn, formatDateTime } from '@/lib/utils';
@@ -9,7 +10,11 @@ interface CatalogResponse {
   books: TenantBook[];
 }
 
-export default function PublicCatalog() {
+interface PublicCatalogProps {
+  librarySlug?: string;
+}
+
+export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
   const [data, setData] = useState<CatalogResponse | null>(null);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -23,10 +28,13 @@ export default function PublicCatalog() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const booksEndpoint = librarySlug
+      ? `/api/public/books/${encodeURIComponent(librarySlug)}`
+      : '/api/public/books';
 
     async function loadBooks() {
       setLoading(true);
-      const response = await fetch(`/api/public/books${query ? `?q=${encodeURIComponent(query)}` : ''}`, {
+      const response = await fetch(`${booksEndpoint}${query ? `?q=${encodeURIComponent(query)}` : ''}`, {
         signal: controller.signal,
       });
       const payload = await response.json();
@@ -37,7 +45,7 @@ export default function PublicCatalog() {
     loadBooks().catch(() => setLoading(false));
 
     return () => controller.abort();
-  }, [query]);
+  }, [librarySlug, query]);
 
   const groupedCategories = useMemo(() => {
     const categoryMap = new Map<string, number>();
@@ -51,7 +59,11 @@ export default function PublicCatalog() {
     event.preventDefault();
     setStatusMessage(null);
 
-    const response = await fetch('/api/public/loan-requests', {
+    const loanEndpoint = librarySlug
+      ? `/api/public/loan-requests/${encodeURIComponent(librarySlug)}`
+      : '/api/public/loan-requests';
+
+    const response = await fetch(loanEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +105,7 @@ export default function PublicCatalog() {
                   {data?.library?.name || 'Your neighborhood library'}, organized around fast borrowing.
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                  Browse only books that are currently available, request a loan without creating an account, and keep every action scoped to the current library subdomain.
+                  Browse only books that are currently available, request a loan without creating an account, and keep every action scoped to the current library.
                 </p>
               </div>
             </div>
@@ -183,13 +195,15 @@ export default function PublicCatalog() {
           <aside className="space-y-5">
             <div className="rounded-[2rem] bg-slate-950 p-6 text-white shadow-[0_30px_70px_-45px_rgba(15,23,42,0.9)]">
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-300">Current tenant</p>
-              <h2 className="mt-3 text-3xl font-semibold">{data?.library?.subdomain || 'library'}.yourdomain.com</h2>
+              <h2 className="mt-3 text-3xl font-semibold">
+                {librarySlug ? `/l/${librarySlug}` : data?.library?.subdomain || 'library'}
+              </h2>
               <p className="mt-3 text-sm leading-7 text-slate-300">
                 {data?.library?.description || 'Each tenant keeps books, loans, and librarian access fully isolated.'}
               </p>
-              <a href="/my-loans" className="mt-6 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">
+              <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="mt-6 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-100">
                 Look up my loans
-              </a>
+              </Link>
             </div>
 
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6">

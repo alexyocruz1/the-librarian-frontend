@@ -17,11 +17,12 @@ export default function RootHostLanding() {
           <section className="rounded-[2rem] border border-slate-200 bg-white p-8">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">For patrons</p>
             <p className="mt-4 text-base leading-8 text-slate-600">
-              Use the assigned library subdomain to browse books, request loans, and look up your requests by identifier.
+              Use the assigned library link to browse books, request loans, and look up your requests by identifier.
             </p>
             <div className="mt-6 rounded-[1.5rem] bg-slate-50 p-5 text-sm text-slate-700">
-              Example:
-              <div className="mt-2 font-semibold text-slate-900">https://honduras.yourdomain.com</div>
+              Example paths:
+              <div className="mt-2 font-semibold text-slate-900">/l/honduras</div>
+              <div className="mt-1 font-semibold text-slate-900">/l/newyork</div>
             </div>
           </section>
 
