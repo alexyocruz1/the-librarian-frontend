@@ -151,6 +151,8 @@
   "common.all": "Todos",
   "common.yes": "Sí",
   "common.no": "No",
+  "landing.librarian": "Soy bibliotecario",
+  "landing.books": "Busco libros",
   "common.selectLibrary": "Elige una biblioteca",
   "common.selectLibraryDesc": "Selecciona la biblioteca desde la que deseas navegar y pedir prestado.",
   "common.backToHome": "Volver al inicio",
