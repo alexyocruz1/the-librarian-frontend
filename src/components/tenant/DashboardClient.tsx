@@ -191,7 +191,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                     <p className="text-sm font-medium text-slate-500">{items[0].identifier}</p>
                   </div>
                   <span className="rounded-full bg-slate-200 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                    Sede: {items[0].library_id}
+                    Sede: {libraries.find((l) => l.id === items[0].library_id)?.name || items[0].library_id}
                   </span>
                 </div>
 
@@ -210,8 +210,8 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4 border-t lg:border-t-0 pt-4 lg:pt-0">
-                          <div className="flex flex-col items-end gap-1">
+                        <div className="flex flex-col lg:items-end gap-4 border-t lg:border-t-0 pt-4 lg:pt-0">
+                          <div className="flex flex-col items-start lg:items-end gap-1">
                             <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">Estado</span>
                             <span className={cn(
                               "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider",
