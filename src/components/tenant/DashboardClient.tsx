@@ -279,7 +279,8 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="font-bold text-slate-900 truncate">{book.title}</p>
-                      <p className="text-xs text-slate-500 font-medium">{book.author} · {book.category}</p>
+                      <p className="text-xs text-slate-500 font-medium">{book.author} · {book.categories?.join(', ') || ''}</p>
+
                     </div>
                     <span className={cn(
                       "rounded-full px-2 py-1 text-xs font-bold",

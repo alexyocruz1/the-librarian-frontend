@@ -14,9 +14,18 @@ export interface TenantBook {
   library_id: string;
   title: string;
   author: string;
-  category: string;
+  categories: string[];
   total_copies: number;
   available_copies: number;
+  library_codes: string[]; // Sequential codes like subdomain0001
+  book_code?: string;      // Manual code
+  editorial?: string;
+  edition?: string;
+  cover_type?: 'hardcover' | 'softcover';
+  shelf_location?: string;
+  cost?: number;
+  acquired_at?: string;
+  image_url?: string;
   archived_at?: string | null;
 }
 
@@ -32,7 +41,7 @@ export interface TenantLoan {
   updated_at: string;
   handled_at?: string | null;
   returned_at?: string | null;
-  book?: Pick<TenantBook, 'id' | 'title' | 'author' | 'category'>;
+  book?: Pick<TenantBook, 'id' | 'title' | 'author' | 'categories'>;
 }
 
 export interface LibrarianSession {
@@ -53,7 +62,16 @@ export interface BookMutationPayload {
   library_id: string;
   title: string;
   author: string;
-  category: string;
+  categories: string[];
   total_copies: number;
   available_copies: number;
+  book_code?: string;
+  editorial?: string;
+  edition?: string;
+  cover_type?: 'hardcover' | 'softcover';
+  shelf_location?: string;
+  cost?: number;
+  acquired_at?: string;
+  image_url?: string;
 }
+

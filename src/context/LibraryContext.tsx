@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Library } from '@/types';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -27,7 +27,7 @@ export function LibraryProvider({ children }: LibraryProviderProps) {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const fetchLibraries = async () => {
+  const fetchLibraries = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -51,7 +51,7 @@ export function LibraryProvider({ children }: LibraryProviderProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedLibrary, user?.role]);
 
   const refreshLibraries = async () => {
     await fetchLibraries();
@@ -60,6 +60,7 @@ export function LibraryProvider({ children }: LibraryProviderProps) {
   useEffect(() => {
     fetchLibraries();
   }, [fetchLibraries]);
+
 
   // Reset selected library when user changes
   useEffect(() => {

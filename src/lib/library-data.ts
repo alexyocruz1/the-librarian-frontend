@@ -20,22 +20,23 @@ function ensureLibraryAccess(session: LibrarianSession, libraryId: string) {
 }
 
 function validateBookPayload(payload: BookMutationPayload) {
-  if (!payload.library_id || !payload.title.trim() || !payload.author.trim() || !payload.category.trim()) {
-    throw new Error('Library, title, author, and category are required.');
+  if (!payload.library_id || !payload.title.trim() || !payload.author.trim() || !payload.categories.length) {
+    throw new Error('La biblioteca, el título, el autor y al menos una categoría son obligatorios.');
   }
 
   if (payload.total_copies < 0) {
-    throw new Error('Total copies cannot be negative.');
+    throw new Error('El total de copias no puede ser negativo.');
   }
 
   if (payload.available_copies < 0) {
-    throw new Error('Available copies cannot be negative.');
+    throw new Error('Las copias disponibles no pueden ser negativas.');
   }
 
   if (payload.available_copies > payload.total_copies) {
-    throw new Error('Available copies cannot exceed total copies.');
+    throw new Error('Las copias disponibles no pueden exceder el total de copias.');
   }
 }
+
 
 function withBook(loan: TenantLoan): TenantLoan {
   const book = mockBooks.find((item) => item.id === loan.book_id);
@@ -46,7 +47,8 @@ function withBook(loan: TenantLoan): TenantLoan {
           id: book.id,
           title: book.title,
           author: book.author,
-          category: book.category,
+        categories: book.categories,
+
         }
       : undefined,
   };
@@ -90,7 +92,8 @@ export async function listAvailableBooks(libraryId: string, query?: string): Pro
         }
 
         const needle = query.toLowerCase();
-        return [book.title, book.author, book.category].some((value) => value.toLowerCase().includes(needle));
+        return [book.title, book.author, ...book.categories].some((value) => value.toLowerCase().includes(needle));
+
       });
   }
 
@@ -364,15 +367,44 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
   validateBookPayload(payload);
   ensureLibraryAccess(session, payload.library_id);
 
+  const normalizedCategories = payload.categories.map(c => c.trim().toLowerCase());
+
   if (!isSupabaseConfigured()) {
+    const library = mockLibraries.find(l => l.id === payload.library_id);
+    const subdomain = library?.subdomain || 'lib';
+    
+    // Find highest sequence number for this library
+    const libBooks = mockBooks.filter(b => b.library_id === payload.library_id);
+    let maxSeq = 0;
+    libBooks.forEach(b => {
+      b.library_codes.forEach(code => {
+        const num = parseInt(code.replace(subdomain, ''));
+        if (!isNaN(num) && num > maxSeq) maxSeq = num;
+      });
+    });
+
+    const library_codes: string[] = [];
+    for (let i = 1; i <= payload.total_copies; i++) {
+      library_codes.push(`${subdomain}${String(maxSeq + i).padStart(4, '0')}`);
+    }
+
     const book: TenantBook = {
       id: `book-${mockBooks.length + 1}`,
       library_id: payload.library_id,
       title: payload.title.trim(),
       author: payload.author.trim(),
-      category: payload.category.trim(),
+      categories: normalizedCategories,
       total_copies: payload.total_copies,
       available_copies: payload.available_copies,
+      library_codes,
+      book_code: payload.book_code,
+      editorial: payload.editorial,
+      edition: payload.edition,
+      cover_type: payload.cover_type,
+      shelf_location: payload.shelf_location,
+      cost: payload.cost,
+      acquired_at: payload.acquired_at,
+      image_url: payload.image_url,
       archived_at: null,
     };
 
@@ -380,8 +412,10 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
     return book;
   }
 
+  // Implementation for Supabase would go here (mapping the fields)
+  // For this project, we primarily use the mock logic for demonstration
   const result = await supabaseRest<TenantBook[]>(
-    '/rest/v1/books?select=id,library_id,title,author,category,total_copies,available_copies,archived_at',
+    '/rest/v1/books?select=id,library_id,title,author,categories,total_copies,available_copies,library_codes,book_code,editorial,edition,cover_type,shelf_location,cost,acquired_at,image_url,archived_at',
     {
       method: 'POST',
       body: JSON.stringify([
@@ -389,9 +423,17 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
           library_id: payload.library_id,
           title: payload.title.trim(),
           author: payload.author.trim(),
-          category: payload.category.trim(),
+          categories: normalizedCategories,
           total_copies: payload.total_copies,
           available_copies: payload.available_copies,
+          book_code: payload.book_code,
+          editorial: payload.editorial,
+          edition: payload.edition,
+          cover_type: payload.cover_type,
+          shelf_location: payload.shelf_location,
+          cost: payload.cost,
+          acquired_at: payload.acquired_at,
+          image_url: payload.image_url,
         },
       ]),
     },
@@ -405,45 +447,83 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
   validateBookPayload(payload);
   ensureLibraryAccess(session, payload.library_id);
 
+  const normalizedCategories = payload.categories.map(c => c.trim().toLowerCase());
+
   if (!isSupabaseConfigured()) {
     const book = mockBooks.find((item) => item.id === bookId && !item.archived_at);
 
     if (!book) {
-      throw new Error('Book not found.');
+      throw new Error('Libro no encontrado.');
     }
 
     ensureLibraryAccess(session, book.library_id);
 
+    // If total_copies increased, we should generate more library_codes
+    if (payload.total_copies > book.total_copies) {
+      const library = mockLibraries.find(l => l.id === payload.library_id);
+      const subdomain = library?.subdomain || 'lib';
+      const libBooks = mockBooks.filter(b => b.library_id === payload.library_id);
+      let maxSeq = 0;
+      libBooks.forEach(b => {
+        b.library_codes.forEach(code => {
+          const num = parseInt(code.replace(subdomain, ''));
+          if (!isNaN(num) && num > maxSeq) maxSeq = num;
+        });
+      });
+
+      const jump = payload.total_copies - book.total_copies;
+      for (let i = 1; i <= jump; i++) {
+        book.library_codes.push(`${subdomain}${String(maxSeq + i).padStart(4, '0')}`);
+      }
+    }
+
     book.title = payload.title.trim();
     book.author = payload.author.trim();
-    book.category = payload.category.trim();
+    book.categories = normalizedCategories;
     book.total_copies = payload.total_copies;
     book.available_copies = payload.available_copies;
+    book.book_code = payload.book_code;
+    book.editorial = payload.editorial;
+    book.edition = payload.edition;
+    book.cover_type = payload.cover_type;
+    book.shelf_location = payload.shelf_location;
+    book.cost = payload.cost;
+    book.acquired_at = payload.acquired_at;
+    book.image_url = payload.image_url;
 
     return book;
   }
 
   const result = await supabaseRest<TenantBook[]>(
-    `/rest/v1/books?id=eq.${bookId}&library_id=eq.${payload.library_id}&archived_at=is.null&select=id,library_id,title,author,category,total_copies,available_copies,archived_at`,
+    `/rest/v1/books?id=eq.${bookId}&library_id=eq.${payload.library_id}&archived_at=is.null&select=*`,
     {
       method: 'PATCH',
       body: JSON.stringify({
         title: payload.title.trim(),
         author: payload.author.trim(),
-        category: payload.category.trim(),
+        categories: normalizedCategories,
         total_copies: payload.total_copies,
         available_copies: payload.available_copies,
+        book_code: payload.book_code,
+        editorial: payload.editorial,
+        edition: payload.edition,
+        cover_type: payload.cover_type,
+        shelf_location: payload.shelf_location,
+        cost: payload.cost,
+        acquired_at: payload.acquired_at,
+        image_url: payload.image_url,
       }),
     },
     { service: true, prefer: 'return=representation' }
   );
 
   if (!result[0]) {
-    throw new Error('Book not found.');
+    throw new Error('Libro no encontrado.');
   }
 
   return result[0];
 }
+
 
 export async function deleteDashboardBook(session: LibrarianSession, bookId: string, libraryId: string) {
   ensureLibraryAccess(session, libraryId);

@@ -32,9 +32,17 @@ export async function POST(request: NextRequest) {
       library_id: String(body.library_id || ''),
       title: String(body.title || ''),
       author: String(body.author || ''),
-      category: String(body.category || ''),
+      categories: Array.isArray(body.categories) ? body.categories.map(String) : [],
       total_copies: Number(body.total_copies || 0),
       available_copies: Number(body.available_copies || 0),
+      book_code: body.book_code ? String(body.book_code) : undefined,
+      editorial: body.editorial ? String(body.editorial) : undefined,
+      edition: body.edition ? String(body.edition) : undefined,
+      cover_type: body.cover_type as any,
+      shelf_location: body.shelf_location ? String(body.shelf_location) : undefined,
+      cost: body.cost ? Number(body.cost) : undefined,
+      acquired_at: body.acquired_at ? String(body.acquired_at) : undefined,
+      image_url: body.image_url ? String(body.image_url) : undefined,
     });
     return NextResponse.json({ book }, { status: 201 });
   } catch (error) {
@@ -58,9 +66,17 @@ export async function PATCH(request: NextRequest) {
       library_id: String(body.library_id || ''),
       title: String(body.title || ''),
       author: String(body.author || ''),
-      category: String(body.category || ''),
+      categories: Array.isArray(body.categories) ? body.categories.map(String) : [],
       total_copies: Number(body.total_copies || 0),
       available_copies: Number(body.available_copies || 0),
+      book_code: body.book_code ? String(body.book_code) : undefined,
+      editorial: body.editorial ? String(body.editorial) : undefined,
+      edition: body.edition ? String(body.edition) : undefined,
+      cover_type: body.cover_type as any,
+      shelf_location: body.shelf_location ? String(body.shelf_location) : undefined,
+      cost: body.cost ? Number(body.cost) : undefined,
+      acquired_at: body.acquired_at ? String(body.acquired_at) : undefined,
+      image_url: body.image_url ? String(body.image_url) : undefined,
     });
     return NextResponse.json({ book });
   } catch (error) {
@@ -70,6 +86,7 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
 
 export async function DELETE(request: NextRequest) {
   const session = await getLibrarianSession();
