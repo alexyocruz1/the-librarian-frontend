@@ -370,7 +370,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               </label>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-4">
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-slate-700">Costo ($)</span>
                 <input
@@ -384,15 +384,35 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-700">Total de copias</span>
+                <span className="mb-2 block text-sm font-medium text-slate-700">Total</span>
                 <input
                   type="number"
                   min={1}
                   value={form.total_copies}
+                  onChange={(event) => {
+                    const val = Number(event.target.value || 1);
+                    setForm((current) => ({
+                      ...current,
+                      total_copies: val,
+                      // If creating new, auto-match availability
+                      available_copies: editingBookId ? current.available_copies : val
+                    }));
+                  }}
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-slate-700">Disponibles</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={form.total_copies}
+                  value={form.available_copies}
                   onChange={(event) =>
                     setForm((current) => ({
                       ...current,
-                      total_copies: Number(event.target.value || 1),
+                      available_copies: Number(event.target.value || 0),
                     }))
                   }
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
@@ -409,6 +429,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 />
               </label>
             </div>
+
 
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">URL de Imagen</span>

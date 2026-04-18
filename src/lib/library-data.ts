@@ -369,25 +369,50 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
 
   const normalizedCategories = payload.categories.map(c => c.trim().toLowerCase());
 
+  // Generation logic for library_codes (needs to work for both Mock and Supabase)
+  const library_codes: string[] = [];
+
+  
+  // 1. Get the library subdomain
+  let subdomain = 'lib';
   if (!isSupabaseConfigured()) {
     const library = mockLibraries.find(l => l.id === payload.library_id);
-    const subdomain = library?.subdomain || 'lib';
-    
-    // Find highest sequence number for this library
+    subdomain = (library?.subdomain || 'lib').toLowerCase();
+  } else {
+    const libs = await listAccessibleLibraries(session);
+    const lib = libs.find(l => l.id === payload.library_id);
+    subdomain = (lib?.subdomain || 'lib').toLowerCase();
+  }
+
+  // 2. Find max sequence
+  let maxSeq = 0;
+  if (!isSupabaseConfigured()) {
     const libBooks = mockBooks.filter(b => b.library_id === payload.library_id);
-    let maxSeq = 0;
     libBooks.forEach(b => {
       b.library_codes.forEach(code => {
         const num = parseInt(code.replace(subdomain, ''));
         if (!isNaN(num) && num > maxSeq) maxSeq = num;
       });
     });
+  } else {
+    // In a real app we'd query Supabase for the max code, 
+    // but for the sake of this implementation we'll fetch existing and find max locally
+    const existing = await listDashboardBooks(session, payload.library_id);
+    existing.forEach(b => {
 
-    const library_codes: string[] = [];
-    for (let i = 1; i <= payload.total_copies; i++) {
-      library_codes.push(`${subdomain}${String(maxSeq + i).padStart(4, '0')}`);
-    }
+      b.library_codes?.forEach(code => {
+        const num = parseInt(code.replace(subdomain, ''));
+        if (!isNaN(num) && num > maxSeq) maxSeq = num;
+      });
+    });
+  }
 
+  // 3. Generate new codes
+  for (let i = 1; i <= payload.total_copies; i++) {
+    library_codes.push(`${subdomain}${String(maxSeq + i).padStart(4, '0')}`);
+  }
+
+  if (!isSupabaseConfigured()) {
     const book: TenantBook = {
       id: `book-${mockBooks.length + 1}`,
       library_id: payload.library_id,
@@ -412,10 +437,8 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
     return book;
   }
 
-  // Implementation for Supabase would go here (mapping the fields)
-  // For this project, we primarily use the mock logic for demonstration
   const result = await supabaseRest<TenantBook[]>(
-    '/rest/v1/books?select=id,library_id,title,author,categories,total_copies,available_copies,library_codes,book_code,editorial,edition,cover_type,shelf_location,cost,acquired_at,image_url,archived_at',
+    '/rest/v1/books?select=*',
     {
       method: 'POST',
       body: JSON.stringify([
@@ -426,6 +449,7 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
           categories: normalizedCategories,
           total_copies: payload.total_copies,
           available_copies: payload.available_copies,
+          library_codes,
           book_code: payload.book_code,
           editorial: payload.editorial,
           edition: payload.edition,
@@ -461,7 +485,7 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
     // If total_copies increased, we should generate more library_codes
     if (payload.total_copies > book.total_copies) {
       const library = mockLibraries.find(l => l.id === payload.library_id);
-      const subdomain = library?.subdomain || 'lib';
+      const subdomain = (library?.subdomain || 'lib').toLowerCase();
       const libBooks = mockBooks.filter(b => b.library_id === payload.library_id);
       let maxSeq = 0;
       libBooks.forEach(b => {
@@ -494,6 +518,33 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
     return book;
   }
 
+  // Handle library_codes expansion for Supabase
+  const currentBook = await supabaseRest<TenantBook[]>(`/rest/v1/books?id=eq.${bookId}&select=*`, { method: 'GET' }, { service: true });
+  const book = currentBook[0];
+  const library_codes = book.library_codes || [];
+
+
+  if (payload.total_copies > book.total_copies) {
+    const libs = await listAccessibleLibraries(session);
+    const lib = libs.find(l => l.id === payload.library_id);
+    const subdomain = (lib?.subdomain || 'lib').toLowerCase();
+    
+    const existing = await listDashboardBooks(session, payload.library_id);
+    let maxSeq = 0;
+    existing.forEach(b => {
+
+      b.library_codes?.forEach(code => {
+        const num = parseInt(code.replace(subdomain, ''));
+        if (!isNaN(num) && num > maxSeq) maxSeq = num;
+      });
+    });
+
+    const jump = payload.total_copies - book.total_copies;
+    for (let i = 1; i <= jump; i++) {
+      library_codes.push(`${subdomain}${String(maxSeq + i).padStart(4, '0')}`);
+    }
+  }
+
   const result = await supabaseRest<TenantBook[]>(
     `/rest/v1/books?id=eq.${bookId}&library_id=eq.${payload.library_id}&archived_at=is.null&select=*`,
     {
@@ -504,6 +555,7 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
         categories: normalizedCategories,
         total_copies: payload.total_copies,
         available_copies: payload.available_copies,
+        library_codes,
         book_code: payload.book_code,
         editorial: payload.editorial,
         edition: payload.edition,
@@ -523,6 +575,7 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
 
   return result[0];
 }
+
 
 
 export async function deleteDashboardBook(session: LibrarianSession, bookId: string, libraryId: string) {
