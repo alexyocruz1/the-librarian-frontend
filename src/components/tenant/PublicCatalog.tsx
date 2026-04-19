@@ -153,6 +153,15 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                 {!loading &&
                   data?.books.map((book) => (
                     <article key={book.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5 transition hover:-translate-y-0.5 hover:bg-white flex flex-col justify-between">
+                      {/* Hidden probe to detect broken images early */}
+                      {book.image_url && !brokenImages.has(book.image_url) && (
+                        <img
+                          src={book.image_url}
+                          alt=""
+                          className="hidden"
+                          onError={() => setBrokenImages(prev => new Set(prev).add(book.image_url!))}
+                        />
+                      )}
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-4">
                           <div>

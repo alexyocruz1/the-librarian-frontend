@@ -494,7 +494,17 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           <div className="mt-6 space-y-3 overflow-y-auto pr-2 max-h-[1000px]">
             {filteredBooks.map((book) => (
               <div key={book.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 hover:bg-white hover:border-slate-200 transition">
+                {/* Hidden probe to detect broken images early */}
+                {book.image_url && !brokenImages.has(book.image_url) && (
+                  <img
+                    src={book.image_url}
+                    alt=""
+                    className="hidden"
+                    onError={() => setBrokenImages(prev => new Set(prev).add(book.image_url!))}
+                  />
+                )}
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                        <p className="text-lg font-bold text-slate-900 truncate">{book.title}</p>
