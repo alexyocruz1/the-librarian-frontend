@@ -38,6 +38,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryInput, setCategoryInput] = useState('');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!selectedLibraryId && libraries[0]?.id) {
@@ -497,16 +498,18 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                        <p className="text-lg font-bold text-slate-900 truncate">{book.title}</p>
-                       <button 
-                        type="button" 
-                        onClick={() => setPreviewImage(book.image_url || 'https://via.placeholder.com/400x600?text=Sin+Imagen')}
-                        className="text-slate-400 hover:text-slate-900 transition"
-                      >
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                           <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                         </svg>
-                       </button>
+                       {book.image_url && !brokenImages.has(book.image_url) && (
+                         <button 
+                          type="button" 
+                          onClick={() => setPreviewImage(book.image_url!)}
+                          className="text-slate-400 hover:text-slate-900 transition"
+                        >
+                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                           </svg>
+                         </button>
+                       )}
                     </div>
                     <p className="text-sm text-slate-500 font-medium">
                       {book.author} · {book.categories.join(', ')}
@@ -575,8 +578,12 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   className="object-cover"
                   unoptimized
                   onError={(e) => {
+                    if (previewImage) {
+                      setBrokenImages(prev => new Set(prev).add(previewImage));
+                    }
                     (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
                   }}
+
                 />
               </div>
 

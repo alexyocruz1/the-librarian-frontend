@@ -99,6 +99,8 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
   }
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+
 
   return (
     <main className="relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(246,188,96,0.22),_transparent_28%),linear-gradient(180deg,_#fffdf8_0%,_#fff_48%,_#f6f8fb_100%)]">
@@ -157,16 +159,18 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500">{book.categories.join(', ')}</p>
                             <div className="flex items-center gap-2 mt-1">
                               <h2 className="text-xl font-semibold text-slate-900 leading-tight">{book.title}</h2>
-                              <button
-                                type="button"
-                                onClick={() => setPreviewImage(book.image_url || 'https://via.placeholder.com/400x600?text=Sin+Imagen')}
-                                className="text-slate-400 hover:text-slate-900 transition shrink-0"
-                              >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                  <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                                </svg>
-                              </button>
+                              {book.image_url && !brokenImages.has(book.image_url) && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewImage(book.image_url!)}
+                                  className="text-slate-400 hover:text-slate-900 transition shrink-0"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              )}
                             </div>
                             <p className="mt-1 text-sm text-slate-600">{book.author}</p>
                           </div>
@@ -263,8 +267,12 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                 className="object-cover"
                 unoptimized
                 onError={(e) => {
+                  if (previewImage) {
+                    setBrokenImages(prev => new Set(prev).add(previewImage));
+                  }
                   (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
                 }}
+
               />
             </div>
 
