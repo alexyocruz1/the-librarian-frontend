@@ -15,8 +15,10 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
   const [books, setBooks] = useState<TenantBook[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'history'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'overdue' | 'history'>('pending');
   const [searchQuery, setSearchQuery] = useState('');
+  const [deliveryConditions, setDeliveryConditions] = useState<Record<string, { good: number; fair: number; bad: number }>>({});
+  const [returnNotes, setReturnNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const params = activeLibraryId ? `?libraryId=${encodeURIComponent(activeLibraryId)}` : '';
@@ -60,7 +62,13 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
       if (!matchesSearch) return false;
 
       if (activeTab === 'pending') return loan.status === 'pending';
-      if (activeTab === 'active') return loan.status === 'approved' || loan.status === 'handled';
+      if (activeTab === 'active') {
+        const isOverdue = loan.status === 'handled' && loan.due_date && new Date(loan.due_date) < new Date();
+        return (loan.status === 'approved' || loan.status === 'handled') && !isOverdue;
+      }
+      if (activeTab === 'overdue') {
+        return loan.status === 'handled' && loan.due_date && new Date(loan.due_date) < new Date();
+      }
       if (activeTab === 'history') return loan.status === 'returned' || loan.status === 'rejected';
 
       return true;
@@ -78,14 +86,15 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     return books.filter((book) => book.available_copies <= 2).slice(0, 10);
   }, [books]);
 
-  async function updateStatus(loanId: string, status: TenantLoan['status']) {
+  async function updateStatus(loanId: string, status: TenantLoan['status'], deliveryCondition?: { good: number; fair: number; bad: number }, returnNote?: string) {
     const response = await fetch('/api/dashboard/loans', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ loanId, status }),
+      body: JSON.stringify({ loanId, status, deliveryCondition, returnNote }),
     });
+
     const payload = await response.json();
 
     if (!response.ok) {
@@ -158,6 +167,15 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                 Activos
               </button>
               <button
+                onClick={() => setActiveTab('overdue')}
+                className={cn(
+                  'px-4 py-2 text-sm font-semibold rounded-xl transition',
+                  activeTab === 'overdue' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                )}
+              >
+                Vencidos
+              </button>
+              <button
                 onClick={() => setActiveTab('history')}
                 className={cn(
                   'px-4 py-2 text-sm font-semibold rounded-xl transition',
@@ -166,6 +184,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
               >
                 Historial
               </button>
+
             </div>
           </div>
 
@@ -207,8 +226,20 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                             <span>{loan.requested_copies} {loan.requested_copies === 1 ? 'copia' : 'copias'}</span>
                             <span className="text-slate-300">•</span>
                             <span>{formatDateTime(loan.created_at)}</span>
+                            {loan.due_date && (
+                              <>
+                                <span className="text-slate-300">•</span>
+                                <span className={cn(
+                                  "font-bold",
+                                  new Date(loan.due_date) < new Date() && loan.status === 'handled' ? "text-rose-600" : "text-slate-500"
+                                )}>
+                                  Devolución: {loan.due_date}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
+
 
                         <div className="flex flex-col lg:items-end gap-4 border-t lg:border-t-0 pt-4 lg:pt-0">
                           <div className="flex flex-col items-start lg:items-end gap-1">
@@ -241,15 +272,82 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                               </>
                             )}
                             {loan.status === 'approved' && (
-                              <button onClick={() => updateStatus(loan.id, 'handled')} className="h-10 rounded-xl bg-amber-500 px-4 text-xs font-bold text-white shadow-sm hover:bg-amber-600 transition">
-                                Marcar entrega
-                              </button>
+                              <div className="flex flex-col items-end gap-3">
+                                <div className="flex gap-2">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-emerald-600">Bueno</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={deliveryConditions[loan.id]?.good ?? loan.requested_copies}
+                                      onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), good: Number(e.target.value) } }))}
+                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-amber-600">Reg.</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={deliveryConditions[loan.id]?.fair ?? 0}
+                                      onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), fair: Number(e.target.value) } }))}
+                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-rose-600">Malo</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={deliveryConditions[loan.id]?.bad ?? 0}
+                                      onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), bad: Number(e.target.value) } }))}
+                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                    />
+                                  </div>
+                                </div>
+                                <button 
+                                  onClick={() => updateStatus(loan.id, 'handled', deliveryConditions[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 })} 
+                                  className="h-10 rounded-xl bg-amber-500 px-4 text-xs font-bold text-white shadow-sm hover:bg-amber-600 transition"
+                                >
+                                  Marcar entrega
+                                </button>
+                              </div>
                             )}
                             {loan.status === 'handled' && (
-                              <button onClick={() => updateStatus(loan.id, 'returned')} className="h-10 rounded-xl bg-sky-600 px-4 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition">
-                                Recibir devolución
-                              </button>
+                              <div className="flex flex-col items-end gap-3">
+                                <input 
+                                  type="text" 
+                                  placeholder="Nota de devolución..." 
+                                  value={returnNotes[loan.id] || ''}
+                                  onChange={(e) => setReturnNotes(prev => ({ ...prev, [loan.id]: e.target.value }))}
+                                  className="w-full lg:w-48 rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                                />
+                                <button 
+                                  onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id])} 
+                                  className="h-10 rounded-xl bg-sky-600 px-4 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition"
+                                >
+                                  Recibir devolución
+                                </button>
+                              </div>
                             )}
+                            {(loan.status === 'returned' || loan.status === 'rejected') && (
+                              <div className="text-right">
+                                {loan.delivery_condition && (
+                                  <div className="text-[10px] font-medium text-slate-400 mb-1">
+                                    Entregado: {loan.delivery_condition.good} B, {loan.delivery_condition.fair} R, {loan.delivery_condition.bad} M
+                                  </div>
+                                )}
+                                {loan.return_note && (
+                                  <div className="rounded-lg bg-slate-50 p-2 text-[11px] text-slate-600 italic border border-slate-100 max-w-[200px]">
+                                    &quot;{loan.return_note}&quot;
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
                           </div>
                         </div>
                       </div>

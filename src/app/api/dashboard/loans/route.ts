@@ -23,8 +23,15 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const loan = await updateLoanStatus(session, String(body.loanId || ''), body.status);
+    const loan = await updateLoanStatus(
+      session, 
+      String(body.loanId || ''), 
+      body.status, 
+      body.deliveryCondition, 
+      body.returnNote
+    );
     return NextResponse.json({ loan });
+
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unable to update loan.' },

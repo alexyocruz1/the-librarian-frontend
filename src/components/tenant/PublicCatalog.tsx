@@ -28,6 +28,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
     full_name: '',
     identifier: '',
     requested_copies: 1,
+    due_date: '',
   });
   const { t } = useI18n();
 
@@ -94,6 +95,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
       full_name: '',
       identifier: '',
       requested_copies: 1,
+      due_date: '',
     });
     setQuery('');
   }
@@ -226,6 +228,18 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                               }
                               className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
                             />
+                            <div className="space-y-1">
+                               <label className="text-[10px] font-bold uppercase tracking-tight text-slate-400 px-1">Fecha de retorno (Máx. 3 meses)</label>
+                               <input
+                                type="date"
+                                required
+                                min={new Date().toISOString().split('T')[0]}
+                                max={new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0]}
+                                value={requestForm.due_date}
+                                onChange={(event) => setRequestForm((current) => ({ ...current, due_date: event.target.value }))}
+                                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+                              />
+                            </div>
                             <button className="w-full rounded-xl bg-amber-500 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-amber-400">
                               {t('borrowRequest.actions.submit') || 'Enviar solicitud'}
                             </button>

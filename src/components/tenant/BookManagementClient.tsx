@@ -16,6 +16,9 @@ const emptyForm = (libraryId: string): BookMutationPayload => ({
   title: '',
   author: '',
   categories: [],
+  good_copies: 1,
+  fair_copies: 0,
+  bad_copies: 0,
   total_copies: 1,
   available_copies: 1,
   book_code: '',
@@ -107,6 +110,9 @@ export default function BookManagementClient({ libraries }: BookManagementClient
       title: book.title,
       author: book.author,
       categories: book.categories,
+      good_copies: book.good_copies,
+      fair_copies: book.fair_copies,
+      bad_copies: book.bad_copies,
       total_copies: book.total_copies,
       available_copies: book.available_copies,
       book_code: book.book_code || '',
@@ -376,7 +382,95 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               </label>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 grid-cols-3">
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-tight text-emerald-600">Bueno</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.good_copies}
+                    onChange={(event) => {
+                      const val = Number(event.target.value || 0);
+                      const newTotal = val + form.fair_copies + form.bad_copies;
+                      setForm((current) => ({
+                        ...current,
+                        good_copies: val,
+                        total_copies: newTotal,
+                        available_copies: editingBookId ? current.available_copies : newTotal
+                      }));
+                    }}
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-tight text-amber-600">Regular</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.fair_copies}
+                    onChange={(event) => {
+                      const val = Number(event.target.value || 0);
+                      const newTotal = form.good_copies + val + form.bad_copies;
+                      setForm((current) => ({
+                        ...current,
+                        fair_copies: val,
+                        total_copies: newTotal,
+                        available_copies: editingBookId ? current.available_copies : newTotal
+                      }));
+                    }}
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-tight text-rose-600">Malo</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.bad_copies}
+                    onChange={(event) => {
+                      const val = Number(event.target.value || 0);
+                      const newTotal = form.good_copies + form.fair_copies + val;
+                      setForm((current) => ({
+                        ...current,
+                        bad_copies: val,
+                        total_copies: newTotal,
+                        available_copies: editingBookId ? current.available_copies : newTotal
+                      }));
+                    }}
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 grid-cols-2">
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-tight text-slate-400">Total</span>
+                  <div className="w-full rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm font-bold text-slate-500">
+                    {form.good_copies + form.fair_copies + form.bad_copies}
+                  </div>
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-[10px] font-bold uppercase tracking-tight text-slate-400">Disponibles</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={form.good_copies + form.fair_copies + form.bad_copies}
+                    value={form.available_copies}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        available_copies: Number(event.target.value || 0),
+                      }))
+                    }
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-slate-700">Costo ($)</span>
                 <input
@@ -388,43 +482,6 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
                 />
               </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-700">Total</span>
-                <input
-                  type="number"
-                  min={1}
-                  value={form.total_copies}
-                  onChange={(event) => {
-                    const val = Number(event.target.value || 1);
-                    setForm((current) => ({
-                      ...current,
-                      total_copies: val,
-                      // If creating new, auto-match availability
-                      available_copies: editingBookId ? current.available_copies : val
-                    }));
-                  }}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-2 block text-sm font-medium text-slate-700">Disponibles</span>
-                <input
-                  type="number"
-                  min={0}
-                  max={form.total_copies}
-                  value={form.available_copies}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      available_copies: Number(event.target.value || 0),
-                    }))
-                  }
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
-                />
-              </label>
-
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-slate-700">Adquisición</span>
                 <input
@@ -435,6 +492,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 />
               </label>
             </div>
+
 
 
             <label className="block">

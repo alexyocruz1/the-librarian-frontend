@@ -24,15 +24,16 @@ function validateBookPayload(payload: BookMutationPayload) {
     throw new Error('La biblioteca, el título, el autor y al menos una categoría son obligatorios.');
   }
 
-  if (payload.total_copies < 0) {
-    throw new Error('El total de copias no puede ser negativo.');
+  if (payload.good_copies < 0 || payload.fair_copies < 0 || payload.bad_copies < 0) {
+    throw new Error('Las copias no pueden ser negativas.');
   }
 
   if (payload.available_copies < 0) {
     throw new Error('Las copias disponibles no pueden ser negativas.');
   }
 
-  if (payload.available_copies > payload.total_copies) {
+  const calculatedTotal = payload.good_copies + payload.fair_copies + payload.bad_copies;
+  if (payload.available_copies > calculatedTotal) {
     throw new Error('Las copias disponibles no pueden exceder el total de copias.');
   }
 }
@@ -159,7 +160,7 @@ function enforceLocalRateLimit(ip: string) {
 }
 
 export async function createLoanRequest(libraryId: string, payload: LoanRequestPayload, ip: string) {
-  if (!payload.full_name.trim() || !payload.identifier.trim() || !payload.book_id.trim()) {
+  if (!payload.full_name.trim() || !payload.identifier.trim() || !payload.book_id.trim() || !payload.due_date) {
     throw new Error('All required fields must be completed.');
   }
 
@@ -199,6 +200,7 @@ export async function createLoanRequest(libraryId: string, payload: LoanRequestP
       full_name: payload.full_name.trim(),
       identifier: payload.identifier.trim(),
       requested_copies: payload.requested_copies,
+      due_date: payload.due_date,
       status: 'pending',
       created_at: nowIso(),
       updated_at: nowIso(),
@@ -219,6 +221,7 @@ export async function createLoanRequest(libraryId: string, payload: LoanRequestP
         p_identifier: payload.identifier.trim(),
         p_requested_copies: payload.requested_copies,
         p_request_ip: ip,
+        p_due_date: payload.due_date,
       }),
     },
     { service: true }
@@ -424,7 +427,7 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
       title: payload.title.trim(),
       author: payload.author.trim(),
       categories: normalizedCategories,
-      total_copies: payload.total_copies,
+      total_copies: payload.good_copies + payload.fair_copies + payload.bad_copies,
       available_copies: payload.available_copies,
       library_codes,
       book_code: payload.book_code,
@@ -435,6 +438,9 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
       cost: payload.cost,
       acquired_at: payload.acquired_at,
       image_url: payload.image_url,
+      good_copies: payload.good_copies,
+      fair_copies: payload.fair_copies,
+      bad_copies: payload.bad_copies,
       archived_at: null,
     };
 
@@ -452,7 +458,10 @@ export async function createDashboardBook(session: LibrarianSession, payload: Bo
           title: payload.title.trim(),
           author: payload.author.trim(),
           categories: normalizedCategories,
-          total_copies: payload.total_copies,
+          good_copies: payload.good_copies,
+          fair_copies: payload.fair_copies,
+          bad_copies: payload.bad_copies,
+          total_copies: payload.good_copies + payload.fair_copies + payload.bad_copies,
           available_copies: payload.available_copies,
           library_codes,
           book_code: payload.book_code,
@@ -509,8 +518,11 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
     book.title = payload.title.trim();
     book.author = payload.author.trim();
     book.categories = normalizedCategories;
-    book.total_copies = payload.total_copies;
+    book.total_copies = payload.good_copies + payload.fair_copies + payload.bad_copies;
     book.available_copies = payload.available_copies;
+    book.good_copies = payload.good_copies;
+    book.fair_copies = payload.fair_copies;
+    book.bad_copies = payload.bad_copies;
     book.book_code = payload.book_code;
     book.editorial = payload.editorial;
     book.edition = payload.edition;
@@ -558,7 +570,10 @@ export async function updateDashboardBook(session: LibrarianSession, bookId: str
         title: payload.title.trim(),
         author: payload.author.trim(),
         categories: normalizedCategories,
-        total_copies: payload.total_copies,
+        good_copies: payload.good_copies,
+        fair_copies: payload.fair_copies,
+        bad_copies: payload.bad_copies,
+        total_copies: payload.good_copies + payload.fair_copies + payload.bad_copies,
         available_copies: payload.available_copies,
         library_codes,
         book_code: payload.book_code,
@@ -633,7 +648,13 @@ export async function deleteDashboardBook(session: LibrarianSession, bookId: str
   return { success: true };
 }
 
-export async function updateLoanStatus(session: LibrarianSession, loanId: string, nextStatus: TenantLoan['status']) {
+export async function updateLoanStatus(
+  session: LibrarianSession, 
+  loanId: string, 
+  nextStatus: TenantLoan['status'],
+  deliveryCondition?: { good: number; fair: number; bad: number },
+  returnNote?: string
+) {
   if (!isSupabaseConfigured()) {
     const loan = mockLoans.find((item) => item.id === loanId);
 
@@ -662,6 +683,7 @@ export async function updateLoanStatus(session: LibrarianSession, loanId: string
 
       book.available_copies -= loan.requested_copies;
       loan.handled_at = nowIso();
+      loan.delivery_condition = deliveryCondition || { good: loan.requested_copies, fair: 0, bad: 0 };
     }
 
     if (nextStatus === 'returned') {
@@ -671,6 +693,7 @@ export async function updateLoanStatus(session: LibrarianSession, loanId: string
 
       book.available_copies += loan.requested_copies;
       loan.returned_at = nowIso();
+      loan.return_note = returnNote;
     }
 
     if (nextStatus === 'approved' || nextStatus === 'rejected') {
@@ -693,6 +716,8 @@ export async function updateLoanStatus(session: LibrarianSession, loanId: string
         p_loan_id: loanId,
         p_next_status: nextStatus,
         p_librarian_id: session.id,
+        p_delivery_condition: deliveryCondition,
+        p_return_note: returnNote,
       }),
     },
     { service: true }

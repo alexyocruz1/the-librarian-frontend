@@ -26,6 +26,9 @@ export interface TenantBook {
   cost?: number;
   acquired_at?: string;
   image_url?: string;
+  good_copies: number;
+  fair_copies: number;
+  bad_copies: number;
   archived_at?: string | null;
 }
 
@@ -41,6 +44,9 @@ export interface TenantLoan {
   updated_at: string;
   handled_at?: string | null;
   returned_at?: string | null;
+  due_date?: string | null;
+  delivery_condition?: { good: number; fair: number; bad: number } | null;
+  return_note?: string | null;
   book?: Pick<TenantBook, 'id' | 'title' | 'author' | 'categories'>;
 }
 
@@ -56,6 +62,7 @@ export interface LoanRequestPayload {
   identifier: string;
   book_id: string;
   requested_copies: number;
+  due_date: string;
 }
 
 export interface BookMutationPayload {
@@ -73,5 +80,8 @@ export interface BookMutationPayload {
   cost?: number;
   acquired_at?: string;
   image_url?: string;
+  good_copies: number;
+  fair_copies: number;
+  bad_copies: number;
 }
 

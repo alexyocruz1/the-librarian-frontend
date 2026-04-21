@@ -50,9 +50,10 @@ export default function ResponsiveSidebar({ session, libraries }: ResponsiveSide
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-72 transform bg-white p-6 transition-transform duration-300 ease-in-out lg:static lg:block lg:translate-x-0 lg:rounded-[2rem] lg:border lg:border-slate-200 lg:bg-white",
+        "fixed inset-y-0 left-0 z-50 w-72 transform bg-white p-6 transition-transform duration-300 ease-in-out lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:rounded-[2rem] lg:border lg:border-slate-200 lg:bg-white",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
+
         <div className="flex flex-col h-full">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 text-center lg:text-left">Sesión iniciada</p>
