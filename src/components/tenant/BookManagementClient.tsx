@@ -242,13 +242,13 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               <label className="block">
                 <span className="mb-2 block text-sm font-medium text-slate-500">Códigos de Biblioteca (Auto)</span>
                 <div className="w-full rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm font-mono text-slate-400">
-                  {editingBookId 
+                  {editingBookId
                     ? (() => {
-                        const codes = books.find(b => b.id === editingBookId)?.library_codes || [];
-                        return codes.length > 1 
-                          ? `${codes[0]} — ${codes[codes.length - 1]}`
-                          : codes[0] || 'N/A';
-                      })()
+                      const codes = books.find(b => b.id === editingBookId)?.library_codes || [];
+                      return codes.length > 1
+                        ? `${codes[0]} — ${codes[codes.length - 1]}`
+                        : codes[0] || 'N/A';
+                    })()
                     : 'Será asignado al guardar'}
                 </div>
               </label>
@@ -459,7 +459,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Explorar catálogo</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Libros en {selectedLibrary?.name || 'sede'}</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-slate-900">Libros en {selectedLibrary?.name || 'biblioteca'}</h2>
             </div>
             <select
               value={selectedLibraryId}
@@ -507,27 +507,27 @@ export default function BookManagementClient({ libraries }: BookManagementClient
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                       <p className="text-lg font-bold text-slate-900 truncate">{book.title}</p>
-                       {book.image_url && !brokenImages.has(book.image_url) && (
-                         <button 
-                          type="button" 
+                      <p className="text-lg font-bold text-slate-900 truncate">{book.title}</p>
+                      {book.image_url && !brokenImages.has(book.image_url) && (
+                        <button
+                          type="button"
                           onClick={() => setPreviewImage(book.image_url!)}
                           className="text-slate-400 hover:text-slate-900 transition"
                         >
-                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                             <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                           </svg>
-                         </button>
-                       )}
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                     <p className="text-sm text-slate-500 font-medium">
                       {book.author} · {book.categories.join(', ')}
                     </p>
                     <div className="mt-2 text-[10px] font-mono text-slate-400">
-                       ID: {book.library_codes.length > 1 
-                         ? `${book.library_codes[0]} — ${book.library_codes[book.library_codes.length - 1]}`
-                         : book.library_codes[0] || 'N/A'}
+                      ID: {book.library_codes.length > 1
+                        ? `${book.library_codes[0]} — ${book.library_codes[book.library_codes.length - 1]}`
+                        : book.library_codes[0] || 'N/A'}
                     </div>
 
                     <div className="mt-3 flex items-center gap-2">
@@ -571,33 +571,33 @@ export default function BookManagementClient({ libraries }: BookManagementClient
 
       {previewImage && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-              <button 
-                onClick={() => setPreviewImage(null)}
-                className="absolute top-6 right-6 z-10 rounded-full bg-white/80 p-2 text-slate-900 shadow-md hover:bg-white transition"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
-                <Image 
-                  src={previewImage} 
-                  alt="Vista previa" 
-                  fill
-                  className="object-cover"
-                  unoptimized
-                  onError={(e) => {
-                    if (previewImage) {
-                      setBrokenImages(prev => new Set(prev).add(previewImage));
-                    }
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
-                  }}
+          <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-6 right-6 z-10 rounded-full bg-white/80 p-2 text-slate-900 shadow-md hover:bg-white transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
+              <Image
+                src={previewImage}
+                alt="Vista previa"
+                fill
+                className="object-cover"
+                unoptimized
+                onError={(e) => {
+                  if (previewImage) {
+                    setBrokenImages(prev => new Set(prev).add(previewImage));
+                  }
+                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x600?text=Imagen+No+Disponible';
+                }}
 
-                />
-              </div>
+              />
+            </div>
 
-           </div>
+          </div>
         </div>
       )}
     </div>

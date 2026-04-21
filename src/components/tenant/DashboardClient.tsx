@@ -98,14 +98,14 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
       current.map((book) =>
         book.id === payload.loan.book_id
           ? {
-              ...book,
-              available_copies:
-                status === 'handled'
-                  ? book.available_copies - payload.loan.requested_copies
-                  : status === 'returned'
-                    ? book.available_copies + payload.loan.requested_copies
-                    : book.available_copies,
-            }
+            ...book,
+            available_copies:
+              status === 'handled'
+                ? book.available_copies - payload.loan.requested_copies
+                : status === 'returned'
+                  ? book.available_copies + payload.loan.requested_copies
+                  : book.available_copies,
+          }
           : book
       )
     );
@@ -117,7 +117,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tus Bibliotecas</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{libraries.length}</p>
-          <p className="mt-2 text-sm text-slate-600">Sedes bajo tu administración.</p>
+          <p className="mt-2 text-sm text-slate-600">bibliotecas bajo tu administración.</p>
         </div>
         <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm border-l-amber-400 border-l-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Pendientes</p>
@@ -191,7 +191,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                     <p className="text-sm font-medium text-slate-500">{items[0].identifier}</p>
                   </div>
                   <span className="rounded-full bg-slate-200 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                    Sede: {libraries.find((l) => l.id === items[0].library_id)?.name || items[0].library_id}
+                    biblioteca: {libraries.find((l) => l.id === items[0].library_id)?.name || items[0].library_id}
                   </span>
                 </div>
 
@@ -216,16 +216,16 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                             <span className={cn(
                               "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider",
                               loan.status === 'pending' ? 'bg-amber-100 text-amber-700' :
-                              loan.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
-                              loan.status === 'handled' ? 'bg-sky-100 text-sky-700' :
-                              loan.status === 'returned' ? 'bg-slate-100 text-slate-500' :
-                              'bg-rose-100 text-rose-700'
+                                loan.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                                  loan.status === 'handled' ? 'bg-sky-100 text-sky-700' :
+                                    loan.status === 'returned' ? 'bg-slate-100 text-slate-500' :
+                                      'bg-rose-100 text-rose-700'
                             )}>
-                              {loan.status === 'pending' ? 'espera' : 
-                               loan.status === 'approved' ? 'aprobado' : 
-                               loan.status === 'handled' ? 'entregado' : 
-                               loan.status === 'returned' ? 'devuelto' : 
-                               loan.status === 'rejected' ? 'rechazado' : loan.status}
+                              {loan.status === 'pending' ? 'espera' :
+                                loan.status === 'approved' ? 'aprobado' :
+                                  loan.status === 'handled' ? 'entregado' :
+                                    loan.status === 'returned' ? 'devuelto' :
+                                      loan.status === 'rejected' ? 'rechazado' : loan.status}
                             </span>
                           </div>
 
@@ -272,7 +272,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Stock Crítico</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900">Libros por agotarse</h2>
             <p className="mt-1 text-sm text-slate-500">Mostrando hasta 10 títulos con existencias bajas.</p>
-            
+
             <div className="mt-6 space-y-3">
               {lowStockBooks.map((book) => (
                 <div key={book.id} className="rounded-2xl border border-slate-100 bg-slate-50/50 px-4 py-4 hover:bg-slate-50 transition">
@@ -291,7 +291,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                   </div>
                 </div>
               ))}
-              
+
               {books.length > 0 && lowStockBooks.length === 0 && (
                 <p className="py-4 text-center text-xs text-slate-400 font-medium italic">Todo el inventario tiene buen stock.</p>
               )}

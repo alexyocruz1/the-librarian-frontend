@@ -107,7 +107,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
       <header className="relative z-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 md:px-10">
         <div className="flex flex-wrap gap-3">
           <Link href={'/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
-            &larr; {t('common.changeLibrary') || 'Cambiar sede'}
+            &larr; {t('common.changeLibrary') || 'Cambiar biblioteca'}
           </Link>
           <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
             {t('dashboard.quickActions.myRequests') || 'Consultar mis préstamos'}
@@ -129,7 +129,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                   {data?.library?.name || t('common.neighborhoodLibrary') || 'Tu biblioteca local'}
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                  {t('common.publicDocs') || 'Explora los libros disponibles, solicita un préstamo sin cuenta y mantén todo organizado por sede.'}
+                  {t('common.publicDocs') || 'Explora los libros disponibles, solicita un préstamo sin cuenta y mantén todo organizado por biblioteca.'}
                 </p>
               </div>
             </div>

@@ -43,16 +43,16 @@ export default function MyLoansLookup({ librarySlug }: MyLoansLookupProps) {
     <main className="min-h-screen bg-[linear-gradient(180deg,_#f8fbff_0%,_#ffffff_45%,_#f7f4ec_100%)] px-6 py-14">
       <div className="mx-auto max-w-4xl space-y-8">
         <div className="flex justify-start">
-           <Link href={librarySlug ? `/l/${librarySlug}` : '/'} className="rounded-full bg-white/80 border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-white shadow-sm transition">
-              &larr; Volver al catálogo
-           </Link>
+          <Link href={librarySlug ? `/l/${librarySlug}` : '/'} className="rounded-full bg-white/80 border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-white shadow-sm transition">
+            &larr; Volver al catálogo
+          </Link>
         </div>
 
         <div className="space-y-3 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Consulta de Préstamos</p>
           <h1 className="font-serif text-5xl text-slate-900 leading-tight">Encuentra todas tus solicitudes.</h1>
           <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-600">
-            Los resultados están limitados a la sede actual para garantizar tu privacidad.
+            Los resultados están limitados a la biblioteca actual para garantizar tu privacidad.
           </p>
         </div>
 
@@ -83,9 +83,9 @@ export default function MyLoansLookup({ librarySlug }: MyLoansLookupProps) {
                 </div>
                 <span className={cn(
                   "rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider",
-                  loan.status === 'pending' ? "bg-amber-100 text-amber-700" : 
-                  loan.status === 'approved' ? "bg-emerald-100 text-emerald-700" :
-                  "bg-slate-100 text-slate-600"
+                  loan.status === 'pending' ? "bg-amber-100 text-amber-700" :
+                    loan.status === 'approved' ? "bg-emerald-100 text-emerald-700" :
+                      "bg-slate-100 text-slate-600"
                 )}>
                   {loan.status}
                 </span>
