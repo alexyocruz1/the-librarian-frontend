@@ -43,6 +43,9 @@ export async function POST(request: NextRequest) {
       cost: body.cost ? Number(body.cost) : undefined,
       acquired_at: body.acquired_at ? String(body.acquired_at) : undefined,
       image_url: body.image_url ? String(body.image_url) : undefined,
+      good_copies: Number(body.good_copies || 0),
+      fair_copies: Number(body.fair_copies || 0),
+      bad_copies: Number(body.bad_copies || 0),
     });
     return NextResponse.json({ book }, { status: 201 });
   } catch (error) {
@@ -77,6 +80,9 @@ export async function PATCH(request: NextRequest) {
       cost: body.cost ? Number(body.cost) : undefined,
       acquired_at: body.acquired_at ? String(body.acquired_at) : undefined,
       image_url: body.image_url ? String(body.image_url) : undefined,
+      good_copies: Number(body.good_copies || 0),
+      fair_copies: Number(body.fair_copies || 0),
+      bad_copies: Number(body.bad_copies || 0),
     });
     return NextResponse.json({ book });
   } catch (error) {

@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
         identifier: String(body.identifier || ''),
         book_id: String(body.book_id || ''),
         requested_copies: Number(body.requested_copies || 1),
+        due_date: String(body.due_date || ''),
       },
       getClientIp(request)
     );
