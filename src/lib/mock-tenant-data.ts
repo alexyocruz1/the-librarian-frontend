@@ -37,6 +37,9 @@ export const mockBooks: TenantBook[] = [
     cost: 15.99,
     acquired_at: '2023-01-15',
     image_url: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1461352425i/139253.jpg',
+    good_copies: 8,
+    fair_copies: 0,
+    bad_copies: 0,
     archived_at: null,
   },
   {
@@ -56,6 +59,9 @@ export const mockBooks: TenantBook[] = [
     cost: 24.50,
     acquired_at: '2023-05-20',
     image_url: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1655988385i/40121378.jpg',
+    good_copies: 6,
+    fair_copies: 0,
+    bad_copies: 0,
     archived_at: null,
   },
   {
@@ -75,6 +81,9 @@ export const mockBooks: TenantBook[] = [
     cost: 18.00,
     acquired_at: '2022-11-10',
     image_url: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1333578746i/3869.jpg',
+    good_copies: 4,
+    fair_copies: 0,
+    bad_copies: 0,
     archived_at: null,
   },
   {
@@ -94,6 +103,9 @@ export const mockBooks: TenantBook[] = [
     cost: 22.00,
     acquired_at: '2023-03-12',
     image_url: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1632283723i/6149.jpg',
+    good_copies: 7,
+    fair_copies: 0,
+    bad_copies: 0,
     archived_at: null,
   },
   {
@@ -113,6 +125,9 @@ export const mockBooks: TenantBook[] = [
     cost: 16.50,
     acquired_at: '2023-08-05',
     image_url: 'https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1506041219i/35133922.jpg',
+    good_copies: 5,
+    fair_copies: 0,
+    bad_copies: 0,
     archived_at: null,
   },
 ];
@@ -144,6 +159,7 @@ export const mockLoans: TenantLoan[] = [
     status: 'pending',
     created_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
     updated_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+    due_date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString().split('T')[0],
   },
   {
     id: 'loan-2',
@@ -156,6 +172,8 @@ export const mockLoans: TenantLoan[] = [
     created_at: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
     updated_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
     handled_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+    due_date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString().split('T')[0], // Overdue
+    delivery_condition: { good: 1, fair: 0, bad: 0 },
   },
   {
     id: 'loan-3',
@@ -167,5 +185,6 @@ export const mockLoans: TenantLoan[] = [
     status: 'approved',
     created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
     updated_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    due_date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString().split('T')[0],
   },
 ];
