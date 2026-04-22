@@ -5,7 +5,11 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'The Librarian',
-  description: 'Multi-tenant library management for public browsing and librarian-led loan handling.',
+  description: 'Manage your library with ease.',
+  icons: {
+    icon: '/watermark.jpg',
+    apple: '/watermark.jpg',
+  },
 };
 
 export const viewport: Viewport = {
