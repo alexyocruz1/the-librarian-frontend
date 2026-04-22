@@ -289,7 +289,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.good ?? loan.requested_copies}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), good: Number(e.target.value) } }))}
-                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -300,7 +300,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.fair ?? 0}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), fair: Number(e.target.value) } }))}
-                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -311,7 +311,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.bad ?? 0}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), bad: Number(e.target.value) } }))}
-                                      className="w-12 rounded-lg border border-slate-200 p-1 text-center text-xs"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
                                     />
                                   </div>
                                 </div>
@@ -325,12 +325,12 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                             )}
                             {loan.status === 'handled' && (
                               <div className="flex flex-col items-end gap-3">
-                                <input 
-                                  type="text" 
-                                  placeholder="Nota de devolución..." 
+                                <textarea 
+                                  placeholder="Nota de devolución (ej. Manchas en portada, hojas sueltas...)" 
                                   value={returnNotes[loan.id] || ''}
                                   onChange={(e) => setReturnNotes(prev => ({ ...prev, [loan.id]: e.target.value }))}
-                                  className="w-full lg:w-48 rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                                  rows={2}
+                                  className="w-full lg:w-64 rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-900/5 transition resize-none"
                                 />
                                 <button 
                                   onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id])} 
