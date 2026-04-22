@@ -53,6 +53,10 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     });
   }, [activeLibraryId]);
 
+  useEffect(() => {
+    setError(null);
+  }, [activeTab]);
+
   const filteredAndGroupedLoans = useMemo(() => {
     const filtered = loans.filter((loan) => {
       const matchesSearch =
@@ -94,6 +98,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     returnNote?: string,
     returnCondition?: { good: number; fair: number; bad: number }
   ) {
+    setError(null);
     const response = await fetch('/api/dashboard/loans', {
       method: 'PATCH',
       headers: {
@@ -213,7 +218,16 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
           </div>
 
           {loading && <p className="mt-8 text-center text-sm text-slate-500">Actualizando cola de préstamos...</p>}
-          {error && <p className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
+          {error && (
+            <div className="mt-8 flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 animate-in fade-in slide-in-from-top-2 duration-200">
+              <p>{error}</p>
+              <button onClick={() => setError(null)} className="ml-4 rounded-lg p-1 hover:bg-rose-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
 
           <div className="mt-8 space-y-6">
             {filteredAndGroupedLoans.map(([key, items]) => (
