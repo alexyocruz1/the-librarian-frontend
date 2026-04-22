@@ -98,7 +98,14 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     const payload = await response.json();
 
     if (!response.ok) {
-      setError(payload.error || 'Unable to update loan.');
+      let msg = payload.error || 'Unable to update loan.';
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed.message) msg = parsed.message;
+      } catch (e) {
+        // Not a JSON string, keep original
+      }
+      setError(msg);
       return;
     }
 

@@ -17,6 +17,7 @@ ADD COLUMN IF NOT EXISTS delivery_condition jsonb DEFAULT '{}'::jsonb,
 ADD COLUMN IF NOT EXISTS return_note text;
 
 -- 3. Update create_public_loan_request to accept due_date
+DROP FUNCTION IF EXISTS public.create_public_loan_request(uuid, uuid, text, text, integer, inet);
 CREATE OR REPLACE FUNCTION public.create_public_loan_request(
   p_library_id uuid,
   p_book_id uuid,
@@ -74,6 +75,7 @@ END;
 $$;
 
 -- 4. Update transition_loan_status to handle conditions and notes
+DROP FUNCTION IF EXISTS public.transition_loan_status(uuid, public.loan_status, uuid);
 CREATE OR REPLACE FUNCTION public.transition_loan_status(
   p_loan_id uuid,
   p_next_status public.loan_status,
@@ -105,6 +107,13 @@ BEGIN
   IF p_next_status = 'handled' THEN
     IF v_loan.status <> 'approved' THEN RAISE EXCEPTION 'Only approved loans can be handled'; END IF;
     IF v_book.available_copies < v_loan.requested_copies THEN RAISE EXCEPTION 'Insufficient copies available'; END IF;
+
+    -- Validate condition counts match requested copies
+    IF (COALESCE((p_delivery_condition->>'good')::int, 0) + 
+        COALESCE((p_delivery_condition->>'fair')::int, 0) + 
+        COALESCE((p_delivery_condition->>'bad')::int, 0)) <> v_loan.requested_copies THEN
+      RAISE EXCEPTION 'La suma de los estados (Bueno, Regular, Malo) debe ser igual a %', v_loan.requested_copies;
+    END IF;
 
     UPDATE public.books SET available_copies = available_copies - v_loan.requested_copies WHERE id = v_book.id;
     UPDATE public.loans SET status = p_next_status, handled_at = now(), delivery_condition = p_delivery_condition WHERE id = v_loan.id;
