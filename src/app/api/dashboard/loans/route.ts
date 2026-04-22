@@ -28,7 +28,8 @@ export async function PATCH(request: NextRequest) {
       String(body.loanId || ''), 
       body.status, 
       body.deliveryCondition, 
-      body.returnNote
+      body.returnNote,
+      body.returnCondition
     );
     return NextResponse.json({ loan });
 

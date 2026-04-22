@@ -18,6 +18,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
   const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'overdue' | 'history'>('pending');
   const [searchQuery, setSearchQuery] = useState('');
   const [deliveryConditions, setDeliveryConditions] = useState<Record<string, { good: number; fair: number; bad: number }>>({});
+  const [returnConditions, setReturnConditions] = useState<Record<string, { good: number; fair: number; bad: number }>>({});
   const [returnNotes, setReturnNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -86,13 +87,19 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
     return books.filter((book) => book.available_copies <= 2).slice(0, 10);
   }, [books]);
 
-  async function updateStatus(loanId: string, status: TenantLoan['status'], deliveryCondition?: { good: number; fair: number; bad: number }, returnNote?: string) {
+  async function updateStatus(
+    loanId: string, 
+    status: TenantLoan['status'], 
+    deliveryCondition?: { good: number; fair: number; bad: number }, 
+    returnNote?: string,
+    returnCondition?: { good: number; fair: number; bad: number }
+  ) {
     const response = await fetch('/api/dashboard/loans', {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ loanId, status, deliveryCondition, returnNote }),
+      body: JSON.stringify({ loanId, status, deliveryCondition, returnNote, returnCondition }),
     });
 
     const payload = await response.json();
@@ -325,6 +332,41 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                             )}
                             {loan.status === 'handled' && (
                               <div className="w-full flex flex-col items-end gap-3">
+                                <div className="flex gap-2">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-emerald-600">Bueno</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={returnConditions[loan.id]?.good ?? loan.requested_copies}
+                                      onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), good: Number(e.target.value) } }))}
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-amber-600">Reg.</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={returnConditions[loan.id]?.fair ?? 0}
+                                      onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), fair: Number(e.target.value) } }))}
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                    />
+                                  </div>
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-[10px] font-bold uppercase text-rose-600">Malo</span>
+                                    <input 
+                                      type="number" 
+                                      min={0} 
+                                      max={loan.requested_copies}
+                                      value={returnConditions[loan.id]?.bad ?? 0}
+                                      onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), bad: Number(e.target.value) } }))}
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                    />
+                                  </div>
+                                </div>
                                 <textarea 
                                   placeholder="Nota de devolución (ej. Manchas en portada, hojas sueltas...)" 
                                   value={returnNotes[loan.id] || ''}
@@ -333,7 +375,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                   className="w-full lg:w-[400px] rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-900/5 transition resize-none"
                                 />
                                 <button 
-                                  onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id])} 
+                                  onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id], returnConditions[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 })} 
                                   className="h-10 rounded-xl bg-sky-600 px-4 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition"
                                 >
                                   Recibir devolución
@@ -341,19 +383,27 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                               </div>
                             )}
                             {(loan.status === 'returned' || loan.status === 'rejected') && (
-                              <div className="text-right">
+                              <div className="text-right space-y-2">
                                 {loan.delivery_condition && (
-                                  <div className="text-[10px] font-medium text-slate-400 mb-1">
-                                    Entregado: {loan.delivery_condition.good} B, {loan.delivery_condition.fair} R, {loan.delivery_condition.bad} M
+                                  <div className="text-[10px] font-medium text-slate-400">
+                                    <span className="font-bold text-slate-500 uppercase mr-1">Entregado:</span>
+                                    {loan.delivery_condition.good} B, {loan.delivery_condition.fair} R, {loan.delivery_condition.bad} M
+                                  </div>
+                                )}
+                                {loan.return_condition && (
+                                  <div className="text-[10px] font-medium text-slate-400">
+                                    <span className="font-bold text-slate-500 uppercase mr-1">Recibido:</span>
+                                    {loan.return_condition.good} B, {loan.return_condition.fair} R, {loan.return_condition.bad} M
                                   </div>
                                 )}
                                 {loan.return_note && (
-                                  <div className="rounded-lg bg-slate-50 p-2 text-[11px] text-slate-600 italic border border-slate-100 max-w-[200px]">
+                                  <div className="rounded-lg bg-slate-50 p-2 text-[11px] text-slate-600 italic border border-slate-100 max-w-[200px] inline-block">
                                     &quot;{loan.return_note}&quot;
                                   </div>
                                 )}
                               </div>
                             )}
+
 
                           </div>
                         </div>

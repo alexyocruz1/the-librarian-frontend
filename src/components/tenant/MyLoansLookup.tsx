@@ -169,6 +169,16 @@ export default function MyLoansLookup({ librarySlug }: MyLoansLookupProps) {
                       </div>
                     </div>
                   )}
+                  {loan.return_condition && (
+                    <div className="space-y-1">
+                      <p className="text-[10px] uppercase font-bold text-slate-400">Estado al devolver</p>
+                      <div className="flex gap-2">
+                        <span className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md border border-emerald-100">Bueno: {loan.return_condition.good}</span>
+                        <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-700 rounded-md border border-amber-100">Regular: {loan.return_condition.fair}</span>
+                        <span className="text-xs px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md border border-rose-100">Malo: {loan.return_condition.bad}</span>
+                      </div>
+                    </div>
+                  )}
                   {loan.return_note && (
                     <div className="space-y-1">
                       <p className="text-[10px] uppercase font-bold text-slate-400">Nota del bibliotecario</p>

@@ -46,6 +46,7 @@ export interface TenantLoan {
   returned_at?: string | null;
   due_date?: string | null;
   delivery_condition?: { good: number; fair: number; bad: number } | null;
+  return_condition?: { good: number; fair: number; bad: number } | null;
   return_note?: string | null;
   book?: Pick<TenantBook, 'id' | 'title' | 'author' | 'categories'>;
 }

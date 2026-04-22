@@ -653,7 +653,8 @@ export async function updateLoanStatus(
   loanId: string, 
   nextStatus: TenantLoan['status'],
   deliveryCondition?: { good: number; fair: number; bad: number },
-  returnNote?: string
+  returnNote?: string,
+  returnCondition?: { good: number; fair: number; bad: number }
 ) {
   if (!isSupabaseConfigured()) {
     const loan = mockLoans.find((item) => item.id === loanId);
@@ -718,6 +719,7 @@ export async function updateLoanStatus(
         p_librarian_id: session.id,
         p_delivery_condition: deliveryCondition,
         p_return_note: returnNote,
+        p_return_condition: returnCondition,
       }),
     },
     { service: true }
