@@ -59,8 +59,11 @@
   * {
     @apply border-gray-200;
   }
-  body {
+  html {
     @apply bg-white text-gray-900;
+  }
+  body {
+    @apply bg-transparent;
   }
 }
 
@@ -69,8 +72,12 @@
     font-family: "Avenir Next", Inter, system-ui, sans-serif;
   }
   
+  html {
+    @apply bg-gray-50;
+  }
+  
   body {
-    @apply bg-gray-50 text-gray-900 antialiased relative;
+    @apply bg-transparent text-gray-900 antialiased relative min-h-screen;
   }
 
   body::before {
@@ -83,8 +90,8 @@
     background-image: url('/watermark.jpg');
     background-repeat: repeat;
     background-size: 250px;
-    opacity: 0.04;
-    z-index: -1;
+    opacity: 0.05;
+    z-index: 9999;
     pointer-events: none;
   }
   
