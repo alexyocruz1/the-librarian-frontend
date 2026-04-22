@@ -248,7 +248,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                         </div>
 
 
-                        <div className="flex flex-col lg:items-end gap-4 border-t lg:border-t-0 pt-4 lg:pt-0">
+                        <div className="w-full lg:w-auto flex flex-col lg:items-end gap-4 border-t lg:border-t-0 pt-4 lg:pt-0">
                           <div className="flex flex-col items-start lg:items-end gap-1">
                             <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">Estado</span>
                             <span className={cn(
@@ -279,7 +279,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                               </>
                             )}
                             {loan.status === 'approved' && (
-                              <div className="flex flex-col items-end gap-3">
+                              <div className="w-full flex flex-col items-end gap-3">
                                 <div className="flex gap-2">
                                   <div className="flex flex-col items-center gap-1">
                                     <span className="text-[10px] font-bold uppercase text-emerald-600">Bueno</span>
@@ -324,7 +324,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                               </div>
                             )}
                             {loan.status === 'handled' && (
-                              <div className="flex flex-col items-end gap-3">
+                              <div className="w-full flex flex-col items-end gap-3">
                                 <textarea 
                                   placeholder="Nota de devolución (ej. Manchas en portada, hojas sueltas...)" 
                                   value={returnNotes[loan.id] || ''}
