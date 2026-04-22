@@ -330,7 +330,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                   value={returnNotes[loan.id] || ''}
                                   onChange={(e) => setReturnNotes(prev => ({ ...prev, [loan.id]: e.target.value }))}
                                   rows={2}
-                                  className="w-full lg:w-64 rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-900/5 transition resize-none"
+                                  className="w-full lg:w-96 rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-900/5 transition resize-none"
                                 />
                                 <button 
                                   onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id])} 
