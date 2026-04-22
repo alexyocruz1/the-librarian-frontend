@@ -71,7 +71,7 @@ export default function MyLoansLookup({ librarySlug }: MyLoansLookupProps) {
     <main className="min-h-screen bg-[linear-gradient(180deg,_#f8fbff_0%,_#ffffff_45%,_#f7f4ec_100%)] px-6 py-14">
       <div className="mx-auto max-w-4xl space-y-8">
         <div className="flex justify-start">
-          <Link href={librarySlug ? `/l/${librarySlug}` : '/'} className="rounded-full bg-white/80 border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-white shadow-sm transition">
+          <Link href={librarySlug ? `/l/${librarySlug}` : '/'} className="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 shadow-sm transition">
             &larr; Volver al catálogo
           </Link>
         </div>

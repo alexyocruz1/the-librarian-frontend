@@ -123,7 +123,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.7fr]">
           <div className="space-y-6">
             <div className="space-y-4">
-              <span className="inline-flex rounded-full border border-amber-200 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-700 backdrop-blur">
+              <span className="inline-flex rounded-full border border-amber-200 bg-white px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-700">
                 {t('common.publicLibraryCatalog') || 'Catálogo de la biblioteca'}
               </span>
               <div className="space-y-3">
@@ -136,7 +136,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200 bg-white/90 p-5 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)] backdrop-blur">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)]">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t('dashboard.quickActions.browseBooks') || 'Descubrir libros'}</p>
@@ -154,7 +154,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                 {loading && <div className="text-sm text-slate-500">Cargando libros...</div>}
                 {!loading &&
                   data?.books.map((book) => (
-                    <article key={book.id} className="rounded-[1.75rem] border border-slate-200 bg-slate-50/70 p-5 transition hover:-translate-y-0.5 hover:bg-white flex flex-col justify-between">
+                    <article key={book.id} className="rounded-[1.75rem] border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:bg-slate-50 flex flex-col justify-between">
                       {/* Hidden probe to detect broken images early */}
                       {book.image_url && !brokenImages.has(book.image_url) && (
                         <img
