@@ -127,7 +127,7 @@ export async function lookupLoans(libraryId: string, identifier: string): Promis
   }
 
   const loans = await supabaseRest<TenantLoan[]>(
-    `/rest/v1/loans?select=id,library_id,book_id,full_name,identifier,requested_copies,status,created_at,updated_at,handled_at,returned_at&library_id=eq.${libraryId}&identifier=eq.${encodeURIComponent(identifier)}&order=created_at.desc`
+    `/rest/v1/loans?select=id,library_id,book_id,full_name,identifier,requested_copies,status,created_at,updated_at,handled_at,returned_at,due_date,delivery_condition,return_note&library_id=eq.${libraryId}&identifier=eq.${encodeURIComponent(identifier)}&order=created_at.desc`
   ,
     { method: 'GET' },
     { service: true }
@@ -333,7 +333,7 @@ export async function listDashboardLoans(session: LibrarianSession, activeLibrar
 
   const idClause = libraryIds.join(',');
   const loans = await supabaseRest<TenantLoan[]>(
-    `/rest/v1/loans?select=id,library_id,book_id,full_name,identifier,requested_copies,status,created_at,updated_at,handled_at,returned_at&library_id=in.(${idClause})&order=created_at.desc`,
+    `/rest/v1/loans?select=id,library_id,book_id,full_name,identifier,requested_copies,status,created_at,updated_at,handled_at,returned_at,due_date,delivery_condition,return_note&library_id=in.(${idClause})&order=created_at.desc`,
     { method: 'GET' },
     { service: true }
   );
