@@ -13,7 +13,7 @@ export default function LibraryPickerClient({ libraries }: LibraryPickerClientPr
   const { t } = useI18n();
 
   return (
-    <main className="relative min-h-screen bg-[linear-gradient(180deg,_#fffaf0_0%,_#ffffff_45%,_#eef5ff_100%)] px-6 py-16">
+    <main className="relative min-h-screen px-6 py-16">
       <LanguageSwitcher />
 
       <div className="mx-auto max-w-4xl space-y-8">

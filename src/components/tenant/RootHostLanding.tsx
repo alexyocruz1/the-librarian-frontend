@@ -8,7 +8,7 @@ export default function RootHostLanding() {
   const { t } = useI18n();
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,_#fffaf0_0%,_#ffffff_45%,_#eef5ff_100%)] p-6">
+    <main className="relative flex min-h-screen items-center justify-center p-6">
       <LanguageSwitcher />
       
       <div className="w-full max-w-lg text-center">
