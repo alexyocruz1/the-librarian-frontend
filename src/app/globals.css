@@ -381,7 +381,7 @@
   }
   
   .glass {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+    @apply bg-white border border-slate-200;
   }
   
   .gradient-primary {

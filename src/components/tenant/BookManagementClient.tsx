@@ -632,7 +632,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setPreviewImage(null)}
-              className="absolute top-6 right-6 z-10 rounded-full bg-white/80 p-2 text-slate-900 shadow-md hover:bg-white transition"
+              className="absolute top-6 right-6 z-10 rounded-full bg-white p-2 text-slate-900 shadow-md hover:bg-slate-100 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
