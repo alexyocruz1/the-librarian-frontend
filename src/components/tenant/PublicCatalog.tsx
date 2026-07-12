@@ -248,6 +248,11 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                       </div>
                     </article>
                   ))}
+                {!loading && data?.books.length === 0 && (
+                  <div className="col-span-full py-12 text-center text-slate-500 italic">
+                    {t('books.emptyCatalog') || 'No hay libros disponibles en esta biblioteca.'}
+                  </div>
+                )}
               </div>
             </div>
             {statusMessage && <p className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">{statusMessage}</p>}
