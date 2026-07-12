@@ -1,5 +1,6 @@
 {
-  "app.title": "The Librarian",
+  "app.title": "El Bibliotecario",
+  "app.description": "Gestiona tu biblioteca con facilidad.",
   "app.loading": "Cargando tu experiencia…",
   "settings.title": "Ajustes",
   "settings.subtitle": "Administra la configuración y preferencias de tu cuenta",
@@ -113,8 +114,8 @@
   "reports.activity.timestamp": "{date}",
   "dashboard.loading": "Cargando tu panel…",
   "history.loading": "Obteniendo tu historial…",
-  "auth.login.title": "The Librarian",
-  "auth.login.subtitle": "Inicia sesión en tu cuenta",
+  "auth.login.title": "El Bibliotecario",
+  "auth.login.subtitle": "Inicia sesión en el panel",
   "auth.login.email.label": "Correo electrónico",
   "auth.login.email.placeholder": "Ingresa tu correo",
   "auth.login.password.label": "Contraseña",

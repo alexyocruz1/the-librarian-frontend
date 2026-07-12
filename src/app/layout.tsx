@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import ClientProviders from '@/components/ClientProviders';
+import DynamicBackground from '@/components/DynamicBackground';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'The Librarian',
+  title: 'El Bibliotecario',
   description: 'Manage your library with ease.',
   icons: {
-    icon: '/watermark.jpg',
-    apple: '/watermark.jpg',
+    icon: '/watermark.jpeg',
+    apple: '/watermark.jpeg',
   },
 };
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <DynamicBackground />
         <ClientProviders>
           {children}
         </ClientProviders>

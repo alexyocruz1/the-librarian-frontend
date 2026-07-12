@@ -3,7 +3,14 @@ import { extractSubdomainFromHost } from '@/lib/tenant';
 
 export function middleware(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
-  const subdomain = extractSubdomainFromHost(request.headers.get('host'));
+  let subdomain = extractSubdomainFromHost(request.headers.get('host'));
+
+  if (!subdomain && request.nextUrl.pathname.startsWith('/l/')) {
+    const parts = request.nextUrl.pathname.split('/');
+    if (parts.length >= 3) {
+      subdomain = parts[2];
+    }
+  }
 
   if (subdomain) {
     requestHeaders.set('x-library-subdomain', subdomain);

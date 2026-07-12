@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <main className="min-h-screen">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 py-0 lg:flex-row lg:px-6 lg:py-8">
+      <div className="mx-auto flex w-full flex-col gap-6 py-0 lg:flex-row lg:px-6 lg:py-8">
         <ResponsiveSidebar session={session} libraries={libraries} />
         <section className="min-w-0 flex-1 px-6 py-8 lg:p-0">{children}</section>
       </div>

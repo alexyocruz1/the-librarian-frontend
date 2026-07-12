@@ -80,20 +80,7 @@
     @apply bg-transparent text-gray-900 antialiased relative min-h-screen;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('/watermark.jpg');
-    background-repeat: repeat;
-    background-size: 220px;
-    opacity: 0.07;
-    z-index: 0;
-    pointer-events: none;
-  }
+
 
   body > * {
     position: relative;

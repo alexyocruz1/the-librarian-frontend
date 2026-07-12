@@ -119,7 +119,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
       </header>
 
 
-      <section className="mx-auto max-w-7xl pt-10 px-6 pb-10 md:px-10 md:py-10">
+      <section className="mx-auto w-full pt-10 px-6 pb-10 md:px-10 md:py-10">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.7fr]">
           <div className="space-y-6">
             <div className="space-y-4">
