@@ -91,6 +91,8 @@
   "reports.metrics.overdueBooks": "Overdue Books",
   "reports.popular.title": "Most Popular Books",
   "reports.popular.subtitle": "Top borrowed books in the selected period",
+  "reports.borrowTrends.title": "Borrow Trends",
+  "reports.borrowTrends.subtitle": "Loan activity over the selected period",
   "reports.recent.title": "Recent Activity",
   "reports.recent.subtitle": "Latest library activities",
   "reports.libraryStats.title": "Library Statistics",

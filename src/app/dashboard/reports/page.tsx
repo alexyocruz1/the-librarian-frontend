@@ -80,6 +80,7 @@ interface ReportStats {
 const RecentActivity = dynamic(() => import('./recent-activity').then(m => m.default), { ssr: false, loading: () => null });
 const PopularBooks = dynamic(() => import('./popular-books').then(m => m.default), { ssr: false, loading: () => null });
 const QuickActions = dynamic(() => import('./quick-actions').then(m => m.default), { ssr: false, loading: () => null });
+const BorrowTrendsChart = dynamic(() => import('./borrow-trends-chart').then(m => m.default), { ssr: false, loading: () => null });
 
 export default function ReportsPage() {
   const { user } = useAuth();
@@ -384,6 +385,9 @@ export default function ReportsPage() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Borrow Trends (lazy) */}
+      <BorrowTrendsChart stats={stats} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Popular Books (lazy) */}

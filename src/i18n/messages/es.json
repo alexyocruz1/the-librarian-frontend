@@ -91,6 +91,8 @@
   "reports.metrics.overdueBooks": "Libros Atrasados",
   "reports.popular.title": "Libros Más Populares",
   "reports.popular.subtitle": "Libros más prestados en el período seleccionado",
+  "reports.borrowTrends.title": "Tendencia de Préstamos",
+  "reports.borrowTrends.subtitle": "Actividad de préstamos en el período seleccionado",
   "reports.recent.title": "Actividad Reciente",
   "reports.recent.subtitle": "Últimas actividades de la biblioteca",
   "reports.libraryStats.title": "Estadísticas de Biblioteca",
