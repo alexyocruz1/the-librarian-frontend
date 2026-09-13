@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { XMarkIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -69,20 +69,14 @@ export default function AssignToLibraryModal({
       setLoadingLibraries(true);
       const response = await api.get('/libraries');
       const allLibraries = response.data.libraries || response.data.data || [];
-      
-      // Filter out libraries where this book is already assigned
-      const availableLibraries = allLibraries.filter((lib: Library) => 
-        !existingLibraries.includes(lib._id)
-      );
-      
-      setLibraries(availableLibraries);
+      setLibraries(allLibraries);
     } catch (error) {
       console.error('Error fetching libraries:', error);
       toast.error(getErrorMessage(error));
     } finally {
       setLoadingLibraries(false);
     }
-  }, [existingLibraries]);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -161,24 +155,8 @@ export default function AssignToLibraryModal({
   const availableLibraries = libraries.filter(lib => !existingLibraries.includes(lib._id));
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50"
-              onClick={onClose}
-            />
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-md"
-            >
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="p-0 max-w-md bg-transparent dark:bg-transparent shadow-none" showCloseButton={false}>
               <Card className="shadow-strong">
                 <CardHeader
                   title={t('assignToLibrary.title')}
@@ -309,10 +287,7 @@ export default function AssignToLibraryModal({
                   </form>
                 </CardBody>
               </Card>
-            </motion.div>
-          </div>
-        </div>
-      )}
-    </AnimatePresence>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -84,15 +84,20 @@ jest.mock('framer-motion', () => ({
 }))
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
-  toast: {
+jest.mock('react-hot-toast', () => {
+  const toast = {
     success: jest.fn(),
     error: jest.fn(),
     loading: jest.fn(),
     dismiss: jest.fn(),
-  },
-  Toaster: () => null,
-}))
+  }
+  return {
+    __esModule: true,
+    default: toast,
+    toast,
+    Toaster: () => null,
+  }
+})
 
 // Mock API client
 jest.mock('@/lib/api', () => ({
