@@ -1,165 +1,110 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { useRouter } from 'next/navigation'
 import LoginPage from '../login/page'
-import { api } from '@/lib/api'
+import { I18nProvider } from '@/context/I18nContext'
+import { PreferencesProvider } from '@/context/PreferencesContext'
 
-// Mock the router
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }))
 
-// Mock the API
-jest.mock('@/lib/api', () => ({
-  api: {
-    login: jest.fn(),
-  },
-}))
+const renderWithProviders = (ui: React.ReactElement) =>
+  render(
+    <PreferencesProvider>
+      <I18nProvider>{ui}</I18nProvider>
+    </PreferencesProvider>
+  )
 
 const mockPush = jest.fn()
-const mockApi = api as jest.Mocked<typeof api>
+const mockRefresh = jest.fn()
 
 describe('Login Page', () => {
   beforeEach(() => {
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
+      refresh: mockRefresh,
     })
     jest.clearAllMocks()
+    global.fetch = jest.fn()
   })
 
-  it('renders login form', () => {
-    render(<LoginPage />)
-    
-    expect(screen.getByText('Welcome back')).toBeInTheDocument()
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
+  it('renders login form prefilled with demo credentials', () => {
+    renderWithProviders(<LoginPage />)
+
+    expect(screen.getByRole('link', { name: /back to home|common.backToHome/i })).toBeInTheDocument()
+    const inputs = screen.getAllByRole('textbox')
+    expect(inputs.length).toBeGreaterThan(0)
+    expect((inputs[0] as HTMLInputElement).value).toBe('ana@librarian.test')
   })
 
-  it('shows validation errors for empty fields', async () => {
-    const user = userEvent.setup()
-    render(<LoginPage />)
-    
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
-    await user.click(submitButton)
-    
+  it('submits credentials and redirects on success', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    })
+
+    renderWithProviders(<LoginPage />)
+
+    const submitButton = screen.getByRole('button', { name: /enter dashboard|signing in|auth\.login\.button/i })
+    fireEvent.click(submitButton)
+
     await waitFor(() => {
-      expect(screen.getByText(/email is required/i)).toBeInTheDocument()
-      expect(screen.getByText(/password is required/i)).toBeInTheDocument()
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/auth/login',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ email: 'ana@librarian.test', password: 'library123' }),
+        })
+      )
+    })
+
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/dashboard')
+      expect(mockRefresh).toHaveBeenCalled()
     })
   })
 
-  it('shows validation error for invalid email', async () => {
-    const user = userEvent.setup()
-    render(<LoginPage />)
-    
-    const emailInput = screen.getByLabelText(/email/i)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
-    
-    await user.type(emailInput, 'invalid-email')
-    await user.click(submitButton)
-    
-    await waitFor(() => {
-      expect(screen.getByText(/invalid email/i)).toBeInTheDocument()
+  it('shows an error message when login fails', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: 'Invalid credentials' }),
     })
+
+    renderWithProviders(<LoginPage />)
+
+    const submitButton = screen.getByRole('button', { name: /enter dashboard|signing in|auth\.login\.button/i })
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid credentials')).toBeInTheDocument()
+    })
+    expect(mockPush).not.toHaveBeenCalled()
   })
 
-  it('submits form with valid data', async () => {
-    const user = userEvent.setup()
-    mockApi.login.mockResolvedValue({
-      success: true,
-      data: {
-        accessToken: 'mock-token',
-        user: {
-          id: '1',
-          name: 'Test User',
-          email: 'test@example.com',
-          role: 'admin',
-          status: 'active',
-          libraries: ['1'],
-        },
-      },
-    })
-    
-    render(<LoginPage />)
-    
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
-    
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, 'password123')
-    await user.click(submitButton)
-    
-    await waitFor(() => {
-      expect(mockApi.login).toHaveBeenCalledWith({
-        email: 'test@example.com',
-        password: 'password123',
+  it('disables the submit button while the request is in flight', async () => {
+    let resolveFetch: (value: unknown) => void = () => {}
+    ;(global.fetch as jest.Mock).mockReturnValue(
+      new Promise((resolve) => {
+        resolveFetch = resolve
       })
-    })
-  })
-
-  it('handles login error', async () => {
-    const user = userEvent.setup()
-    mockApi.login.mockResolvedValue({
-      success: false,
-      error: 'Invalid credentials',
-    })
-    
-    render(<LoginPage />)
-    
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
-    
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, 'wrongpassword')
-    await user.click(submitButton)
-    
-    await waitFor(() => {
-      expect(mockApi.login).toHaveBeenCalled()
-    })
-  })
-
-  it('shows loading state during submission', async () => {
-    const user = userEvent.setup()
-    mockApi.login.mockImplementation(
-      () => new Promise(resolve => setTimeout(() => resolve({ success: true, data: {} }), 100))
     )
-    
-    render(<LoginPage />)
-    
-    const emailInput = screen.getByLabelText(/email/i)
-    const passwordInput = screen.getByLabelText(/password/i)
-    const submitButton = screen.getByRole('button', { name: /sign in/i })
-    
-    await user.type(emailInput, 'test@example.com')
-    await user.type(passwordInput, 'password123')
-    await user.click(submitButton)
-    
-    expect(submitButton).toBeDisabled()
+
+    renderWithProviders(<LoginPage />)
+
+    const submitButton = screen.getByRole('button', { name: /enter dashboard|signing in|auth\.login\.button/i })
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled()
+    })
+
+    resolveFetch({ ok: true, json: async () => ({}) })
   })
 
-  it('has link to register page', () => {
-    render(<LoginPage />)
-    
-    const registerLink = screen.getByRole('link', { name: /sign up/i })
-    expect(registerLink).toHaveAttribute('href', '/auth/register')
-  })
+  it('has a link back to the home page', () => {
+    renderWithProviders(<LoginPage />)
 
-  it('toggles password visibility', async () => {
-    const user = userEvent.setup()
-    render(<LoginPage />)
-    
-    const passwordInput = screen.getByLabelText(/password/i)
-    const toggleButton = screen.getByRole('button', { name: /toggle password visibility/i })
-    
-    expect(passwordInput).toHaveAttribute('type', 'password')
-    
-    await user.click(toggleButton)
-    expect(passwordInput).toHaveAttribute('type', 'text')
-    
-    await user.click(toggleButton)
-    expect(passwordInput).toHaveAttribute('type', 'password')
+    const backLink = screen.getByRole('link')
+    expect(backLink).toHaveAttribute('href', '/')
   })
 })

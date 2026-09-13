@@ -157,6 +157,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                     <article key={book.id} className="rounded-[1.75rem] border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:bg-slate-50 flex flex-col justify-between">
                       {/* Hidden probe to detect broken images early */}
                       {book.image_url && !brokenImages.has(book.image_url) && (
+                        // eslint-disable-next-line @next/next/no-img-element -- invisible probe to detect broken URLs, not a displayed image
                         <img
                           src={book.image_url}
                           alt=""

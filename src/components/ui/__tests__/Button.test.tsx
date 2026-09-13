@@ -7,32 +7,32 @@ describe('Button Component', () => {
     
     const button = screen.getByRole('button', { name: /click me/i })
     expect(button).toBeInTheDocument()
-    expect(button).toHaveClass('btn', 'btn-primary')
+    expect(button).toHaveClass('bg-primary-600', 'text-white')
   })
 
   it('renders with different variants', () => {
     const { rerender } = render(<Button variant="secondary">Secondary</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-secondary')
+    expect(screen.getByRole('button')).toHaveClass('bg-white')
 
     rerender(<Button variant="success">Success</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-success')
+    expect(screen.getByRole('button')).toHaveClass('bg-success-600')
 
     rerender(<Button variant="warning">Warning</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-warning')
+    expect(screen.getByRole('button')).toHaveClass('bg-warning-600')
 
     rerender(<Button variant="error">Error</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-error')
+    expect(screen.getByRole('button')).toHaveClass('bg-error-600')
 
     rerender(<Button variant="ghost">Ghost</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-ghost')
+    expect(screen.getByRole('button')).toHaveClass('bg-transparent')
   })
 
   it('renders with different sizes', () => {
     const { rerender } = render(<Button size="sm">Small</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-sm')
+    expect(screen.getByRole('button')).toHaveClass('px-3', 'py-1.5', 'text-xs')
 
     rerender(<Button size="lg">Large</Button>)
-    expect(screen.getByRole('button')).toHaveClass('btn-lg')
+    expect(screen.getByRole('button')).toHaveClass('px-6', 'py-3', 'text-base')
   })
 
   it('handles click events', () => {
@@ -59,7 +59,7 @@ describe('Button Component', () => {
     
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
-    expect(button).toHaveClass('btn-loading')
+    expect(button.querySelector('svg.animate-spin')).toBeInTheDocument()
   })
 
   it('renders with left icon', () => {

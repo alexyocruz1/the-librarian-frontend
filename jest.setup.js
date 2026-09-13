@@ -1,5 +1,16 @@
 import '@testing-library/jest-dom'
 
+// Stable reference so hooks depending on [user] (e.g. PreferencesContext) don't
+// see a new object on every render and loop forever.
+const mockAuthUser = {
+  id: '1',
+  name: 'Test User',
+  email: 'test@example.com',
+  role: 'admin',
+  status: 'active',
+  libraries: ['1'],
+}
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {
@@ -119,14 +130,7 @@ jest.mock('@/lib/api', () => ({
 // Mock Auth Context
 jest.mock('@/context/AuthContext', () => ({
   useAuth: () => ({
-    user: {
-      id: '1',
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'admin',
-      status: 'active',
-      libraries: ['1'],
-    },
+    user: mockAuthUser,
     isAuthenticated: true,
     isLoading: false,
     login: jest.fn(),
@@ -142,14 +146,7 @@ jest.mock('@/context/AuthContext', () => ({
 // Mock useAuth hook
 jest.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({
-    user: {
-      id: '1',
-      name: 'Test User',
-      email: 'test@example.com',
-      role: 'admin',
-      status: 'active',
-      libraries: ['1'],
-    },
+    user: mockAuthUser,
     isAuthenticated: true,
     isLoading: false,
     login: jest.fn(),

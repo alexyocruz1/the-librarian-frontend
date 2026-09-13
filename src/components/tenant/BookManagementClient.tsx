@@ -554,6 +554,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               <div key={book.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 hover:bg-white hover:border-slate-200 transition">
                 {/* Hidden probe to detect broken images early */}
                 {book.image_url && !brokenImages.has(book.image_url) && (
+                  // eslint-disable-next-line @next/next/no-img-element -- invisible probe to detect broken URLs, not a displayed image
                   <img
                     src={book.image_url}
                     alt=""
