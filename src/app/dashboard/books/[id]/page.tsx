@@ -19,6 +19,7 @@ import {
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import CopyModal from '@/components/modals/CopyModal';
 import BookModal from '@/components/modals/BookModal';
 import AssignToLibraryModal from '@/components/modals/AssignToLibraryModal';
@@ -1039,51 +1040,51 @@ export default function BookDetailPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>
                       {t('bookDetail.copies.table.barcode')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('bookDetail.copies.table.library')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('bookDetail.copies.table.status')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('bookDetail.copies.table.condition')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('bookDetail.copies.table.shelfLocation')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('bookDetail.copies.table.acquired')}
-                    </th>
+                    </TableHead>
                     {canManage && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <TableHead>
                         {t('bookDetail.copies.table.actions')}
-                      </th>
+                      </TableHead>
                     )}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {copies.map((copy) => (
-                    <tr key={copy._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <TableRow key={copy._id}>
+                      <TableCell>
                         <div className="text-sm font-mono text-gray-900">
                           {copy.barcode}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell>
                         <div className="text-sm text-gray-900">
                           {(copy.libraryId as any)?.name || 'Unknown Library'}
                         </div>
                         <div className="text-xs text-gray-500">
                           {(copy.libraryId as any)?.code || 'N/A'}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={(() => {
                           switch (copy.status) {
                             case 'available':
@@ -1102,16 +1103,16 @@ export default function BookDetailPage() {
                         })()}>
                           {t(`copyModal.status.${copy.status}`)}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="secondary">
                           {t(`copyModal.condition.${copy.condition}`)}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-900">
                         {copy.shelfLocation || 'Not specified'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-900">
                         {copy.acquiredAt ? (() => {
                           // Extract date parts from ISO string to avoid timezone conversion
                           const isoString = copy.acquiredAt;
@@ -1123,9 +1124,9 @@ export default function BookDetailPage() {
                             return isoString;
                           }
                         })() : 'Not specified'}
-                      </td>
+                      </TableCell>
                       {canManage && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <TableCell className="text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
@@ -1161,12 +1162,12 @@ export default function BookDetailPage() {
                               {t('bookDetail.copies.actions.delete')}
                             </Button>
                           </div>
-                        </td>
+                        </TableCell>
                       )}
-                    </tr>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardBody>

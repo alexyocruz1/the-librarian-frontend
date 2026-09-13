@@ -16,6 +16,7 @@ import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import UserModal from '@/components/modals/UserModal';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -278,44 +279,45 @@ export default function UsersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>
                       {t('users.table.user')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('users.table.role')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('users.table.status')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('users.table.studentId')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('users.table.libraries')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    </TableHead>
+                    <TableHead>
                       {t('users.table.joined')}
-                    </th>
+                    </TableHead>
                     {isSuperAdmin && (
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      <TableHead>
                         {t('users.table.actions')}
-                      </th>
+                      </TableHead>
                     )}
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {filteredUsers.map((user, index) => (
                     <motion.tr
                       key={user._id}
+                      data-slot="table-row"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <TableCell>
                         <div className="flex items-center">
                           <div className="shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
@@ -329,31 +331,31 @@ export default function UsersPage() {
                             <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={getRoleBadgeVariant(user.role)}>
                           {user.role}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </TableCell>
+                      <TableCell>
                         <Badge variant={getStatusBadgeVariant(user.status)}>
                           {user.status}
                         </Badge>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-900 dark:text-gray-100">
                         {user.studentId || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                        {user.libraries && user.libraries.length > 0 
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-900 dark:text-gray-100">
+                        {user.libraries && user.libraries.length > 0
                           ? `${user.libraries.length} ${user.libraries.length > 1 ? t('common.libraries') : t('common.library')}`
                           : '-'
                         }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-900 dark:text-gray-100">
                         {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
+                      </TableCell>
                       {isSuperAdmin && (
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <TableCell className="text-sm font-medium">
                           <div className="flex items-center gap-2">
                             {user.status === 'pending' && (
                               <>
@@ -397,12 +399,12 @@ export default function UsersPage() {
                               </Button>
                             )}
                           </div>
-                        </td>
+                        </TableCell>
                       )}
                     </motion.tr>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </CardBody>
