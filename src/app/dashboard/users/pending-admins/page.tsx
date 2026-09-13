@@ -79,8 +79,8 @@ export default function PendingAdminsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <div className="skeleton h-8 w-56 rounded mb-2" />
-          <div className="skeleton h-4 w-80 rounded" />
+          <div className="skeleton h-8 w-56 rounded-sm mb-2" />
+          <div className="skeleton h-4 w-80 rounded-sm" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1,2,3].map((i)=> (
@@ -88,8 +88,8 @@ export default function PendingAdminsPage() {
               <div className="flex items-center gap-4">
                 <div className="skeleton h-10 w-10 rounded-full" />
                 <div className="flex-1">
-                  <div className="skeleton h-4 w-28 rounded mb-2" />
-                  <div className="skeleton h-6 w-12 rounded" />
+                  <div className="skeleton h-4 w-28 rounded-sm mb-2" />
+                  <div className="skeleton h-6 w-12 rounded-sm" />
                 </div>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function PendingAdminsPage() {
         <Card>
           <CardBody className="p-6">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <ClockIcon className="h-8 w-8 text-warning-600" />
               </div>
               <div className="ml-4">
@@ -146,7 +146,7 @@ export default function PendingAdminsPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
                           <span className="text-lg font-medium text-primary-700">
                             {u.name.charAt(0).toUpperCase()}

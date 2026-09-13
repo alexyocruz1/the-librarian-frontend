@@ -206,7 +206,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
       </div>
 
       <div className="grid gap-8 xl:grid-cols-[0.9fr_1.3fr]">
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <section className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Editor de Libros</p>
@@ -235,7 +235,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                     setSelectedLibraryId(event.target.value);
                     setForm((current) => ({ ...current, library_id: event.target.value }));
                   }}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                 >
                   {libraries.map((library) => (
                     <option key={library.id} value={library.id}>
@@ -265,7 +265,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               <input
                 value={form.title}
                 onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                 placeholder="Ej. El Quijote"
                 required
               />
@@ -277,7 +277,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <input
                   value={form.author}
                   onChange={(event) => setForm((current) => ({ ...current, author: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                   placeholder="Ej. Miguel de Cervantes"
                   required
                 />
@@ -288,7 +288,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <input
                   value={form.book_code}
                   onChange={(event) => setForm((current) => ({ ...current, book_code: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                   placeholder="Ej. 978-3-16-148410-0"
                 />
               </label>
@@ -300,7 +300,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <input
                   value={form.editorial}
                   onChange={(event) => setForm((current) => ({ ...current, editorial: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                   placeholder="Ej. Alfaguara"
                 />
               </label>
@@ -310,7 +310,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <input
                   value={form.edition}
                   onChange={(event) => setForm((current) => ({ ...current, edition: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                   placeholder="Ej. Primera Edición"
                 />
               </label>
@@ -332,7 +332,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   onChange={(e) => setCategoryInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCategory(); } }}
                   placeholder="Añadir categoría..."
-                  className="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none"
+                  className="flex-1 rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden"
                 />
                 <button
                   type="button"
@@ -376,7 +376,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <input
                   value={form.shelf_location}
                   onChange={(event) => setForm((current) => ({ ...current, shelf_location: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
                   placeholder="Ej. B-23"
                 />
               </label>
@@ -400,7 +400,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                         available_copies: editingBookId ? current.available_copies : newTotal
                       }));
                     }}
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                   />
                 </label>
                 <label className="block">
@@ -419,7 +419,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                         available_copies: editingBookId ? current.available_copies : newTotal
                       }));
                     }}
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                   />
                 </label>
                 <label className="block">
@@ -438,7 +438,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                         available_copies: editingBookId ? current.available_copies : newTotal
                       }));
                     }}
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                   />
                 </label>
               </div>
@@ -464,7 +464,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                         available_copies: Number(event.target.value || 0),
                       }))
                     }
-                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                    className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                   />
                 </label>
               </div>
@@ -479,7 +479,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   step="0.01"
                   value={form.cost}
                   onChange={(event) => setForm((current) => ({ ...current, cost: Number(event.target.value || 0) }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                 />
               </label>
               <label className="block">
@@ -488,7 +488,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   type="date"
                   value={form.acquired_at}
                   onChange={(event) => setForm((current) => ({ ...current, acquired_at: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                  className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                 />
               </label>
             </div>
@@ -500,7 +500,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               <input
                 value={form.image_url}
                 onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-none transition"
+                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm focus:outline-hidden transition"
                 placeholder="https://ejemplo.com/portada.jpg"
               />
             </label>
@@ -513,7 +513,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
           </form>
         </section>
 
-        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm flex flex-col min-h-[600px]">
+        <section className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs flex flex-col min-h-[600px]">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-slate-100 pb-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Explorar catálogo</p>
@@ -527,7 +527,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                   setForm(emptyForm(event.target.value));
                 }
               }}
-              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm bg-slate-50 hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-slate-900/5"
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-sm bg-slate-50 hover:bg-white transition focus:outline-hidden focus:ring-2 focus:ring-slate-900/5"
             >
               {libraries.map((library) => (
                 <option key={library.id} value={library.id}>
@@ -543,7 +543,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
               placeholder="Buscar por título, autor, categoría o código..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
             />
           </div>
 
@@ -629,7 +629,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
       </div>
 
       {previewImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setPreviewImage(null)}
@@ -639,7 +639,7 @@ export default function BookManagementClient({ libraries }: BookManagementClient
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
+            <div className="aspect-2/3 w-full overflow-hidden rounded-4xl bg-slate-100 relative">
               <Image
                 src={previewImage}
                 alt="Vista previa"

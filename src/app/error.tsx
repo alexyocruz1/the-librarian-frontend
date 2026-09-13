@@ -30,7 +30,7 @@ export default function Error({ error, reset }: ErrorProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-error-50 to-warning-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-error-50 to-warning-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -115,15 +115,15 @@ export default function Error({ error, reset }: ErrorProps) {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center justify-center space-x-2">
-                  <WrenchScrewdriverIcon className="w-4 h-4 flex-shrink-0" />
+                  <WrenchScrewdriverIcon className="w-4 h-4 shrink-0" />
                   <span className="text-center">System maintenance in progress</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2">
-                  <BookOpenIcon className="w-4 h-4 flex-shrink-0" />
+                  <BookOpenIcon className="w-4 h-4 shrink-0" />
                   <span className="text-center">Books are being reorganized</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2 sm:col-span-2 md:col-span-1">
-                  <ArrowPathIcon className="w-4 h-4 flex-shrink-0" />
+                  <ArrowPathIcon className="w-4 h-4 shrink-0" />
                   <span className="text-center">Try refreshing the page</span>
                 </div>
               </div>

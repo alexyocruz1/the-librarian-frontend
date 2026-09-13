@@ -236,7 +236,7 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                         <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-600 mb-3">
                           <div className="text-center">
                             {/* Simulated Barcode */}
-                            <div className="inline-block bg-black dark:bg-white p-2 rounded">
+                            <div className="inline-block bg-black dark:bg-white p-2 rounded-sm">
                               <div className="flex items-center justify-center space-x-1 mb-1">
                                 {Array.from({ length: 20 }, (_, i) => (
                                   <div
@@ -261,7 +261,7 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                           <div className="text-sm text-gray-600 dark:text-gray-400">
                             <strong>{t('libraryModal.preview.example')}:</strong>
                           </div>
-                          <div className="text-xs font-mono bg-gray-100 dark:bg-gray-600 p-2 rounded">
+                          <div className="text-xs font-mono bg-gray-100 dark:bg-gray-600 p-2 rounded-sm">
                             {codeValue.toUpperCase()}-2025-0001
                           </div>
                           <p className="text-xs text-gray-500 dark:text-gray-400">

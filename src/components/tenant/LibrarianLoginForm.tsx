@@ -47,7 +47,7 @@ export default function LibrarianLoginForm() {
           &larr; {t('common.backToHome') || 'Back to home'}
         </Link>
       </div>
-      <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6 rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_25px_70px_-40px_rgba(15,23,42,0.35)]">
+      <form onSubmit={handleSubmit} className="mx-auto w-full max-w-md space-y-6 rounded-4xl border border-slate-200 bg-white p-8 shadow-[0_25px_70px_-40px_rgba(15,23,42,0.35)]">
         <div>
           <h1 className="font-serif text-3xl font-bold text-slate-900 text-center">{t('auth.login.title') || 'Login'}</h1>
         </div>

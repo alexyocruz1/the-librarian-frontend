@@ -108,7 +108,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
     <main className="relative min-h-screen">
       <header className="relative z-0 flex flex-wrap items-center justify-between gap-4 px-6 pt-6 md:px-10">
         <div className="flex flex-wrap gap-3">
-          <Link href={'/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-sm">
+          <Link href={'/libraries'} className="inline-flex shrink-0 rounded-full bg-white border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 shadow-xs">
             &larr; {t('common.changeLibrary') || 'Cambiar biblioteca'}
           </Link>
           <Link href={librarySlug ? `/l/${librarySlug}/my-loans` : '/my-loans'} className="inline-flex shrink-0 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 shadow-md">
@@ -136,7 +136,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)]">
+            <div className="rounded-4xl border border-slate-200 bg-white p-5 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)]">
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t('dashboard.quickActions.browseBooks') || 'Descubrir libros'}</p>
@@ -146,7 +146,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder={t('search.placeholder') || "Buscar libros disponibles"}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-amber-300 focus:bg-white md:max-w-md"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-hidden transition focus:border-amber-300 focus:bg-white md:max-w-md"
                 />
               </div>
 
@@ -203,7 +203,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                         </div>
 
                         {requestingBookId === book.id && (
-                          <form onSubmit={(event) => submitLoanRequest(event, book.id)} className="space-y-3 rounded-[1.5rem] border border-slate-200 bg-white p-4">
+                          <form onSubmit={(event) => submitLoanRequest(event, book.id)} className="space-y-3 rounded-3xl border border-slate-200 bg-white p-4">
                             <input
                               value={requestForm.full_name}
                               onChange={(event) => setRequestForm((current) => ({ ...current, full_name: event.target.value }))}
@@ -260,7 +260,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
           </div>
 
           <aside className="space-y-5">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6">
+            <div className="rounded-4xl border border-slate-200 bg-white p-6">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{t('dashboard.stats.desc.inCatalog') || 'Categorías'}</p>
               <div className="mt-4 space-y-3">
                 {groupedCategories.map(([category, count]) => (
@@ -278,7 +278,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
       </section>
 
       {previewImage && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 p-6 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative max-w-sm w-full bg-white rounded-[2.5rem] p-4 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <button
               onClick={() => setPreviewImage(null)}
@@ -288,7 +288,7 @@ export default function PublicCatalog({ librarySlug }: PublicCatalogProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="aspect-[2/3] w-full overflow-hidden rounded-[2rem] bg-slate-100 relative">
+            <div className="aspect-2/3 w-full overflow-hidden rounded-4xl bg-slate-100 relative">
               <Image
                 src={previewImage}
                 alt="Vista previa"

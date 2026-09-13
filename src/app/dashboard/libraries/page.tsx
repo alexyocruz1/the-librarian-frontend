@@ -335,23 +335,23 @@ export default function LibrariesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="skeleton h-8 w-40 rounded mb-2" />
-            <div className="skeleton h-4 w-80 rounded" />
+            <div className="skeleton h-8 w-40 rounded-sm mb-2" />
+            <div className="skeleton h-4 w-80 rounded-sm" />
           </div>
-          <div className="skeleton h-10 w-32 rounded" />
+          <div className="skeleton h-10 w-32 rounded-sm" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="card p-6 space-y-4">
-              <div className="skeleton h-6 w-1/2 rounded" />
-              <div className="skeleton h-4 w-1/3 rounded" />
+              <div className="skeleton h-6 w-1/2 rounded-sm" />
+              <div className="skeleton h-4 w-1/3 rounded-sm" />
               <div className="space-y-3">
-                <div className="skeleton h-4 w-3/4 rounded" />
-                <div className="skeleton h-4 w-2/3 rounded" />
+                <div className="skeleton h-4 w-3/4 rounded-sm" />
+                <div className="skeleton h-4 w-2/3 rounded-sm" />
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="skeleton h-6 w-full rounded" />
-                <div className="skeleton h-6 w-full rounded" />
+                <div className="skeleton h-6 w-full rounded-sm" />
+                <div className="skeleton h-6 w-full rounded-sm" />
               </div>
             </div>
           ))}
@@ -376,7 +376,7 @@ export default function LibrariesPage() {
               title="Grid view"
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'grid'
-                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-xs'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
@@ -389,7 +389,7 @@ export default function LibrariesPage() {
               title="List view"
               className={`p-2 rounded-md transition-colors ${
                 viewMode === 'list'
-                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-sm'
+                  ? 'bg-white dark:bg-gray-700 text-primary-600 shadow-xs'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
@@ -558,7 +558,7 @@ export default function LibrariesPage() {
                 <div className="space-y-6">
                   {/* Location - Enhanced Design */}
                   <div className="flex items-start gap-4 pt-4">
-                    <div className="flex-shrink-0 w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
+                    <div className="shrink-0 w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
                       <MapPinIcon className="w-5 h-5 text-primary-600" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -584,7 +584,7 @@ export default function LibrariesPage() {
                   {/* Contact - Enhanced Design */}
                   {library.contact && (
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 bg-success-100 dark:bg-success-900 rounded-xl flex items-center justify-center">
+                      <div className="shrink-0 w-10 h-10 bg-success-100 dark:bg-success-900 rounded-xl flex items-center justify-center">
                         <PhoneIcon className="w-5 h-5 text-success-600" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -711,7 +711,7 @@ export default function LibrariesPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       {/* Library Icon */}
-                      <div className="flex-shrink-0 w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
+                      <div className="shrink-0 w-12 h-12 bg-primary-100 dark:bg-primary-900 rounded-xl flex items-center justify-center">
                         <BuildingLibraryIcon className="w-6 h-6 text-primary-600" />
                       </div>
                       
@@ -884,16 +884,16 @@ export default function LibrariesPage() {
                     <div className="flex flex-col h-full">
                       <div className="h-48 bg-gray-200 dark:bg-gray-700 animate-pulse" />
                       <div className="p-4 flex-1 flex flex-col space-y-3">
-                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4" />
+                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse w-3/4" />
                         <div className="grid grid-cols-2 gap-2">
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
+                          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
                         </div>
-                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
+                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
                         <div className="pt-3 border-t border-gray-200 dark:border-gray-700 mt-auto">
-                          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-sm animate-pulse" />
                         </div>
                       </div>
                     </div>
@@ -1091,7 +1091,7 @@ export default function LibrariesPage() {
               <div className="p-6">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-error-100 dark:bg-error-900 rounded-full flex items-center justify-center">
+                  <div className="shrink-0 w-10 h-10 bg-error-100 dark:bg-error-900 rounded-full flex items-center justify-center">
                     <ExclamationTriangleIcon className="w-6 h-6 text-error-600" />
                   </div>
                   <div>
@@ -1115,7 +1115,7 @@ export default function LibrariesPage() {
                   {/* Library Info */}
                   <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
+                      <div className="shrink-0 w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-lg flex items-center justify-center">
                         <BuildingLibraryIcon className="w-4 h-4 text-primary-600" />
                       </div>
                       <div>

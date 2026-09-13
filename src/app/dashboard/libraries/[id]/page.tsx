@@ -289,7 +289,7 @@ export default function LibraryDetailPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                           <span className="text-sm font-medium text-primary-700">
                             {admin.name.charAt(0).toUpperCase()}

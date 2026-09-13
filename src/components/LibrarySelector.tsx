@@ -145,7 +145,7 @@ export default function LibrarySelector({
               </div>
               
               {selectedLibrary?._id === library._id && (
-                <div className="flex-shrink-0 ml-2">
+                <div className="shrink-0 ml-2">
                   <div className="w-2 h-2 bg-primary-600 rounded-full" />
                 </div>
               )}

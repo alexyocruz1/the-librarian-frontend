@@ -151,22 +151,22 @@ export default function UsersPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="skeleton h-8 w-24 rounded mb-2" />
-            <div className="skeleton h-4 w-64 rounded" />
+            <div className="skeleton h-8 w-24 rounded-sm mb-2" />
+            <div className="skeleton h-4 w-64 rounded-sm" />
           </div>
-          <div className="skeleton h-10 w-28 rounded" />
+          <div className="skeleton h-10 w-28 rounded-sm" />
         </div>
         <div className="card p-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <div className="skeleton h-10 w-full rounded" />
+              <div className="skeleton h-10 w-full rounded-sm" />
             </div>
-            <div className="skeleton h-10 w-24 rounded" />
+            <div className="skeleton h-10 w-24 rounded-sm" />
           </div>
         </div>
         <div className="card p-6">
-          <div className="skeleton h-5 w-32 rounded mb-4" />
-          <div className="skeleton h-64 w-full rounded" />
+          <div className="skeleton h-5 w-32 rounded-sm mb-4" />
+          <div className="skeleton h-64 w-full rounded-sm" />
         </div>
       </div>
     );
@@ -317,7 +317,7 @@ export default function UsersPage() {
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
+                          <div className="shrink-0 h-10 w-10">
                             <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
                               <span className="text-sm font-medium text-primary-700">
                                 {user.name.charAt(0).toUpperCase()}

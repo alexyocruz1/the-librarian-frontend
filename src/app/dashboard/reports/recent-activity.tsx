@@ -23,7 +23,7 @@ export default function RecentActivity({ stats }: { stats: any }) {
               transition={{ delay: index * 0.1 }}
               className="flex items-start gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
             >
-              <div className="flex-shrink-0 mt-1">
+              <div className="shrink-0 mt-1">
                 {activity.type === 'borrow' && <BookOpenIcon className="w-4 h-4 text-primary-600" />}
                 {activity.type === 'return' && <BookOpenIcon className="w-4 h-4 text-success-600" />}
                 {activity.type === 'request' && <ClockIcon className="w-4 h-4 text-warning-600" />}

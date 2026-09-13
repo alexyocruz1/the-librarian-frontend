@@ -645,8 +645,8 @@ export default function BookDetailPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
-          <div className="skeleton h-10 w-24 rounded" />
-          <div className="skeleton h-8 w-64 rounded" />
+          <div className="skeleton h-10 w-24 rounded-sm" />
+          <div className="skeleton h-8 w-64 rounded-sm" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
@@ -655,42 +655,42 @@ export default function BookDetailPage() {
                 <div className="space-y-4">
                   {[1,2,3,4].map((i)=> (
                     <div key={i}>
-                      <div className="skeleton h-4 w-32 rounded mb-2" />
-                      <div className="skeleton h-5 w-48 rounded" />
+                      <div className="skeleton h-4 w-32 rounded-sm mb-2" />
+                      <div className="skeleton h-5 w-48 rounded-sm" />
                     </div>
                   ))}
                 </div>
                 <div className="space-y-4">
                   {[1,2,3,4].map((i)=> (
                     <div key={i}>
-                      <div className="skeleton h-4 w-32 rounded mb-2" />
-                      <div className="skeleton h-5 w-48 rounded" />
+                      <div className="skeleton h-4 w-32 rounded-sm mb-2" />
+                      <div className="skeleton h-5 w-48 rounded-sm" />
                     </div>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="skeleton h-4 w-40 rounded mb-3" />
+                <div className="skeleton h-4 w-40 rounded-sm mb-3" />
                 <div className="space-y-2">
-                  {[...Array(4)].map((_,i)=>(<div key={i} className="skeleton h-4 w-full rounded" />))}
+                  {[...Array(4)].map((_,i)=>(<div key={i} className="skeleton h-4 w-full rounded-sm" />))}
                 </div>
               </div>
             </div>
           </div>
           <div className="space-y-6">
             <div className="card p-4 h-[360px] flex items-center justify-center">
-              <div className="skeleton h-64 w-48 rounded" />
+              <div className="skeleton h-64 w-48 rounded-sm" />
             </div>
             <div className="card p-6 space-y-3">
-              <div className="skeleton h-5 w-32 rounded" />
-              <div className="skeleton h-10 w-full rounded" />
-              <div className="skeleton h-10 w-full rounded" />
+              <div className="skeleton h-5 w-32 rounded-sm" />
+              <div className="skeleton h-10 w-full rounded-sm" />
+              <div className="skeleton h-10 w-full rounded-sm" />
             </div>
           </div>
         </div>
         <div className="card p-6">
-          <div className="skeleton h-5 w-40 rounded mb-4" />
-          <div className="skeleton h-32 w-full rounded" />
+          <div className="skeleton h-5 w-40 rounded-sm mb-4" />
+          <div className="skeleton h-32 w-full rounded-sm" />
         </div>
       </div>
     );
@@ -892,7 +892,7 @@ export default function BookDetailPage() {
                 alt={title.title}
                 width={300}
                 height={400}
-                className="aspect-[3/4] w-full"
+                className="aspect-3/4 w-full"
                 fallbackText={t('bookDetail.cover.notAvailable')}
               />
             </CardBody>
@@ -1323,7 +1323,7 @@ export default function BookDetailPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <div className="flex items-center mb-4">
-                <div className="flex-shrink-0 w-10 h-10 mx-auto bg-error-100 dark:bg-error-900 rounded-full flex items-center justify-center">
+                <div className="shrink-0 w-10 h-10 mx-auto bg-error-100 dark:bg-error-900 rounded-full flex items-center justify-center">
                   <TrashIcon className="w-6 h-6 text-error-600 dark:text-error-400" />
                 </div>
               </div>
@@ -1388,7 +1388,7 @@ export default function BookDetailPage() {
             
             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
               <div className="flex items-start">
-                <XCircleIcon className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 flex-shrink-0" />
+                <XCircleIcon className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 mr-3 shrink-0" />
                 <div className="text-sm text-red-800 dark:text-red-200">
                   <p className="font-medium mb-1">{t('bookDetail.actions.deleteBookConfirm.warning.title')}</p>
                   <ul className="list-disc list-inside space-y-1 text-xs">

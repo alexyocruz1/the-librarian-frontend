@@ -31,7 +31,7 @@ export default function LibraryPickerClient({ libraries }: LibraryPickerClientPr
             <Link 
               key={lib.id} 
               href={`/l/${lib.subdomain}`} 
-              className="flex flex-col rounded-3xl bg-white p-6 shadow-sm border border-slate-200 transition hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-slate-900"
+              className="flex flex-col rounded-3xl bg-white p-6 shadow-xs border border-slate-200 transition hover:-translate-y-1 hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-slate-900"
             >
               <h2 className="text-xl font-bold text-slate-900">{lib.name}</h2>
               {lib.city && <p className="mt-1 text-sm font-medium uppercase tracking-widest text-slate-500">{lib.city}</p>}

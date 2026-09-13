@@ -28,7 +28,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   return (
     <html>
       <body>
-        <div className="min-h-screen bg-gradient-to-br from-error-50 to-warning-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-linear-to-br from-error-50 to-warning-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -112,11 +112,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center justify-center space-x-2">
-                      <ExclamationTriangleIcon className="w-4 h-4 flex-shrink-0" />
+                      <ExclamationTriangleIcon className="w-4 h-4 shrink-0" />
                       <span className="text-center">System recovery in progress</span>
                     </div>
                     <div className="flex items-center justify-center space-x-2">
-                      <BookOpenIcon className="w-4 h-4 flex-shrink-0" />
+                      <BookOpenIcon className="w-4 h-4 shrink-0" />
                       <span className="text-center">Books are being safely relocated</span>
                     </div>
                   </div>

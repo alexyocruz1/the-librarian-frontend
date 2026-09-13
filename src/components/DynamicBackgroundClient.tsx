@@ -66,7 +66,7 @@ export default function DynamicBackgroundClient({
       {Array.from({ length: 200 }).map((_, i) => (
         <div 
           key={i} 
-          className="w-[220px] h-[220px] flex-shrink-0"
+          className="w-[220px] h-[220px] shrink-0"
           style={{ 
             backgroundImage: `url('/${images[i % images.length]}')`, 
             backgroundSize: 'contain', 

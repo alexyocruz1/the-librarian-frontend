@@ -246,7 +246,7 @@ export default function AdvancedSearchModal({
                           type="checkbox"
                           checked={filters.availability === true}
                           onChange={(e) => handleFilterChange('availability', e.target.checked ? true : undefined)}
-                          className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                          className="rounded-sm border-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="ml-2 text-sm text-gray-700">
                           Only available books

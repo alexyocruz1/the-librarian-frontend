@@ -11,8 +11,8 @@ interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Skeleton({ className, rounded = 'md', width, height, ...props }: SkeletonProps) {
   const radius = {
-    sm: 'rounded-sm',
-    md: 'rounded',
+    sm: 'rounded-xs',
+    md: 'rounded-sm',
     lg: 'rounded-lg',
     xl: 'rounded-xl',
     full: 'rounded-full',
@@ -31,7 +31,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className="skeleton h-4 w-full rounded" />
+        <div key={i} className="skeleton h-4 w-full rounded-sm" />
       ))}
     </div>
   );

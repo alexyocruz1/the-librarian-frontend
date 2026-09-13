@@ -176,12 +176,12 @@ export default function ReportsPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <div className="skeleton h-8 w-48 rounded mb-2" />
-            <div className="skeleton h-4 w-72 rounded" />
+            <div className="skeleton h-8 w-48 rounded-sm mb-2" />
+            <div className="skeleton h-4 w-72 rounded-sm" />
           </div>
           <div className="flex items-center gap-3">
-            <div className="skeleton h-10 w-40 rounded" />
-            <div className="skeleton h-10 w-36 rounded" />
+            <div className="skeleton h-10 w-40 rounded-sm" />
+            <div className="skeleton h-10 w-36 rounded-sm" />
           </div>
         </div>
 
@@ -191,8 +191,8 @@ export default function ReportsPage() {
               <div className="flex items-center gap-4">
                 <div className="skeleton h-10 w-10 rounded-full" />
                 <div className="flex-1">
-                  <div className="skeleton h-4 w-24 rounded mb-2" />
-                  <div className="skeleton h-6 w-16 rounded" />
+                  <div className="skeleton h-4 w-24 rounded-sm mb-2" />
+                  <div className="skeleton h-6 w-16 rounded-sm" />
                 </div>
               </div>
             </div>
@@ -201,31 +201,31 @@ export default function ReportsPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card p-6">
-            <div className="skeleton h-5 w-40 rounded mb-4" />
+            <div className="skeleton h-5 w-40 rounded-sm mb-4" />
             <div className="space-y-3">
               {[1,2,3,4].map((i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3">
                     <div className="skeleton h-8 w-8 rounded-full" />
                     <div>
-                      <div className="skeleton h-4 w-40 rounded mb-2" />
-                      <div className="skeleton h-3 w-24 rounded" />
+                      <div className="skeleton h-4 w-40 rounded-sm mb-2" />
+                      <div className="skeleton h-3 w-24 rounded-sm" />
                     </div>
                   </div>
-                  <div className="skeleton h-6 w-10 rounded" />
+                  <div className="skeleton h-6 w-10 rounded-sm" />
                 </div>
               ))}
             </div>
           </div>
           <div className="card p-6">
-            <div className="skeleton h-5 w-40 rounded mb-4" />
+            <div className="skeleton h-5 w-40 rounded-sm mb-4" />
             <div className="space-y-3">
               {[1,2,3,4].map((i) => (
                 <div key={i} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
                   <div className="skeleton h-5 w-5 rounded-full" />
                   <div className="flex-1">
-                    <div className="skeleton h-4 w-64 rounded mb-2" />
-                    <div className="skeleton h-3 w-32 rounded" />
+                    <div className="skeleton h-4 w-64 rounded-sm mb-2" />
+                    <div className="skeleton h-3 w-32 rounded-sm" />
                   </div>
                 </div>
               ))}
@@ -237,21 +237,21 @@ export default function ReportsPage() {
           <div className="card p-6 space-y-4">
             {[1,2,3].map((i) => (
               <div key={i} className="flex items-center justify-between">
-                <div className="skeleton h-4 w-32 rounded" />
-                <div className="skeleton h-5 w-12 rounded" />
+                <div className="skeleton h-4 w-32 rounded-sm" />
+                <div className="skeleton h-5 w-12 rounded-sm" />
               </div>
             ))}
           </div>
           <div className="card p-6 space-y-3">
             {[1,2,3].map((i) => (
-              <div key={i} className="skeleton h-10 w-full rounded" />
+              <div key={i} className="skeleton h-10 w-full rounded-sm" />
             ))}
           </div>
           <div className="card p-6 space-y-4">
             {[1,2,3].map((i) => (
               <div key={i} className="flex items-center justify-between">
-                <div className="skeleton h-4 w-40 rounded" />
-                <div className="skeleton h-6 w-16 rounded" />
+                <div className="skeleton h-4 w-40 rounded-sm" />
+                <div className="skeleton h-6 w-16 rounded-sm" />
               </div>
             ))}
           </div>
@@ -309,7 +309,7 @@ export default function ReportsPage() {
           <Card className="h-full">
             <CardBody className="p-6 h-full">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <BookOpenIcon className="h-8 w-8 text-primary-600" />
                 </div>
                 <div className="ml-4">
@@ -330,7 +330,7 @@ export default function ReportsPage() {
           <Card className="h-full">
             <CardBody className="p-6 h-full">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <UsersIcon className="h-8 w-8 text-success-600" />
                 </div>
                 <div className="ml-4">
@@ -351,7 +351,7 @@ export default function ReportsPage() {
           <Card className="h-full">
             <CardBody className="p-6 h-full">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <ClockIcon className="h-8 w-8 text-warning-600" />
                 </div>
                 <div className="ml-4">
@@ -372,7 +372,7 @@ export default function ReportsPage() {
           <Card className="h-full">
             <CardBody className="p-6 h-full">
               <div className="flex items-center">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <ExclamationTriangleIcon className="h-8 w-8 text-error-600" />
                 </div>
                 <div className="ml-4">
@@ -466,7 +466,7 @@ export default function ReportsPage() {
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-success-100 dark:bg-success-900 rounded-full flex items-center justify-center">
+                    <div className="shrink-0 w-8 h-8 bg-success-100 dark:bg-success-900 rounded-full flex items-center justify-center">
                       <span className="text-sm font-medium text-success-700 dark:text-success-300">#{index + 1}</span>
                     </div>
                     <div>

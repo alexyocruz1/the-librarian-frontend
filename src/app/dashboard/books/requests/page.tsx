@@ -247,10 +247,10 @@ export default function MyRequestsPage() {
           <CardBody>
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-sm w-3/4 mb-2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-sm w-1/2"></div>
               </div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-sm w-16"></div>
             </div>
           </CardBody>
         </Card>
@@ -303,14 +303,14 @@ export default function MyRequestsPage() {
       {loading ? (
         <div className="space-y-6">
           <div>
-            <div className="skeleton h-8 w-32 rounded mb-2" />
-            <div className="skeleton h-4 w-80 rounded" />
+            <div className="skeleton h-8 w-32 rounded-sm mb-2" />
+            <div className="skeleton h-4 w-80 rounded-sm" />
           </div>
           <Card>
             <CardBody>
               <div className="flex flex-wrap gap-2">
                 {[1,2,3,4,5].map((i)=> (
-                  <div key={i} className="skeleton h-8 w-28 rounded" />
+                  <div key={i} className="skeleton h-8 w-28 rounded-sm" />
                 ))}
               </div>
             </CardBody>
@@ -321,10 +321,10 @@ export default function MyRequestsPage() {
                 <CardBody>
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-sm w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-sm w-1/2"></div>
                     </div>
-                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded-sm w-16"></div>
                   </div>
                 </CardBody>
               </Card>

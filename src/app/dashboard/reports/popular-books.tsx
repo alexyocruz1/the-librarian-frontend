@@ -26,7 +26,7 @@ export default function PopularBooks({ stats }: { stats: any }) {
               className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
             >
               <div className="flex items-center gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <div className="shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
                   <span className="text-sm font-medium text-primary-700">#{index + 1}</span>
                 </div>
                 <div>

@@ -86,8 +86,8 @@ export default function PendingStudentsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <div className="skeleton h-8 w-44 rounded mb-2" />
-          <div className="skeleton h-4 w-80 rounded" />
+          <div className="skeleton h-8 w-44 rounded-sm mb-2" />
+          <div className="skeleton h-4 w-80 rounded-sm" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1,2,3].map((i)=>(
@@ -95,28 +95,28 @@ export default function PendingStudentsPage() {
               <div className="flex items-center gap-4">
                 <div className="skeleton h-10 w-10 rounded-full" />
                 <div className="flex-1">
-                  <div className="skeleton h-4 w-28 rounded mb-2" />
-                  <div className="skeleton h-6 w-12 rounded" />
+                  <div className="skeleton h-4 w-28 rounded-sm mb-2" />
+                  <div className="skeleton h-6 w-12 rounded-sm" />
                 </div>
               </div>
             </div>
           ))}
         </div>
         <div className="card p-6">
-          <div className="skeleton h-5 w-40 rounded mb-4" />
+          <div className="skeleton h-5 w-40 rounded-sm mb-4" />
           <div className="space-y-4">
             {[...Array(4)].map((_,i)=>(
               <div key={i} className="flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   <div className="skeleton h-12 w-12 rounded-full" />
                   <div>
-                    <div className="skeleton h-4 w-48 rounded mb-2" />
-                    <div className="skeleton h-3 w-32 rounded" />
+                    <div className="skeleton h-4 w-48 rounded-sm mb-2" />
+                    <div className="skeleton h-3 w-32 rounded-sm" />
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <div className="skeleton h-9 w-24 rounded" />
-                  <div className="skeleton h-9 w-24 rounded" />
+                  <div className="skeleton h-9 w-24 rounded-sm" />
+                  <div className="skeleton h-9 w-24 rounded-sm" />
                 </div>
               </div>
             ))}
@@ -139,7 +139,7 @@ export default function PendingStudentsPage() {
         <Card>
           <CardBody className="p-6">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <ClockIcon className="h-8 w-8 text-warning-600" />
               </div>
               <div className="ml-4">
@@ -153,7 +153,7 @@ export default function PendingStudentsPage() {
         <Card>
           <CardBody className="p-6">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <UserIcon className="h-8 w-8 text-primary-600" />
               </div>
               <div className="ml-4">
@@ -169,7 +169,7 @@ export default function PendingStudentsPage() {
         <Card>
           <CardBody className="p-6">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <AcademicCapIcon className="h-8 w-8 text-success-600" />
               </div>
               <div className="ml-4">
@@ -208,7 +208,7 @@ export default function PendingStudentsPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
                           <span className="text-lg font-medium text-primary-700">
                             {user.name.charAt(0).toUpperCase()}

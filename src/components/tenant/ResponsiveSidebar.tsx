@@ -50,14 +50,14 @@ export default function ResponsiveSidebar({ session, libraries }: ResponsiveSide
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-72 transform bg-white p-6 transition-transform duration-300 ease-in-out lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:rounded-[2rem] lg:border lg:border-slate-200 lg:bg-white",
+        "fixed inset-y-0 left-0 z-50 w-72 transform bg-white p-6 transition-transform duration-300 ease-in-out lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:rounded-4xl lg:border lg:border-slate-200 lg:bg-white",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
 
         <div className="flex flex-col h-full">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 text-center lg:text-left">Sesión iniciada</p>
-              <h2 className="mt-3 text-2xl font-semibold text-slate-900 text-center lg:text-left break-words">{session.full_name}</h2>
+              <h2 className="mt-3 text-2xl font-semibold text-slate-900 text-center lg:text-left wrap-break-word">{session.full_name}</h2>
               <p className="mt-1 text-sm text-slate-500 text-center lg:text-left truncate" title={session.email}>{session.email}</p>
 
               <nav className="mt-8 space-y-2">
@@ -85,9 +85,9 @@ export default function ResponsiveSidebar({ session, libraries }: ResponsiveSide
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tus Bibliotecas</p>
                 <div className="mt-3 space-y-2 overflow-y-auto max-h-[200px] pr-1">
                   {libraries.map((library) => (
-                    <div key={library.id} className="rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-sm border border-slate-100">
+                    <div key={library.id} className="rounded-2xl bg-white px-3 py-3 text-sm text-slate-700 shadow-xs border border-slate-100">
                       <p className="font-semibold text-slate-900 truncate">{library.name}</p>
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-slate-400 truncate">{library.subdomain}.librarian.app</p>
+                      <p className="text-[10px] uppercase tracking-widest text-slate-400 truncate">{library.subdomain}.librarian.app</p>
                     </div>
                   ))}
                 </div>

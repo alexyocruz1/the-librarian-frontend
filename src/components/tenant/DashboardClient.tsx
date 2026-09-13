@@ -142,17 +142,17 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
   return (
     <div className="space-y-8">
       <section className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tus Bibliotecas</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{libraries.length}</p>
           <p className="mt-2 text-sm text-slate-600">bibliotecas bajo tu administración.</p>
         </div>
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm border-l-amber-400 border-l-4">
+        <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs border-l-amber-400 border-l-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Pendientes</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{loans.filter((l) => l.status === 'pending').length}</p>
           <p className="mt-2 text-sm text-slate-600">Solicitudes nuevas esperando aprobación.</p>
         </div>
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm border-l-emerald-400 border-l-4">
+        <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs border-l-emerald-400 border-l-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">En curso</p>
           <p className="mt-3 text-4xl font-semibold text-slate-900">{loans.filter((l) => l.status === 'approved' || l.status === 'handled').length}</p>
           <p className="mt-2 text-sm text-slate-600">Libros ya aprobados o prestados actualmente.</p>
@@ -160,7 +160,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
       </section>
 
       <section className="grid gap-8 xl:grid-cols-[1.5fr_0.75fr]">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Gestión de préstamos</p>
@@ -171,7 +171,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                 onClick={() => setActiveTab('pending')}
                 className={cn(
                   'px-4 py-2 text-sm font-semibold rounded-xl transition',
-                  activeTab === 'pending' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                  activeTab === 'pending' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'
                 )}
               >
                 Pendientes
@@ -180,7 +180,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                 onClick={() => setActiveTab('active')}
                 className={cn(
                   'px-4 py-2 text-sm font-semibold rounded-xl transition',
-                  activeTab === 'active' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                  activeTab === 'active' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'
                 )}
               >
                 Activos
@@ -189,7 +189,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                 onClick={() => setActiveTab('overdue')}
                 className={cn(
                   'px-4 py-2 text-sm font-semibold rounded-xl transition',
-                  activeTab === 'overdue' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                  activeTab === 'overdue' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'
                 )}
               >
                 Vencidos
@@ -198,7 +198,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                 onClick={() => setActiveTab('history')}
                 className={cn(
                   'px-4 py-2 text-sm font-semibold rounded-xl transition',
-                  activeTab === 'history' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'
+                  activeTab === 'history' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'
                 )}
               >
                 Historial
@@ -213,7 +213,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
               placeholder="Buscar por nombre o identificador..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-slate-900/5 transition"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
 
           <div className="mt-8 space-y-6">
             {filteredAndGroupedLoans.map(([key, items]) => (
-              <div key={key} className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
+              <div key={key} className="rounded-4xl border border-slate-100 bg-white p-6 shadow-xs">
                 <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-4 mb-4">
                   <div>
                     <h3 className="text-xl font-semibold text-slate-900">{items[0].full_name}</h3>
@@ -244,7 +244,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
 
                 <div className="space-y-4">
                   {items.map((loan) => (
-                    <div key={loan.id} className="rounded-2xl bg-white p-5 shadow-sm border border-slate-100">
+                    <div key={loan.id} className="rounded-2xl bg-white p-5 shadow-xs border border-slate-100">
                       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-slate-900 truncate text-lg">{loan.book?.title || 'Título desconocido'}</p>
@@ -291,7 +291,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                           <div className="flex gap-2">
                             {loan.status === 'pending' && (
                               <>
-                                <button onClick={() => updateStatus(loan.id, 'approved')} className="h-10 rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 transition">
+                                <button onClick={() => updateStatus(loan.id, 'approved')} className="h-10 rounded-xl bg-emerald-600 px-4 text-xs font-bold text-white shadow-xs hover:bg-emerald-700 transition">
                                   Aprobar
                                 </button>
                                 <button onClick={() => updateStatus(loan.id, 'rejected')} className="h-10 rounded-xl bg-white border border-rose-200 px-4 text-xs font-bold text-rose-600 hover:bg-rose-50 transition">
@@ -310,7 +310,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.good ?? loan.requested_copies}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), good: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -321,7 +321,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.fair ?? 0}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), fair: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -332,13 +332,13 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={deliveryConditions[loan.id]?.bad ?? 0}
                                       onChange={(e) => setDeliveryConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), bad: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                 </div>
                                 <button 
                                   onClick={() => updateStatus(loan.id, 'handled', deliveryConditions[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 })} 
-                                  className="h-10 rounded-xl bg-amber-500 px-4 text-xs font-bold text-white shadow-sm hover:bg-amber-600 transition"
+                                  className="h-10 rounded-xl bg-amber-500 px-4 text-xs font-bold text-white shadow-xs hover:bg-amber-600 transition"
                                 >
                                   Marcar entrega
                                 </button>
@@ -355,7 +355,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={returnConditions[loan.id]?.good ?? loan.requested_copies}
                                       onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), good: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -366,7 +366,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={returnConditions[loan.id]?.fair ?? 0}
                                       onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), fair: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                   <div className="flex flex-col items-center gap-1">
@@ -377,7 +377,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                       max={loan.requested_copies}
                                       value={returnConditions[loan.id]?.bad ?? 0}
                                       onChange={(e) => setReturnConditions(prev => ({ ...prev, [loan.id]: { ...(prev[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 }), bad: Number(e.target.value) } }))}
-                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-none transition"
+                                      className="w-16 rounded-lg border border-slate-200 p-2 text-center text-sm font-semibold focus:border-amber-400 outline-hidden transition"
                                     />
                                   </div>
                                 </div>
@@ -386,11 +386,11 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
                                   value={returnNotes[loan.id] || ''}
                                   onChange={(e) => setReturnNotes(prev => ({ ...prev, [loan.id]: e.target.value }))}
                                   rows={2}
-                                  className="w-full lg:w-[400px] rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-sky-900/5 transition resize-none"
+                                  className="w-full lg:w-[400px] rounded-xl border border-slate-200 px-3 py-2 text-xs focus:outline-hidden focus:ring-2 focus:ring-sky-900/5 transition resize-none"
                                 />
                                 <button 
                                   onClick={() => updateStatus(loan.id, 'returned', undefined, returnNotes[loan.id], returnConditions[loan.id] || { good: loan.requested_copies, fair: 0, bad: 0 })} 
-                                  className="h-10 rounded-xl bg-sky-600 px-4 text-xs font-bold text-white shadow-sm hover:bg-sky-700 transition"
+                                  className="h-10 rounded-xl bg-sky-600 px-4 text-xs font-bold text-white shadow-xs hover:bg-sky-700 transition"
                                 >
                                   Recibir devolución
                                 </button>
@@ -437,7 +437,7 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Stock Crítico</p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900">Libros por agotarse</h2>
             <p className="mt-1 text-sm text-slate-500">Mostrando hasta 10 títulos con existencias bajas.</p>
