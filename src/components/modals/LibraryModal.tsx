@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Card, CardHeader, CardBody } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -124,24 +124,8 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50"
-              onClick={onClose}
-            />
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-xl shadow-xl"
-            >
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="p-0 max-w-2xl" showCloseButton={false}>
               <Card className="border-0 shadow-none">
                 <CardHeader
                   title={mode === 'create' ? t('libraryModal.title.create') : t('libraryModal.title.edit')}
@@ -295,10 +279,7 @@ export default function LibraryModal({ isOpen, onClose, onSuccess, library, mode
                   </form>
                 </CardBody>
               </Card>
-            </motion.div>
-          </div>
-        </div>
-      )}
-    </AnimatePresence>
+      </DialogContent>
+    </Dialog>
   );
 }
