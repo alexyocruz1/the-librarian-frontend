@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
+import { ShimmerButton } from '@/components/ui/shimmer-button';
 import { useI18n } from '@/context/I18nContext';
 
 export default function LibrarianLoginForm() {
@@ -64,9 +65,15 @@ export default function LibrarianLoginForm() {
 
         {error && <p className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
 
-        <button className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-700">
+        <ShimmerButton
+          type="submit"
+          disabled={loading}
+          borderRadius="1rem"
+          background="rgb(15 23 42)"
+          className="w-full text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+        >
           {loading ? t('auth.login.button.loading') || 'Signing in...' : t('auth.login.button.idle') || 'Enter dashboard'}
-        </button>
+        </ShimmerButton>
       </form>
     </div>
   );
