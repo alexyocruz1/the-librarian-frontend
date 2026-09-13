@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { LibraryTenant, TenantBook, TenantLoan } from '@/types/tenant';
 import { cn, formatDateTime, groupBy } from '@/lib/utils';
+import { NumberTicker } from '@/components/ui/number-ticker';
 
 interface DashboardClientProps {
   libraries: LibraryTenant[];
@@ -144,17 +145,23 @@ export default function DashboardClient({ libraries, activeLibraryId }: Dashboar
       <section className="grid gap-4 lg:grid-cols-3">
         <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Tus Bibliotecas</p>
-          <p className="mt-3 text-4xl font-semibold text-slate-900">{libraries.length}</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-900">
+            <NumberTicker value={libraries.length} />
+          </p>
           <p className="mt-2 text-sm text-slate-600">bibliotecas bajo tu administración.</p>
         </div>
         <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs border-l-amber-400 border-l-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Pendientes</p>
-          <p className="mt-3 text-4xl font-semibold text-slate-900">{loans.filter((l) => l.status === 'pending').length}</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-900">
+            <NumberTicker value={loans.filter((l) => l.status === 'pending').length} />
+          </p>
           <p className="mt-2 text-sm text-slate-600">Solicitudes nuevas esperando aprobación.</p>
         </div>
         <div className="rounded-4xl border border-slate-200 bg-white p-6 shadow-xs border-l-emerald-400 border-l-4">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">En curso</p>
-          <p className="mt-3 text-4xl font-semibold text-slate-900">{loans.filter((l) => l.status === 'approved' || l.status === 'handled').length}</p>
+          <p className="mt-3 text-4xl font-semibold text-slate-900">
+            <NumberTicker value={loans.filter((l) => l.status === 'approved' || l.status === 'handled').length} />
+          </p>
           <p className="mt-2 text-sm text-slate-600">Libros ya aprobados o prestados actualmente.</p>
         </div>
       </section>

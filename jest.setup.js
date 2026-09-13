@@ -81,6 +81,28 @@ jest.mock('framer-motion', () => ({
     stop: jest.fn(),
     set: jest.fn(),
   }),
+  // Synchronous stand-ins (no real spring physics) so components like
+  // NumberTicker settle to their final value immediately in tests.
+  useMotionValue: (initial) => {
+    let value = initial
+    const listeners = []
+    return {
+      get: () => value,
+      set: (next) => {
+        value = next
+        listeners.forEach((listener) => listener(value))
+      },
+      on: (_event, callback) => {
+        listeners.push(callback)
+        return () => {
+          const index = listeners.indexOf(callback)
+          if (index >= 0) listeners.splice(index, 1)
+        }
+      },
+    }
+  },
+  useSpring: (motionValue) => motionValue,
+  useInView: () => true,
 }))
 
 // Mock react-hot-toast
